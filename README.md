@@ -1,3 +1,4 @@
+![](./res/images/katsu_logo.png)
 
 **Katsu** is a light cross-platform C library for 2D video game programming. It 
 includes an API for 2D rendering, a simple input system, and raw sound output. 
@@ -8,9 +9,8 @@ for Katsu's 2D rendering capabilities.
 ## Features
 
 + 4bpp 8x8 pixel tile format
-+ Affine transformations
-+ Horizontal effects emulation
-+ Background and sprite transparency
++ Background and sprite affine transformations
++ Horizontal line effects
 + Window effects
 + Other old-school effects (Mosaic, palette manipulation, etc.)
 
