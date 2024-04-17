@@ -23,7 +23,7 @@ To build the library from source, your requirements depend on your operating sys
 
 IN PROGRESS
 
-### Deibain-based Linux
+### Debian-based Linux
 
 You will need the development packages for X11, OpenGL, and PulseAudio.
 
@@ -31,8 +31,8 @@ You can download them from your package manager as ```libx11-dev```, ```libgl1-m
 and ```libpulse-dev```. After they are installed, compile and run from the terminal with:
 
 ```
-> gcc <your_source_code> src/katsu/*.c src/katsu/platform/linux*.c -o game -lGL -lpthread -lpulse-simple -lX11 -ldl -I../include
-> ./game
+$> gcc <your_source_code> src/*.c src/opengl/*.c src/platform/linux/*.c -o game -lGL -lpthread -lpulse-simple -lX11 -ldl -I../include
+$> ./game
 ```
 
 ### RedHat-based Linux
@@ -43,8 +43,8 @@ You can download them from your package manager as ```libX11-devel```, ```mesa-l
 and ```pulseaudio-libs-devel```. After this, compile and run from the terminal with:
 
 ```
-> gcc <your_source_code> src/katsu/*.c src/katsu/platform/linux*.c -o game -lGL -lpthread -lpulse-simple -lX11 -ldl -I../include
-> ./game
+$> gcc <your_source_code> src/*.c src/opengl/*.c src/platform/linux/*.c -o game -lGL -lpthread -lpulse-simple -lX11 -ldl -I../include
+$> ./game
 ```
 
 ## Keyboard keys

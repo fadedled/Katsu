@@ -9,28 +9,28 @@
 JoypadState joy_state[MAX_JOYPADS];
 
 
-u32  kt_JoyIsActive(u32 joy_id)
+u32 kt_JoyIsActive(u32 joy_id)
 {
 	joy_id &= MAX_JOYPADS-1;
 	return joy_state[joy_id].active;
 }
 
 
-u32  kt_JoyButtonHeld(u32 joy_id)
+u32 kt_JoyButtonHeld(u32 joy_id)
 {
 	joy_id &= MAX_JOYPADS-1;
 	return joy_state[joy_id].btn;
 }
 
 
-u32  kt_JoyButtonUp(u32 joy_id)
+u32 kt_JoyButtonUp(u32 joy_id)
 {
 	joy_id &= MAX_JOYPADS-1;
 	return joy_state[joy_id].btn_prev & ~joy_state[joy_id].btn;
 }
 
 
-u32  kt_JoyButtonDown(u32 joy_id)
+u32 kt_JoyButtonDown(u32 joy_id)
 {
 	joy_id &= MAX_JOYPADS-1;
 	return ~joy_state[joy_id].btn_prev & joy_state[joy_id].btn;

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "video_common.h"
+#include "gfx_common.h"
 
 u32 tile_mem[0x20000];
 u32 pal_mem[0x800];
@@ -18,7 +19,7 @@ u32 colorline[0x100];
 u32 window_cnt;
 u32 window[2][0x100];
 u32 blend_mode;
-Layers layer_mem[16];
+Layer layer_mem[16];
 
 /* Graphics Loading Functions */
 void kt_TileData(u32 tile_ofs, u32 tile_count, const u32* data)
@@ -150,7 +151,11 @@ void kt_LayerClear(u32 layer)
 
 void kt_LayerClearAll(void)
 {
-
+	u32 i = 0;
+	while (i < MAX_LAYERS) {
+		kt_LayerClear(i);
+		++i;
+	}
 }
 
 

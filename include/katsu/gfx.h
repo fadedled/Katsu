@@ -18,17 +18,19 @@
 
 
 /*Layer types*/
-#define LAYER_BG_TYPE_NORMAL		0
-#define LAYER_BG_TYPE_SCROLL		1
-#define LAYER_BG_TYPE_AFFINE		2
+#define LAYER_TYPE_NONE				0
+#define LAYER_TYPE_BG_NORMAL		1
+#define LAYER_TYPE_BG_SCROLL		2
+#define LAYER_TYPE_BG_AFFINE		3
+#define LAYER_TYPE_SPRITE			4
 
 
 /*Sprites*/
-#define SPR_POS(x, y)									((y << 16) | (x & 0xFFFFu))
-#define SPR_TILE(tile_num, flip, hsize, vsize, pal)		((pal << 24) | ((vsize & 0xF) << 20) | ((hsize & 0xF) << 16) | ((flip & 0x3) << 14) | (tile_num & 0x3FFF))
-#define SPR_HUE(hue, hue_alpha)							(((hue & 0x7FFFu) << 16) | ((hue_alpha & 0xFFu) << 8))
-#define SPR_BLEND(alpha)								((0x80000000u) | (alpha & 0xFFu))
-#define SPR_MAT(mat_num)								((0x00000100u) | (mat_num & 0xFFu))
+#define SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
+#define SPR_TILE(tile_num, flip, hsize, vsize, pal)		(((pal) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
+#define SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
+#define SPR_BLEND(alpha)								((0x80000000u) | ((alpha) & 0xFFu))
+#define SPR_MAT(mat_num)								((mat_num) & 0xFFu)
 
 
 /*Sprite Flip*/
@@ -71,10 +73,11 @@ enum WindowIds {
 #define KT_BLEND_ONE_MINUS_DST_ALPHA		0x5
 
 
+#define MAT_IDENTITY						0
 #define MAX_MATRIX							256
 
 
-
+#define COLOR_INIT(r, g, b, a)		((u32)(r) | ((u32)(g)<<8) | ((u32)(b)<<16) | ((u32)(a)<<24))
 
 
 /*== Structs ==*/
@@ -88,7 +91,7 @@ enum WindowIds {
  * pos  = [pos_y : 16][pos_x : 16]
  * tile = [pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tile_num : 14]
  * sfx  = [blend : 1][hue : 15][hue_alpha : 8][alpha : 8]
- * mat  = [none : 23][mat_act : 1][mat_num : 8]
+ * mat  = [none : 24][mat_num : 8]
  */
 typedef struct Sprite_t {
 	u32 pos;

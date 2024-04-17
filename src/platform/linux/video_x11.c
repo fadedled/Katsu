@@ -5,6 +5,11 @@
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+#define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
+#define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
+typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 
 struct KTVideoX11_t {
@@ -20,41 +25,80 @@ KeyCode xkey_mapping[16];
 u32  __kt_VideoInit(void)
 {
 	//Open the X11 display
+	s32 fb_attr[] = {
+			GLX_X_RENDERABLE    , True,
+			GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
+			GLX_RENDER_TYPE     , GLX_RGBA_BIT,
+			GLX_X_VISUAL_TYPE   , GLX_TRUE_COLOR,
+			GLX_RED_SIZE        , 8,
+			GLX_GREEN_SIZE      , 8,
+			GLX_BLUE_SIZE       , 8,
+			GLX_ALPHA_SIZE      , 8,
+			GLX_DEPTH_SIZE      , 24,
+			GLX_STENCIL_SIZE    , 8,
+			GLX_DOUBLEBUFFER    , True,
+			None
+	};
+
+	/* Open an X display */
 	kt_x11.dpy = XOpenDisplay(NULL);
 	if (kt_x11.dpy == NULL) {
 		return 1;
 	}
-
-	XVisualInfo vinfo;
-
 	int def_screen = XDefaultScreen(kt_x11.dpy);
-	int def_depth = XDefaultDepth(kt_x11.dpy, def_screen);
-	if (!XMatchVisualInfo(kt_x11.dpy, def_screen, def_depth, TrueColor, &vinfo)) {
+
+	/* Get first framebuffer that matches the settings */
+	printf("0\n");
+	s32 fbcount;
+	GLXFBConfig *fbc_arr = glXChooseFBConfig(kt_x11.dpy, def_screen, fb_attr, &fbcount);
+	if (!fbc_arr){
 		return 1;
 	}
+	printf("1\n");
+	XVisualInfo *vinfo = glXGetVisualFromFBConfig(kt_x11.dpy, fbc_arr[0]);
 
 	XSetWindowAttributes win_attr;
-	win_attr.colormap = XDefaultColormap(kt_x11.dpy, vinfo.screen);
+	win_attr.colormap = XDefaultColormap(kt_x11.dpy, vinfo->screen);
 	win_attr.background_pixel = None;
 	win_attr.border_pixel = 0;
 	win_attr.event_mask = KeyPressMask | KeyReleaseMask | StructureNotifyMask;
 	//XXX: ResizeRedirectMask? ExposureMask?
 
-	kt_x11.win = XCreateWindow(kt_x11.dpy, XDefaultRootWindow(kt_x11.dpy),
+	kt_x11.win = XCreateWindow(kt_x11.dpy, RootWindow(kt_x11.dpy, vinfo->screen),
 							   0, 0, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT,
-							   0, vinfo.depth, InputOutput, vinfo.visual,
+							   0, vinfo->depth, InputOutput, vinfo->visual,
 							   CWColormap | CWEventMask | CWBackPixel | CWBorderPixel, &win_attr);
 
-
-	kt_x11.wmdelwin = XInternAtom(kt_x11.dpy, "WM_DELETE_WINDOW", False);
+printf("2\n");
+printf("3.1\n");
+kt_x11.wmdelwin = XInternAtom(kt_x11.dpy, "WM_DELETE_WINDOW", False);
+	printf("3\n");
 	XSetWMProtocols(kt_x11.dpy, kt_x11.win, &kt_x11.wmdelwin, 1);
 
 	if (!kt_x11.win) {
 		return 2;
 	}
+
+	int context_attribs[] = {
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		None
+    };
 	//Create the OpenGL context
+
+#if 1
+	glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
+	glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
+		glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
+	kt_x11.glc = glXCreateContextAttribsARB(kt_x11.dpy, fbc_arr[0], 0,
+											True, context_attribs);
+	free(fbc_arr);
+	printf("4\n");
+#else
 	kt_x11.glc = glXCreateContext(kt_x11.dpy, &vinfo, NULL, True);
+#endif
 	glXMakeCurrent(kt_x11.dpy, kt_x11.win, kt_x11.glc);
+
 
 	//Generate the keyboard mappings
 	joy_state[0].active = 1;
