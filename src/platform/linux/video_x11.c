@@ -48,13 +48,11 @@ u32  __kt_VideoInit(void)
 	int def_screen = XDefaultScreen(kt_x11.dpy);
 
 	/* Get first framebuffer that matches the settings */
-	printf("0\n");
 	s32 fbcount;
 	GLXFBConfig *fbc_arr = glXChooseFBConfig(kt_x11.dpy, def_screen, fb_attr, &fbcount);
 	if (!fbc_arr){
 		return 1;
 	}
-	printf("1\n");
 	XVisualInfo *vinfo = glXGetVisualFromFBConfig(kt_x11.dpy, fbc_arr[0]);
 
 	XSetWindowAttributes win_attr;
@@ -69,10 +67,7 @@ u32  __kt_VideoInit(void)
 							   0, vinfo->depth, InputOutput, vinfo->visual,
 							   CWColormap | CWEventMask | CWBackPixel | CWBorderPixel, &win_attr);
 
-printf("2\n");
-printf("3.1\n");
-kt_x11.wmdelwin = XInternAtom(kt_x11.dpy, "WM_DELETE_WINDOW", False);
-	printf("3\n");
+	kt_x11.wmdelwin = XInternAtom(kt_x11.dpy, "WM_DELETE_WINDOW", False);
 	XSetWMProtocols(kt_x11.dpy, kt_x11.win, &kt_x11.wmdelwin, 1);
 
 	if (!kt_x11.win) {
@@ -85,18 +80,12 @@ kt_x11.wmdelwin = XInternAtom(kt_x11.dpy, "WM_DELETE_WINDOW", False);
 		None
     };
 	//Create the OpenGL context
-
-#if 1
 	glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
 		glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
 	kt_x11.glc = glXCreateContextAttribsARB(kt_x11.dpy, fbc_arr[0], 0,
 											True, context_attribs);
 	free(fbc_arr);
-	printf("4\n");
-#else
-	kt_x11.glc = glXCreateContext(kt_x11.dpy, &vinfo, NULL, True);
-#endif
 	glXMakeCurrent(kt_x11.dpy, kt_x11.win, kt_x11.glc);
 
 
@@ -138,9 +127,16 @@ void __kt_VideoExit(void)
 }
 
 
-void __kt_VideoAttrSet(u32 attr, u32 val)
+void __kt_VideoAttrSet(u32 attr, void *val)
 {
-	//XStoreName(kt_x11.dpy, kt_x11.win, "Window Name");
+	switch (attr) {
+		case VIDEO_ATTR_TITLE: {
+			XStoreName(kt_x11.dpy, kt_x11.win, (char *) val);
+		} break;
+		case VIDEO_ATTR_FRAME: {
+			//XXX: implement
+		} break;
+	}
 }
 
 
@@ -180,6 +176,8 @@ void __kt_VideoPoll(void)
 			} break;
 			case ConfigureNotify:{
 				XConfigureEvent conf_ev = xev.xconfigure;
+					vstate.frame_w = conf_ev.width;
+					vstate.frame_h = conf_ev.height;
 			} break;
 		}
 	}

@@ -28,7 +28,7 @@
 /*Sprites*/
 #define SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
 //XXX: Standarize size
-#define SPR_TILE(tile_num, flip, hsize, vsize, pal)		(((pal) << 24) | ((((vsize >> 3)-1) & 0xF) << 20) | ((((hsize >> 3)-1) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
+#define SPR_TILE(tile_num, flip, hsize, vsize, pal)		(((pal) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
 #define SPR_BLEND(alpha)								((0x80000000u) | ((alpha) & 0xFFu))
 #define SPR_MAT(mat_num)								((mat_num) & 0xFFu)
@@ -41,12 +41,22 @@
 #define FLIP_XY			0x3
 
 /*Sprite Size*/
-#define SPR_SIZE_8		0x0
-#define SPR_SIZE_16		0x1
-#define SPR_SIZE_24		0x2
-#define SPR_SIZE_32		0x3
-#define SPR_SIZE_40		0x4
-#define SPR_SIZE_48		0x5
+#define SIZE_8		0x0
+#define SIZE_16		0x1
+#define SIZE_24		0x2
+#define SIZE_32		0x3
+#define SIZE_40		0x4
+#define SIZE_48		0x5
+#define SIZE_56		0x6
+#define SIZE_64		0x7
+#define SIZE_72		0x8
+#define SIZE_80		0x9
+#define SIZE_88		0xA
+#define SIZE_96		0xB
+#define SIZE_104	0xC
+#define SIZE_112	0xD
+#define SIZE_120	0xE
+#define SIZE_128	0xF
 
 /*Window IDs*/
 enum WindowIds {

@@ -65,20 +65,42 @@ const u8 spr_tiles[] =
     0xfa, 0xff, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+
 int main() {
 	if (kt_Init()) {
 		return 0;
 	}
-
+	u32 x = 40;
+	u32 y = 20;
+	Sprite spr[4] = {0};
 	kt_TileData(0, 12, (u32 *) spr_tiles);
 	kt_PaletteData(0, 16, spr_palette);
+
+	spr[0].pos = SPR_POS(20, 40);
+	spr[0].tile = SPR_TILE(0, 0, SIZE_16, SIZE_24, 0);
+	spr[0].sfx = SPR_HUE(0xFFFF, 0x00) | SPR_BLEND(0x80);
+	spr[0].mat = 0;
+
+	spr[1].pos = SPR_POS(60, 120);
+	spr[1].tile = SPR_TILE(0, 0, SIZE_32, SIZE_16, 0);
+	spr[1].sfx = SPR_HUE(0x00FF, 0x00);
+	spr[1].mat = 0;
+
+	spr[2].pos = SPR_POS(40, 20);
+	spr[2].tile = SPR_TILE(6, 0, SIZE_16, SIZE_24, 0);
+	spr[2].sfx = SPR_HUE(0x00FF, 0x00);
+	spr[2].mat = 0;
+	kt_LayerSprite(0, spr, 3);
 
 	while (1) {
 		kt_Poll();
 
-		printf("%04x %04x %04x\n", kt_JoyButtonUp(0)
-							, kt_JoyButtonDown(0)
-							, kt_JoyButtonHeld(0));
+		u32 btns = kt_JoyButtonHeld(0);
+		x += ((btns >> JOY_BIT_RIGHT) & 0x1) - ((btns >> JOY_BIT_LEFT) & 0x1);
+		y += ((btns >> JOY_BIT_DOWN) & 0x1) - ((btns >> JOY_BIT_UP) & 0x1);
+
+		spr[2].pos = SPR_POS(x, y);
+
 		if (kt_JoyButtonHeld(0) & JOY_A) {
 			kt_BackColorSet(0x505050);
 		} else {

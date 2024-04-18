@@ -135,7 +135,14 @@ void kt_LayerBgMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y)
 
 void kt_LayerSprite(u32 layer, Sprite *spr, u32 count)
 {
-
+	layer &= 0xF;
+	if (count && spr) {
+		layer_mem[layer].type = LAYER_TYPE_SPRITE;
+		layer_mem[layer].udata_count = count & (MAX_SPRITES - 1);
+		layer_mem[layer].udata_arr = (void *) spr;
+	} else {
+		layer_mem[layer].type = LAYER_TYPE_NONE;
+	}
 }
 
 
@@ -146,7 +153,7 @@ void kt_LayerWindowSet(u32 layer, u32 act_windows)
 
 void kt_LayerClear(u32 layer)
 {
-
+	layer_mem[layer & 0xF].type = LAYER_TYPE_NONE;
 }
 
 void kt_LayerClearAll(void)

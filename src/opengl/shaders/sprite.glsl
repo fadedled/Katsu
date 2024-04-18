@@ -6,8 +6,8 @@
 
 layout(std140, binding = 0) uniform video_data
 {
-	vec2 viewport;
-	vec2 outsize;
+	vec2 frame;
+	vec2 outdims;
 	vec4 color_offset;
 };
 

@@ -15,11 +15,26 @@ typedef struct Matrix_t {
 	f32 d;
 } mat;
 
+/* LAYER STRUCTURE
+ * type: controls what is shown
+ * pos: top-left corner shown
+ * size: size of layer startng from top-left corner
+ * attr: attributes for layer
+ * udata_count: number of user data passed entries in udata_arr
+ * udata_arr: array of user data
+ * 	- if type is LAYER_TYPE_NONE then the array is not used.
+ * 	- if type is LAYER_TYPE_BG_NORMAL then the array is not used.
+ * 	- if type is LAYER_TYPE_BG_SCROLL then the entries are scaled offsets.
+ * 	- if type is LAYER_TYPE_BG_AFFINE then these are matrices.
+ * 	- if type is LAYER_TYPE_SPRITES then these are sprites.
+ */
 typedef struct Layer_t {
 	u32 type;
-	u32 stuff1;
-	u32 stuff2;
-	u32 stuff3;
+	u32 pos;
+	u32 size;
+	u32 attr;
+	u32 udata_count;
+	void *udata_arr;
 } Layer;
 
 extern u32 tile_mem[0x20000];

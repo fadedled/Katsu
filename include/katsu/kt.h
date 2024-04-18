@@ -18,6 +18,8 @@
 #define KT_ERROR_NO_JOYPAD		0x00000002u
 #define KT_ERROR_NO_AUDIO		0x00000003u
 
+#define MAX(a, b)		((a) > (b) ? (a) : (b))
+#define MIN(a, b)		((a) > (b) ? (b) : (a))
 
 enum KtExitCode {
 	KT_EXIT,

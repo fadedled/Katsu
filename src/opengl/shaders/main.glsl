@@ -6,8 +6,8 @@
 
 layout(std140, binding = 0) uniform video_data
 {
-	vec2 viewport;
-	vec2 outsize;
+	vec2 frame;
+	vec2 outdims;
 	vec4 color_offset;
 };
 
@@ -24,8 +24,8 @@ void main()
 	const vec2 cl = vec2(1.0, 0.0);
 	vec2 p = vec2(uint(gl_VertexID) & 1u, uint(gl_VertexID) >> 1u);
 	gl_Position = vec4(((p * 2.0) - 1.0), 0.0, 1.0);
-	uv = p.xy * outsize;
-	scale = max(floor(viewport / outsize), cl.xx);
+	uv = p.xy * outdims;
+	scale = max(floor(frame / outdims), cl.xx);
 	range = 0.5 - (0.5 / scale);
 }
 
@@ -46,7 +46,7 @@ vec2 sharp_uv()
 {
 	vec2 center = fract(uv) - 0.5;
 	vec2 f = ((center - clamp(center, -range, range)) * scale) + 0.5;
-	return ((floor(uv) + f) / outsize);
+	return ((floor(uv) + f) / outdims);
 }
 
 void main()

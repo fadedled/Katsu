@@ -11,6 +11,8 @@
 
 #define VIDEO_MAX_WIDTH     424
 #define VIDEO_MAX_HEIGHT    240
+#define VIDEO_MIN_WIDTH     32
+#define VIDEO_MIN_HEIGHT    VIDEO_MIN_WIDTH
 
 
 /*Fill Modes*/

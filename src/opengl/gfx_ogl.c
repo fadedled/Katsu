@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "gl.h"
 #include "../gfx_common.h"
+#include "../video_common.h"
 
 
 #include "shaders/main.inc"
@@ -12,10 +13,10 @@
 
 
 struct VideoData_t {
-	f32 viewport_w;
-	f32 viewport_h;
-	f32 outsize_w;
-	f32 outsize_h;
+	f32 frame_w;
+	f32 frame_h;
+	f32 outdims_w;
+	f32 outdims_h;
 	f32 color_offset_r;
 	f32 color_offset_g;
 	f32 color_offset_b;
@@ -55,43 +56,22 @@ u32 vert_count[MAX_SPRITES];
 
 static void __kt_BuildVertexData(void)
 {
-	Sprite spr = {0};
-	Sprite spr2 = {0};
-	spr.pos = SPR_POS(0, 0);
-	spr.tile = SPR_TILE(0, 0, 16, 24, 0);
-	spr.sfx = SPR_HUE(0xFFFF, 0x00);// | SPR_BLEND(0x80);
-	spr.mat = 0;
-
-	spr2.pos = SPR_POS(60, 120);
-	spr2.tile = SPR_TILE(0, 0, 32, 16, 0);
-	spr2.sfx = SPR_HUE(0x00FF, 0x00);
-	spr2.mat = 0;
-
-	sprite_verts[0] = spr;
-	sprite_verts[1] = spr;
-	sprite_verts[2] = spr;
-	sprite_verts[3] = spr;
-	sprite_verts[4] = spr2;
-	sprite_verts[5] = spr2;
-	sprite_verts[6] = spr2;
-	sprite_verts[7] = spr2;
-#if 0
 	u32 count = 0;
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < MAX_LAYERS; ++i) {
-		if (lr->type == LAYER_TYPE_SPRITE) {
-			Sprite *spr = lr->spr;
-			for (u32 i = 0; i < lr->spr_count && count < (MAX_SPRITES * 4); ++i) {
+		if (lr->type == LAYER_TYPE_SPRITE && lr->udata_arr) {
+			Sprite *spr = (Sprite *) lr->udata_arr;
+			for (u32 i = 0; i < lr->udata_count && count < (MAX_SPRITES * 4); ++i) {
 				sprite_verts[count] = *spr;
 				sprite_verts[count+1] = *spr;
 				sprite_verts[count+2] = *spr;
 				sprite_verts[count+3] = *spr;
 				count += 4;
+				++spr;
 			}
 		}
 		++lr;
 	}
-#endif
 }
 
 
@@ -165,8 +145,8 @@ static void __kt_BlendModeSet(u32 src, u32 dest, u32 func)
 	const u32 factor_arr[]= {GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA};
 
 	u32 gl_src = factor_arr[src];
-	u32 gl_dest = factor_arr[src];
-	u32 gl_func = func_arr[src];
+	u32 gl_dest = factor_arr[dest];
+	u32 gl_func = func_arr[func];
 
 	glBlendEquation(gl_func);
 	glBlendFunc(gl_src, gl_dest);
@@ -281,14 +261,14 @@ void ogl_Init(void)
 void ogl_Draw(void)
 {
 	//XXX: do not do this here
-	video_data.viewport_w = (f32) VIDEO_MAX_WIDTH;
-	video_data.viewport_h = (f32) VIDEO_MAX_HEIGHT;
-	video_data.outsize_w = (f32) VIDEO_MAX_WIDTH;
-	video_data.outsize_h = (f32) VIDEO_MAX_HEIGHT;
+	video_data.frame_w = (f32) vstate.frame_w;
+	video_data.frame_h = (f32) vstate.frame_h;
+	video_data.outdims_w = (f32) vstate.output_w;
+	video_data.outdims_h = (f32) vstate.output_h;
 	video_data.color_offset_r = (f32) (((coloroffs >> 0) & 0xFFu) / 255.0);
 	video_data.color_offset_g = (f32) (((coloroffs >> 8) & 0xFFu) / 255.0);
 	video_data.color_offset_b = (f32) (((coloroffs >> 16) & 0xFFu) / 255.0);
-	video_data.color_offset_a = (f32) (((coloroffs >> 24) & 0xFFu) / 255.0);
+	video_data.color_offset_a = 1.0;
 
 	f32 backcol_r = (backcolor & 0xFF) / 255.0;
 	f32 backcol_g = ((backcolor>>8) & 0xFF) / 255.0;
@@ -316,17 +296,16 @@ void ogl_Draw(void)
 	glBindTexture(GL_TEXTURE_2D, tex_win);
 
 	//Draw the windows
-	__kt_BlendModeSet(KT_BLEND_ONE, KT_BLEND_ZERO, BLEND_FUNC_ADD);
+	__kt_BlendModeSet(KT_BLEND_SRC_ALPHA, KT_BLEND_ONE, BLEND_FUNC_ADD);
 
 	//Draw all layers
 	glBindFramebuffer(GL_FRAMEBUFFER, fb_main);
 	glViewport(0, 0, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
 	glClearColor(backcol_r, backcol_g, backcol_b, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_BLEND);
 	//XXX: Test
-	glUseProgram(prog_spr);
-	glMultiDrawArrays(GL_TRIANGLE_STRIP, vert_start, vert_count, 2);
+	u32 blnd_act = 0;
+	glDisable(GL_BLEND);
 
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < MAX_LAYERS; ++i) {
@@ -334,22 +313,34 @@ void ogl_Draw(void)
 
 		//Draw the layer
 		switch (lr->type) {
-			case LAYER_TYPE_SPRITE: {
-
-
-				//glMultiDrawArrays(GL_TRIANGLE_STRIP, 0, lr->count, 4);
-			} break;
-			default: break;
+		case LAYER_TYPE_SPRITE: {
+			//Since blending is activated per spirte we configure on the fly
+			glUseProgram(prog_spr);
+			Sprite *spr = (Sprite *) lr->udata_arr;
+			for (u32 j = 0; j < lr->udata_count; ++j) {
+				if (blnd_act ^ spr[j].sfx >> 31) {
+					blnd_act = spr[j].sfx >> 31;
+					if (blnd_act) {
+						glEnable(GL_BLEND);
+					} else {
+						glDisable(GL_BLEND);
+					}
+				}
+				glDrawArrays(GL_TRIANGLE_STRIP, j << 2, 4);
+			}
+		} break;
+		default: break;
 		}
 		++lr;
 	}
-	glDisable(GL_BLEND);
+
 	//Draw final image
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(prog_final);
-
+	glDisable(GL_BLEND);
 	//XXX: Use the real viewport output
-	glViewport(0, 0, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
+	glViewport(0, 0, vstate.frame_w, vstate.frame_h);
+	glClear(GL_COLOR_BUFFER_BIT);
 	//XXX: Upload final color/width/hegiht
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);
