@@ -57,14 +57,14 @@ static void __kt_BuildVertexData(void)
 {
 	Sprite spr = {0};
 	Sprite spr2 = {0};
-	spr.pos = SPR_POS(20, 40);
-	spr.tile = SPR_TILE(0, 0, 2, 3, 0);
-	spr.sfx = SPR_HUE(0xFFFF, 0xFF) | SPR_BLEND(0x80);
+	spr.pos = SPR_POS(0, 0);
+	spr.tile = SPR_TILE(0, 0, 16, 24, 0);
+	spr.sfx = SPR_HUE(0xFFFF, 0x00);// | SPR_BLEND(0x80);
 	spr.mat = 0;
 
 	spr2.pos = SPR_POS(60, 120);
-	spr2.tile = SPR_TILE(0, 0, 4, 2, 0);
-	spr2.sfx = SPR_HUE(0x00FF, 0x88);
+	spr2.tile = SPR_TILE(0, 0, 32, 16, 0);
+	spr2.sfx = SPR_HUE(0x00FF, 0x00);
 	spr2.mat = 0;
 
 	sprite_verts[0] = spr;
@@ -106,7 +106,7 @@ static u32 __kt_CreateSimpleGLProgram(char *sh_src)
 
 	// Compile Vertex Shader
 	u32 vsh_obj = glCreateShader(GL_VERTEX_SHADER);
-	const char *vsh_source[2] = {"#version 430 core\n#define VERTEX_SHADER\n", sh_src};
+	const char *vsh_source[2] = {"#version 450 core\n#define VERTEX_SHADER\n", sh_src};
 	glShaderSource(vsh_obj, 2, vsh_source, NULL);
 	glCompileShader(vsh_obj);
 
@@ -121,7 +121,7 @@ static u32 __kt_CreateSimpleGLProgram(char *sh_src)
 
 	// Compile Fragment Shader
 	u32 fsh_obj = glCreateShader(GL_FRAGMENT_SHADER);
-	const char *fsh_source[2] = {"#version 430 core\n#define FRAGMENT_SHADER\n", sh_src};
+	const char *fsh_source[2] = {"#version 450 core\n#define FRAGMENT_SHADER\n", sh_src};
 	glShaderSource(fsh_obj, 2, fsh_source, NULL);
 	glCompileShader(fsh_obj);
 
@@ -193,6 +193,7 @@ void ogl_Init(void)
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(Sprite), (void*) 0);
+	glEnable(GL_TEXTURE_2D);
 
 	/*XXX: Uniform buffer object ???*/
 	#if KT_DEBUG
@@ -205,38 +206,39 @@ void ogl_Init(void)
 	#endif
 	prog_final = __kt_CreateSimpleGLProgram(main_glsl);
 
-	glActiveTexture(GL_TEXTURE0);
+
 	/*Texture for tiles*/
 	glGenTextures(1, &tex_tiles);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_tiles);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, 0x200, 0x100, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
+	glTextureParameteri(tex_tiles, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTextureParameteri(tex_tiles, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTextureStorage2D(tex_tiles, 1, GL_R32UI, 0x100, 0x200);
 	/*Texture for backgrounds*/
 	glGenTextures(1, &tex_bg);
 	glBindTexture(GL_TEXTURE_2D, tex_bg);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, 0x100, 0x100, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
+	glTextureParameteri(tex_bg, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTextureParameteri(tex_bg, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTextureStorage2D(tex_bg, 1, GL_R32UI, 0x100, 0x100);
 	/*Texture for palettes*/
 	glGenTextures(1, &tex_pal);
 	glBindTexture(GL_TEXTURE_2D, tex_pal);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0x100, 0x100, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTextureParameteri(tex_pal, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTextureParameteri(tex_pal, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTextureStorage2D(tex_pal, 1, GL_RGBA8, 0x10, 0x80);
 
 	/*Texture for main framebuffer*/
 	glGenTextures(1, &tex_win);
 	glBindTexture(GL_TEXTURE_2D, tex_win);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTextureParameteri(tex_win, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTextureParameteri(tex_win, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureStorage2D(tex_win, 1, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
 
 	glGenTextures(1, &tex_mfb);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTextureParameteri(tex_mfb, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTextureParameteri(tex_mfb, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureStorage2D(tex_mfb, 1, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
 
 	/*Gen a depth render buffer*/
 	glGenRenderbuffers(1, &rb_depth);
@@ -300,27 +302,30 @@ void ogl_Draw(void)
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(video_data), &video_data);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, video_data_ubo);
 
+	glTextureSubImage2D(tex_tiles, 0, 0, 0, 0x100, 0x200, GL_RED_INTEGER, GL_UNSIGNED_INT, tile_mem);
+	glTextureSubImage2D(tex_bg, 0, 0, 0, 0x100, 0x100, GL_RED_INTEGER, GL_UNSIGNED_INT, bg_mem);
+	glTextureSubImage2D(tex_pal, 0, 0, 0, 0x10, 0x80, GL_RGBA, GL_UNSIGNED_BYTE, pal_mem);
 
-
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex_tiles);
+	glActiveTexture(GL_TEXTURE0+1);
+	glBindTexture(GL_TEXTURE_2D, tex_bg);
+	glActiveTexture(GL_TEXTURE0+2);
+	glBindTexture(GL_TEXTURE_2D, tex_pal);
+	glActiveTexture(GL_TEXTURE0+3);
+	glBindTexture(GL_TEXTURE_2D, tex_win);
 
 	//Draw the windows
-	__kt_BlendModeSet(KT_BLEND_SRC_ALPHA, KT_BLEND_ONE_MINUS_SRC_ALPHA, BLEND_FUNC_ADD);
-
+	__kt_BlendModeSet(KT_BLEND_ONE, KT_BLEND_ZERO, BLEND_FUNC_ADD);
 
 	//Draw all layers
 	glBindFramebuffer(GL_FRAMEBUFFER, fb_main);
 	glViewport(0, 0, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
 	glClearColor(backcol_r, backcol_g, backcol_b, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//XXX: Use the real viewport output
-	glViewport(0, 0, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
-	//XXX: Upload final color/width/hegiht
-	glActiveTexture(GL_TEXTURE0);
-
-
+	glDisable(GL_BLEND);
+	//XXX: Test
 	glUseProgram(prog_spr);
-	glEnable(GL_BLEND);
 	glMultiDrawArrays(GL_TRIANGLE_STRIP, vert_start, vert_count, 2);
 
 	Layer *lr = layer_mem;

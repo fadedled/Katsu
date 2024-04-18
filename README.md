@@ -1,4 +1,4 @@
-![](./res/images/katsu_logo.png)
+![](./res/images/klogo.png)
 
 **Katsu** is a light cross-platform C library for 2D video game programming. It 
 includes an API for 2D rendering, a simple input system, and raw sound output. 

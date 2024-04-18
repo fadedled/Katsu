@@ -39,14 +39,17 @@ vec4 u16toRGBA(uint color, uint alpha) {
 void main()
 {
 	/*Get vertex position*/
-	//XXX: add matrix transformation
 	ivec2 vert = ivec2(gl_VertexID, gl_VertexID >> 1) & 0x1;
-	ivec2 hsize = (((ivec2(sprite.y >> 16u, sprite.y >> 20u) & 0xf) << 2) + 4);
-	uv = vec2((hsize * vert) << 1);
-	uvec2 upos = uvec2(sprite.x & 0xFFFFu, sprite.x >> 16u);
-	ivec2 ipos = ivec2((-(upos & 0x8000u)) | upos) + ivec2(uv);
+	ivec2 hsize = ((ivec2(sprite.yy >> uvec2(16u, 20u)) & 0xf) + 1) << 2;
+	uv = vec2(((hsize << 1) * vert));
+	/*Matrix transformation*/
+	vec4 mtx = vec4(1.0, 0.0, 0.0, 1.0);//matrix[sprite.w & 0xFFu];
+	vec2 center_uv = uv - vec2(hsize);
+	center_uv = vec2(dot(center_uv, mtx.xy), dot(center_uv, mtx.zw));
+	uvec2 uofs = uvec2(sprite.x, sprite.x >> 16u) & 0xFFFFu;
+	ivec2 iofs = ivec2((-(uofs & 0x8000u)) | uofs) + ivec2(center_uv) + hsize;
 	//XXX: use screen values from the uniform
-	vec2 pos = (vec2(ipos) / (vec2(424.0, -240.0))) + vec2(-1.0, 1.0);
+	vec2 pos = (vec2(iofs) / (vec2(424.0, -240.0) / 2.0)) + vec2(-1.0, 1.0);
 	gl_Position = vec4(pos, 0.0, 1.0);
 
 	tile = (sprite.y & 0x3FFFu) << 3;
@@ -81,16 +84,16 @@ layout(binding = 2) uniform sampler2D pal_mem;
 void main()
 {
 	//XXX: implement depending on 4bpp or 8bpp
-	uvec2 iuv = uvec2(uv);
-	uint chy = (tile + (iuv.x & 0x78u) + ((iuv.y & 0x78u) * width)) + (iuv.y & 7u) & 0x1fffu;
-	uint chx = ((iuv.x & 7u) << 2u);
-	uint index = (texelFetch(tile_mem, ivec2(chy & 0xffu, chy >> 8u), 0).r >> chx) & 0xfu;
-	//XXX: this must be done
-	//if (index == 0u) {
-	//	discard;
-	//}
-	vec4 spr_color = texelFetch(pal_mem, ivec2(pal, index), 0);
+	uvec2 chr_hi = (uvec2(uv) & 0x78u) * uvec2(1, width);
+	uvec2 chr_lo = (uvec2(uv) & 0x7u) << uvec2(2, 0);
+	uvec2 chr = uvec2(tile + chr_hi.x + chr_hi.y + chr_lo.y) & uvec2(0xFF, 0x3FFF);
+	uint index = (texelFetch(tile_mem, ivec2(chr.x, chr.y >> 8), 0).r >> chr_lo.x) & 0xfu;
+	//Color 0 is transparent
+	if (index == 0u) {
+		discard;
+	}
 	//get final color
+	vec4 spr_color = texelFetch(pal_mem, ivec2(index, pal), 0);
 	frag_color = vec4(mix(spr_color, hue, hue.a).rgb, blend);
 }
 
