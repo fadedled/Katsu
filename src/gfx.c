@@ -8,6 +8,8 @@
 #include "video_common.h"
 #include "gfx_common.h"
 
+#define COLOROFFS(r, g, b)	(u32) ((((r) & 0x1FFu)) | (((g) & 0x1FFu) << 9) | (((b) & 0x1FFu) << 18))
+
 u32 tile_mem[0x20000];
 u32 pal_mem[0x800];
 u32 bg_mem[0x10000];
@@ -80,6 +82,9 @@ void kt_BackColorSet(u32 color)
 
 void kt_ColorOffsetSet(s32 r, s32 g, s32 b)
 {
+	//r = MIN(MAX(r, -255), 255);
+	//g = MIN(MAX(g, -255), 255);
+	//b = MIN(MAX(b, -255), 255);
 	coloroffs = COLOROFFS(r, g, b);
 }
 
@@ -151,9 +156,22 @@ void kt_LayerWindowSet(u32 layer, u32 act_windows)
 
 }
 
+void kt_LayerBlendModeSet(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
+{
+	layer &= 0xF;
+	layer_mem[layer].blnd = (src_alpha & 0xf) | ((dst_alpha & 0xf) << 4) | ((func & 0x3) << 8);
+}
+
+
 void kt_LayerClear(u32 layer)
 {
-	layer_mem[layer & 0xF].type = LAYER_TYPE_NONE;
+	layer &= 0xF;
+	layer_mem[layer].type = LAYER_TYPE_NONE;
+	layer_mem[layer].pos = 0;
+	layer_mem[layer].size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
+	layer_mem[layer].attr = 0;
+	layer_mem[layer].udata_count = 0;
+	layer_mem[layer].udata_arr = NULL;
 }
 
 void kt_LayerClearAll(void)
@@ -195,7 +213,7 @@ void kt_WindowLine(u32 win, const u32* data, u32 count)
 /*Utils*/
 void kt_Reset(void)
 {
-
+	kt_LayerClearAll();
 }
 
 void kt_BlendModeSet(u32 src_alpha, u32 dst_alpha, u32 func)
@@ -203,7 +221,8 @@ void kt_BlendModeSet(u32 src_alpha, u32 dst_alpha, u32 func)
 
 }
 
-u32  kt_ColorLerp(u32 color0, u32 color1, u8 blend)
+u32  kt_ColorLerp(u32 clr0, u32 clr1, u8 blend)
 {
-
+	return  (((clr0 & 0xFF00FF) + ((((clr1 & 0xFF00FF) - (clr0 & 0xFF00FF))*blend) >> 8)) & 0xFF00FF) +
+			(((clr0 & 0x00FF00) + ((((clr1 & 0x00FF00) - (clr0 & 0x00FF00))*blend) >> 8)) & 0x00FF00);
 }

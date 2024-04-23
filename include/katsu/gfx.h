@@ -77,14 +77,12 @@ enum WindowIds {
 #define COLORLINE_FILL_DUMMY		3
 #define MAX_COLORLINE_FILL			4
 
-#define COLOROFFS(r, g, b)	((((u32) (r) & 0x1FEu) >> 1) | (((u32) (g) & 0x1FEu) << 7) | (((u32) (b) & 0x1FEu) << 15))
-
 /*Blending*/
 #define BLEND_FUNC_ADD						0x0
 #define BLEND_FUNC_SUB						0x1
 
-#define KT_BLEND_ZERO						0x0
-#define KT_BLEND_ONE						0x1
+#define KT_BLEND_ONE						0x0
+#define KT_BLEND_ZERO						0x1
 #define KT_BLEND_SRC_ALPHA					0x2
 #define KT_BLEND_ONE_MINUS_SRC_ALPHA		0x3
 #define KT_BLEND_DST_ALPHA					0x4
@@ -124,8 +122,7 @@ void kt_PaletteData(u32 color_ofs, u32 color_count, const u32* data);
 void kt_BgData(u32 bg_num, u32 bg_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const u32* data);
 
 void kt_BackColorSet(u32 color);
-void kt_ColorOffset0Set(s32 r, s32 g, s32 b);
-void kt_ColorOffset1Set(s32 r, s32 g, s32 b);
+void kt_ColorOffsetSet(s32 r, s32 g, s32 b);
 void kt_ColorLinesData(const u32* data, u32 count);
 void kt_ColorLinesSet(u32 active, u32 fill_mode);
 
@@ -137,6 +134,7 @@ void kt_LayerBgOffsetSet(u32 layer, u32 x_ofs, u32 y_ofs);
 void kt_LayerBgBlendSet(u32 layer, u32 active, u8 alpha);
 void kt_LayerBgMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y);
 void kt_LayerSprite(u32 layer, Sprite *spr, u32 count);
+void kt_LayerBlendModeSet(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func);
 
 void kt_LayerWindowSet(u32 layer, u32 act_windows);
 void kt_LayerClear(u32 layer);
@@ -155,7 +153,6 @@ void kt_WindowLine(u32 win, const u32* data, u32 count);
 
 /*Utils*/
 void kt_Reset(void);
-void kt_BlendModeSet(u32 src_alpha, u32 dst_alpha, u32 func);
 u32  kt_ColorLerp(u32 color0, u32 color1, u8 blend);
 
 

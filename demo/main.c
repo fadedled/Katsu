@@ -98,7 +98,7 @@ int main() {
 		u32 btns = kt_JoyButtonHeld(0);
 		x += ((btns >> JOY_BIT_RIGHT) & 0x1) - ((btns >> JOY_BIT_LEFT) & 0x1);
 		y += ((btns >> JOY_BIT_DOWN) & 0x1) - ((btns >> JOY_BIT_UP) & 0x1);
-
+		kt_ColorOffsetSet(x - 50, x - 50, y - 50);
 		spr[2].pos = SPR_POS(x, y);
 
 		if (kt_JoyButtonHeld(0) & JOY_A) {

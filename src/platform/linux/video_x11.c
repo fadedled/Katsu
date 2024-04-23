@@ -106,7 +106,7 @@ u32  __kt_VideoInit(void)
 	xkey_mapping[12] = XKeysymToKeycode(kt_x11.dpy, XK_Return);
 	xkey_mapping[13] = XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
 
-
+	kt_Reset();
 	XMapWindow(kt_x11.dpy, kt_x11.win);
 	XFlush(kt_x11.dpy);
 	return KT_OK;

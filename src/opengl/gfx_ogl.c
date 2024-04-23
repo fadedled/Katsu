@@ -42,14 +42,7 @@ u32 fb_win;
 u32 fb_main;
 u32 rb_depth;
 
-/*
-extern u32 tile_mem[0x20000];
-extern u32 pal_mem[0x800];
-extern u32 bg_mem[0x10000];
-extern mat mat_mem[0x100];
-*/
 
-#define KT_DEBUG 1
 Sprite sprite_verts[MAX_SPRITES * 4];
 u32 vert_start[MAX_SPRITES];
 u32 vert_count[MAX_SPRITES];
@@ -75,10 +68,10 @@ static void __kt_BuildVertexData(void)
 }
 
 
-static u32 __kt_CreateSimpleGLProgram(char *sh_src)
+static u32 __kt_CreateSimpleGLProgram(unsigned char *sh_src)
 {
 
-#if KT_DEBUG
+#ifdef KT_DEBUG
 	s32 status;
 	GLsizei log_length = 0;
 	GLchar message[1024];
@@ -90,7 +83,7 @@ static u32 __kt_CreateSimpleGLProgram(char *sh_src)
 	glShaderSource(vsh_obj, 2, vsh_source, NULL);
 	glCompileShader(vsh_obj);
 
-#if KT_DEBUG
+#ifdef KT_DEBUG
 	glGetShaderiv(vsh_obj, GL_COMPILE_STATUS, &status);
 	if (!status) {
 		glGetShaderInfoLog(vsh_obj, 1024, &log_length, message);
@@ -105,7 +98,7 @@ static u32 __kt_CreateSimpleGLProgram(char *sh_src)
 	glShaderSource(fsh_obj, 2, fsh_source, NULL);
 	glCompileShader(fsh_obj);
 
-#if KT_DEBUG
+#ifdef KT_DEBUG
 	glGetShaderiv(fsh_obj, GL_COMPILE_STATUS, &status);
 	if (!status) {
 		glGetShaderInfoLog(fsh_obj, 1024, &log_length, message);
@@ -120,14 +113,14 @@ static u32 __kt_CreateSimpleGLProgram(char *sh_src)
 	glAttachShader(program, fsh_obj);
 	glLinkProgram(program);
 
-	#if KT_DEBUG
+#ifdef KT_DEBUG
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
 	if (!status) {
 		glGetProgramInfoLog(program, 1024, &log_length, message);
 		printf("%s\n", message);
 		exit(0);
 	}
-	#endif //KT_DEBUG
+#endif //KT_DEBUG
 
 	/* Delete shaders */
 	glDetachShader(program, vsh_obj);
@@ -142,7 +135,7 @@ static u32 __kt_CreateSimpleGLProgram(char *sh_src)
 static void __kt_BlendModeSet(u32 src, u32 dest, u32 func)
 {
 	const u32 func_arr[]= {GL_FUNC_ADD, GL_FUNC_SUBTRACT};
-	const u32 factor_arr[]= {GL_ZERO, GL_ONE, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA};
+	const u32 factor_arr[]= {GL_ONE, GL_ZERO, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA};
 
 	u32 gl_src = factor_arr[src];
 	u32 gl_dest = factor_arr[dest];
@@ -176,14 +169,14 @@ void ogl_Init(void)
 	glEnable(GL_TEXTURE_2D);
 
 	/*XXX: Uniform buffer object ???*/
-	#if KT_DEBUG
+#ifdef KT_DEBUG
 	printf("%s GLSL: %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 	printf("Compiling Sprite Program\n");
-	#endif
+#endif
 	prog_spr = __kt_CreateSimpleGLProgram(sprite_glsl);
-	#if KT_DEBUG
+#ifdef KT_DEBUG
 	printf("Compiling Main Program\n");
-	#endif
+#endif
 	prog_final = __kt_CreateSimpleGLProgram(main_glsl);
 
 
@@ -265,9 +258,9 @@ void ogl_Draw(void)
 	video_data.frame_h = (f32) vstate.frame_h;
 	video_data.outdims_w = (f32) vstate.output_w;
 	video_data.outdims_h = (f32) vstate.output_h;
-	video_data.color_offset_r = (f32) (((coloroffs >> 0) & 0xFFu) / 255.0);
-	video_data.color_offset_g = (f32) (((coloroffs >> 8) & 0xFFu) / 255.0);
-	video_data.color_offset_b = (f32) (((coloroffs >> 16) & 0xFFu) / 255.0);
+	video_data.color_offset_r = ((f32) S9TOS32(coloroffs) / 255.0);
+	video_data.color_offset_g = ((f32) S9TOS32(coloroffs >> 9) / 255.0);
+	video_data.color_offset_b = ((f32) S9TOS32(coloroffs >> 18) / 255.0);
 	video_data.color_offset_a = 1.0;
 
 	f32 backcol_r = (backcolor & 0xFF) / 255.0;
@@ -296,7 +289,6 @@ void ogl_Draw(void)
 	glBindTexture(GL_TEXTURE_2D, tex_win);
 
 	//Draw the windows
-	__kt_BlendModeSet(KT_BLEND_SRC_ALPHA, KT_BLEND_ONE, BLEND_FUNC_ADD);
 
 	//Draw all layers
 	glBindFramebuffer(GL_FRAMEBUFFER, fb_main);
@@ -309,8 +301,9 @@ void ogl_Draw(void)
 
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < MAX_LAYERS; ++i) {
-		//XXX: Add windows...
-
+		//Set the blending mode for the layer
+		u32 blnd = lr->blnd;
+		__kt_BlendModeSet((blnd & 0xf), ((blnd >> 4) & 0xf), ((blnd >> 8) & 0x3));
 		//Draw the layer
 		switch (lr->type) {
 		case LAYER_TYPE_SPRITE: {

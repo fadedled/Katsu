@@ -33,9 +33,13 @@ typedef struct Layer_t {
 	u32 pos;
 	u32 size;
 	u32 attr;
+	u32 blnd;
 	u32 udata_count;
 	void *udata_arr;
 } Layer;
+
+
+#define S9TOS32(x)		((-((s32)(x) & 0x100) | ((s32)(x) & 0xFF)))
 
 extern u32 tile_mem[0x20000];
 extern u32 pal_mem[0x800];
