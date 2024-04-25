@@ -2,7 +2,6 @@
 
 #include <katsu/kt.h>
 #include <stdio.h>
-#include <GL/gl.h>
 
 
 /*Test Sprite Palette*/
@@ -91,7 +90,7 @@ int main() {
 	spr[2].sfx = SPR_HUE(0x00FF, 0x00);
 	spr[2].mat = 0;
 	kt_LayerSprite(0, spr, 3);
-
+	kt_VideoFrameSet(VIDEO_FRAME_2X);
 	while (1) {
 		kt_Poll();
 

@@ -209,7 +209,7 @@ void ogl_Init(void)
 	glGenTextures(1, &tex_mfb);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
 
 	/*Gen a depth render buffer*/
@@ -335,6 +335,10 @@ void ogl_Draw(void)
 	//XXX: Upload final color/width/hegiht
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);
+
+	u32 filter_mode = (vstate.frame_w > VIDEO_MAX_WIDTH * 2  || vstate.frame_h > VIDEO_MAX_HEIGHT * 2 ? GL_LINEAR : GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mode);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }

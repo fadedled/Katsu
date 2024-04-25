@@ -7,7 +7,7 @@ LIBDIR   :=	lib
 BUILD    :=	build
 INCLUDES :=	include
 SOURCES  :=	src src/platform/linux src/opengl
-CFLAGS	 :=	-O2 -Wall -fPIC -DKT_DEBUG
+CFLAGS	 :=	-O2 -Wall -fPIC #-DKT_DEBUG
 
 #All files to compile
 DIRS     := $(LIBDIR) $(BUILD)

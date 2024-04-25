@@ -134,7 +134,15 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 			XStoreName(kt_x11.dpy, kt_x11.win, (char *) val);
 		} break;
 		case VIDEO_ATTR_FRAME: {
-			//XXX: implement
+			u32 frame = *((u32*)val);
+			u32 w = VIDEO_MAX_WIDTH * (frame + 1);
+			u32 h = VIDEO_MAX_HEIGHT * (frame + 1);
+			if (frame == VIDEO_FRAME_FULLSCREEN) {
+
+			}
+			else {
+				XResizeWindow(kt_x11.dpy, kt_x11.win, w, h);
+			}
 		} break;
 	}
 }

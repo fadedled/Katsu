@@ -3,8 +3,10 @@
 #include "../../video_common.h"
 #include "../../joypad_common.h"
 #include <windows.h>
-#include <wingdi.h>
 #include <strsafe.h>
+//#include <shellscalingapi.h>
+#include "../../opengl/gl.h"
+#include <wingdi.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,11 +25,21 @@ struct KTVideoX11_t {
 	HWND hwin;
 	HDC hdc;
 	HGLRC glc;
-	//Atoms
-	Atom wmdelwin;
+
 } kt_win;
 
-KeyCode xkey_mapping[16];
+u32 wkey_mapping[16];
+
+void __kt_WinResize(HWND hWnd, int nWidth, int nHeight)
+{
+	RECT cli_rect, win_rect;
+	GetClientRect(hWnd, &cli_rect);
+	GetWindowRect(hWnd, &win_rect);
+	u32 brd_x = (win_rect.right - win_rect.left) - cli_rect.right;
+	u32 brd_y = (win_rect.bottom - win_rect.top) - cli_rect.bottom;
+	MoveWindow(hWnd, win_rect.left, win_rect.top, nWidth + brd_x, nHeight + brd_y, TRUE);
+}
+
 
 static LRESULT CALLBACK __kt_WinCallback(HWND win, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -35,6 +47,12 @@ static LRESULT CALLBACK __kt_WinCallback(HWND win, UINT msg, WPARAM wparam, LPAR
 		case WM_SIZE: {
 			vstate.frame_w = LOWORD(lparam);
 			vstate.frame_h = HIWORD(lparam);
+		} break;
+		case WM_WINDOWPOSCHANGING: {
+			RECT cli_rect, win_rect;
+			GetClientRect(kt_win.hwin, &cli_rect);
+			vstate.frame_w = cli_rect.right - cli_rect.left;
+			vstate.frame_h = cli_rect.bottom - cli_rect.top;
 		} break;
 		case WM_DESTROY: {
 		} break;
@@ -45,14 +63,50 @@ static LRESULT CALLBACK __kt_WinCallback(HWND win, UINT msg, WPARAM wparam, LPAR
 		} break;
 		case WM_PAINT: {
 		} break;
-		case default:
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN: {
+			//Obtain scan code and see if there is a mapping
+			u32 keyFlags = HIWORD(lparam);
+			u32 keycode = LOBYTE(keyFlags);
+			if ((keyFlags & KF_EXTENDED) == KF_EXTENDED) {
+				keycode |= 0xE000;
+			}
+			for (u32 k = 0; k < 14; ++k) {
+				if (wkey_mapping[k] == keycode) {
+					joy_state[0].btn |= (1 << k);
+				}
+			}
+		} break;
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+		{
+			//Obtain scan code and see if there is a mapping
+			u32 keyFlags = HIWORD(lparam);
+			u32 keycode = LOBYTE(keyFlags);
+			if ((keyFlags & KF_EXTENDED) == KF_EXTENDED) {
+				keycode |= 0xE000;
+			}
+			for (u32 k = 0; k < 14; ++k) {
+				if (wkey_mapping[k] == keycode) {
+					joy_state[0].btn &= ~(1 << k);
+				}
+			}
+		} break;
+		default:
 			return DefWindowProc(win, msg, wparam, lparam);
 	}
+
 	return 0;
 }
 
+
+
 u32  __kt_VideoInit(void)
 {
+	//XXX: No
+	vstate.frame_w = VIDEO_MAX_WIDTH;
+	vstate.frame_h = VIDEO_MAX_HEIGHT;
+
 	/* Open a window */
 	HGLRC glc_old;
 	const LPCTSTR CLASS_NAME = TEXT("kt_WinClass");
@@ -74,9 +128,10 @@ u32  __kt_VideoInit(void)
 	if (!kt_win.hwin){
 		return 1;
 	}
-
+	__kt_WinResize(kt_win.hwin, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
+	kt_VideoFrameSet(VIDEO_FRAME_2X);
 	kt_win.hdc = GetDC(kt_win.hwin);
-
+	//SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
 
 	//Create OpenGL context
 	PIXELFORMATDESCRIPTOR pfd = {0};
@@ -88,11 +143,11 @@ u32  __kt_VideoInit(void)
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.cColorBits = 24;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	SetPixelFormat(plWin.hdc, ChoosePixelFormat(plWin.hdc, &pfd), &pfd);
-	if (!(glc_old = wglCreateContext(plWin.hdc))) {
-		return PL_NO_GL_CONTEXT;
+	SetPixelFormat(kt_win.hdc, ChoosePixelFormat(kt_win.hdc, &pfd), &pfd);
+	if (!(glc_old = wglCreateContext(kt_win.hdc))) {
+		return 1;
 	}
-	wglMakeCurrent(plWin.hdc, glc_old);
+	wglMakeCurrent(kt_win.hdc, glc_old);
 
 	//Get OpenGL 4.3
 	WGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
@@ -102,20 +157,20 @@ u32  __kt_VideoInit(void)
 	wglGetExtensionsStringARB = (WGLGETEXTENSIONSSTRINGARBPROC)
 				wglGetProcAddress("wglGetExtensionsStringARB");
 
-	const char* wglExts = wglGetExtensionsStringARB(plWin.hdc);
+	const char* wglExts = wglGetExtensionsStringARB(kt_win.hdc);
 	if (strstr(wglExts, "WGL_ARB_create_context") && wglCreateContextAttribsARB) {
-		int context_attribs[] = {
+		int context_attribs[7] = {
 			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
 			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
 			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 			0};
 		/* Create OpenGL context and make current */
 		wglDeleteContext(glc_old);
-		plWin.glc = wglCreateContextAttribsARB(plWin.hdc, 0, context_attribs);
-		if (!plWin.glc) {
+		kt_win.glc = wglCreateContextAttribsARB(kt_win.hdc, 0, context_attribs);
+		if (!kt_win.glc) {
 			return 1;
 		}
-		wglMakeCurrent(plWin.hdc, plWin.glc);
+		wglMakeCurrent(kt_win.hdc, kt_win.glc);
 	}
 	else {
 		return 1;
@@ -129,9 +184,25 @@ u32  __kt_VideoInit(void)
 	}
 
 	//Generate the keyboard mappings
+	joy_state[0].active = 1;
+	wkey_mapping[0] = 0xE04B;// XKeysymToKeycode(kt_x11.dpy, XK_Left);
+	wkey_mapping[1] = 0xE04D;//XKeysymToKeycode(kt_x11.dpy, XK_Right);
+	wkey_mapping[2] = 0xE048;//XKeysymToKeycode(kt_x11.dpy, XK_Up);
+	wkey_mapping[3] = 0xE050;//XKeysymToKeycode(kt_x11.dpy, XK_Down);
+	wkey_mapping[4] = 0x002C;//XKeysymToKeycode(kt_x11.dpy, XK_Z);
+	wkey_mapping[5] = 0x002D;//XKeysymToKeycode(kt_x11.dpy, XK_X);
+	wkey_mapping[6] = 0x001E;//XKeysymToKeycode(kt_x11.dpy, XK_A);
+	wkey_mapping[7] = 0x001F;//XKeysymToKeycode(kt_x11.dpy, XK_S);
+	wkey_mapping[8] = 0x0010;//XKeysymToKeycode(kt_x11.dpy, XK_Q);
+	wkey_mapping[9] = 0x0011;//XKeysymToKeycode(kt_x11.dpy, XK_W);
+	wkey_mapping[10] = 0x0012;//XKeysymToKeycode(kt_x11.dpy, XK_E);
+	wkey_mapping[11] = 0x0020;//XKeysymToKeycode(kt_x11.dpy, XK_D);
+	wkey_mapping[12] = 0x001C;// XKeysymToKeycode(kt_x11.dpy, XK_Return);
+	wkey_mapping[13] = 0x0036;//XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
+
 
 	kt_Reset();
-	showWindow(kt_win.hwin, SW_SHOW);
+	ShowWindow(kt_win.hwin, SW_SHOW);
 	return KT_OK;
 }
 
@@ -140,7 +211,7 @@ void __kt_VideoExit(void)
 {
 	//Destroy the OpenGL context
 	wglMakeCurrent(NULL, NULL);
-	wglDeleteContext(plWin.glc);
+	wglDeleteContext(kt_win.glc);
 	PostQuitMessage(0);
 }
 
@@ -152,7 +223,15 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 			SetWindowTextA(kt_win.hwin, (const char *) val);
 		} break;
 		case VIDEO_ATTR_FRAME: {
-			//XXX: implement
+			u32 frame = *((u32*)val);
+			u32 w = VIDEO_MAX_WIDTH * (frame + 1);
+			u32 h = VIDEO_MAX_HEIGHT * (frame + 1);
+			if (frame == VIDEO_FRAME_FULLSCREEN) {
+
+			}
+			else {
+				__kt_WinResize(kt_win.hwin, w, h);
+			}
 		} break;
 	}
 }
@@ -166,8 +245,6 @@ void __kt_VideoPoll(void)
 	GetMessage(&msg, NULL, 0, 0);
 	TranslateMessage(&msg);
 	DispatchMessage(&msg);
-
-	XEvent xev;
 }
 
 
