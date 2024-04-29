@@ -17,25 +17,31 @@ typedef struct Matrix_t {
 
 /* LAYER STRUCTURE
  * type: controls what is shown
- * pos: top-left corner shown
- * size: size of layer startng from top-left corner
- * attr: attributes for layer
+ * pos = [pos_y : 16][pos_x : 16]  - top-left corner shown
+ * size = [height : 16][width : 16]  - size of layer startng from top-left corner
+ * map_attr: [blend : 1][tmap : 4][tmap_size : 2][mos_y : 4][mos_x : 4][alpha : 8] - attributes for backgorund layer
+ * map_ofs: [ofs_y : 16][ofs_x : 16] - offset of backgorund layer (unused for scroll bg)
+ * blnd: [func : 2][dst_alpha : 3][src_alpha : 3]  - Blending function and alpha source and destination
+ * win_act: [spr_win : 1][win1 : 1][win0 : 1][out_win : 1]  - Window Activation
  * udata_count: number of user data passed entries in udata_arr
  * udata_arr: array of user data
  * 	- if type is LAYER_TYPE_NONE then the array is not used.
- * 	- if type is LAYER_TYPE_BG_NORMAL then the array is not used.
- * 	- if type is LAYER_TYPE_BG_SCROLL then the entries are scaled offsets.
- * 	- if type is LAYER_TYPE_BG_AFFINE then these are matrices.
+ * 	- if type is LAYER_TYPE_MAP_NORMAL then the array is not used.
+ * 	- if type is LAYER_TYPE_MAP_SCROLL then the entries are scaled offsets.
+ * 	- if type is LAYER_TYPE_MAP_AFFINE then these are matrices.
  * 	- if type is LAYER_TYPE_SPRITES then these are sprites.
  */
+
 typedef struct Layer_t {
 	u32 type;
 	u32 pos;
 	u32 size;
-	u32 attr;
-	u32 blnd;
+	u32 map_attr;
+	u32 map_ofs;
 	u32 udata_count;
 	void *udata_arr;
+	u8 blnd;
+	u8 win_act;
 } Layer;
 
 
@@ -43,7 +49,7 @@ typedef struct Layer_t {
 
 extern u32 tile_mem[0x20000];
 extern u32 pal_mem[0x800];
-extern u32 bg_mem[0x10000];
+extern u32 tmap_mem[0x10000];
 extern mat mat_mem[0x100];
 extern u32 backcolor;
 extern u32 coloroffs;

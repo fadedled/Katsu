@@ -1,5 +1,5 @@
 /*
- * main.glsl - Main Display Vertex Shader
+ * sprite.glsl - GLSL Shader for sprite drawing
  * ======================================
  * Uses glsl version 430
  */
@@ -87,13 +87,13 @@ void main()
 	uvec2 chr_hi = (uvec2(uv) & 0x78u) * uvec2(1, width);
 	uvec2 chr_lo = (uvec2(uv) & 0x7u) << uvec2(2, 0);
 	uvec2 chr = uvec2(tile + chr_hi.x + chr_hi.y + chr_lo.y) & uvec2(0xFF, 0x3FFF);
-	uint index = (texelFetch(tile_mem, ivec2(chr.x, chr.y >> 8), 0).r >> chr_lo.x) & 0xfu;
+	uint idx = (texelFetch(tile_mem, ivec2(chr.x, chr.y >> 8), 0).r >> chr_lo.x) & 0xfu;
 	//Color 0 is transparent
-	if (index == 0u) {
+	if (idx == 0u) {
 		discard;
 	}
 	//get final color
-	vec4 spr_color = texelFetch(pal_mem, ivec2(index, pal), 0);
+	vec4 spr_color = texelFetch(pal_mem, ivec2(idx, pal), 0);
 	frag_color = vec4(mix(spr_color, hue, hue.a).rgb, blend);
 }
 

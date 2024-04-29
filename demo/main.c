@@ -73,7 +73,7 @@ int main() {
 	u32 y = 20;
 	Sprite spr[4] = {0};
 	kt_TileData(0, 12, (u32 *) spr_tiles);
-	kt_PaletteData(0, 16, spr_palette);
+	kt_ClutData(0, 16, spr_palette);
 
 	spr[0].pos = SPR_POS(20, 40);
 	spr[0].tile = SPR_TILE(0, 0, SIZE_16, SIZE_24, 0);
@@ -89,7 +89,8 @@ int main() {
 	spr[2].tile = SPR_TILE(6, 0, SIZE_16, SIZE_24, 0);
 	spr[2].sfx = SPR_HUE(0x00FF, 0x00);
 	spr[2].mat = 0;
-	kt_LayerSprite(0, spr, 3);
+	kt_LayerSprite(1, spr, 3);
+	kt_LayerMap(0, LAYER_TYPE_MAP_NORMAL, 0, TILEMAP_SIZE_64x64);
 	kt_VideoFrameSet(VIDEO_FRAME_2X);
 	while (1) {
 		kt_Poll();

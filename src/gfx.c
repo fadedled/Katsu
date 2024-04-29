@@ -12,7 +12,7 @@
 
 u32 tile_mem[0x20000];
 u32 pal_mem[0x800];
-u32 bg_mem[0x10000];
+u32 tmap_mem[0x10000];
 mat mat_mem[0x100];
 u32 backcolor;
 u32 coloroffs;
@@ -52,7 +52,7 @@ void kt_TileData(u32 tile_ofs, u32 tile_count, const u32* data)
 	}
 }
 
-void kt_PaletteData(u32 color_ofs, u32 color_count, const u32* data)
+void kt_ClutData(u32 color_ofs, u32 color_count, const u32* data)
 {
 	color_ofs &= (MAX_COLORS - 1);
 
@@ -69,7 +69,7 @@ void kt_PaletteData(u32 color_ofs, u32 color_count, const u32* data)
 	}
 }
 
-void kt_BgData(u32 bg_num, u32 bg_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const u32* data)
+void kt_TilemapData(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const u32* data)
 {
 
 }
@@ -82,9 +82,9 @@ void kt_BackColorSet(u32 color)
 
 void kt_ColorOffsetSet(s32 r, s32 g, s32 b)
 {
-	//r = MIN(MAX(r, -255), 255);
-	//g = MIN(MAX(g, -255), 255);
-	//b = MIN(MAX(b, -255), 255);
+	r = MIN(MAX(r, -255), 255);
+	g = MIN(MAX(g, -255), 255);
+	b = MIN(MAX(b, -255), 255);
 	coloroffs = COLOROFFS(r, g, b);
 }
 
@@ -113,27 +113,33 @@ void kt_ColorLinesData(const u32* data, u32 count)
 
 
 /*Layers*/
-void kt_LayerBg(u32 layer, u32 type, u32 bg_num, u32 bg_size)
+void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size)
+{
+	layer &= 0xF;
+	layer_mem[layer].type = type & 0x3;
+	layer_mem[layer].pos = 0;
+	layer_mem[layer].size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
+	layer_mem[layer].map_attr = 0;
+	layer_mem[layer].udata_count = 0;
+	layer_mem[layer].udata_arr = NULL;
+}
+
+void kt_LayerMapBoxSet(u32 layer, u32 x, u32 y, u32 w, u32 h)
 {
 
 }
 
-void kt_LayerBgBoxSet(u32 layer, u32 x, u32 y, u32 w, u32 h)
+void kt_LayerMapOffsetSet(u32 layer, u32 x_ofs, u32 y_ofs)
 {
 
 }
 
-void kt_LayerBgOffsetSet(u32 layer, u32 x_ofs, u32 y_ofs)
+void kt_LayerMapBlendSet(u32 layer, u32 active, u8 alpha)
 {
 
 }
 
-void kt_LayerBgBlendSet(u32 layer, u32 active, u8 alpha)
-{
-
-}
-
-void kt_LayerBgMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y)
+void kt_LayerMapMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y)
 {
 
 }
@@ -159,7 +165,7 @@ void kt_LayerWindowSet(u32 layer, u32 act_windows)
 void kt_LayerBlendModeSet(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
 {
 	layer &= 0xF;
-	layer_mem[layer].blnd = (src_alpha & 0xf) | ((dst_alpha & 0xf) << 4) | ((func & 0x3) << 8);
+	layer_mem[layer].blnd = (src_alpha & 0x7) | ((dst_alpha & 0x7) << 3) | ((func & 0x3) << 6);
 }
 
 
@@ -169,7 +175,7 @@ void kt_LayerClear(u32 layer)
 	layer_mem[layer].type = LAYER_TYPE_NONE;
 	layer_mem[layer].pos = 0;
 	layer_mem[layer].size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
-	layer_mem[layer].attr = 0;
+	layer_mem[layer].map_attr = 0;
 	layer_mem[layer].udata_count = 0;
 	layer_mem[layer].udata_arr = NULL;
 }

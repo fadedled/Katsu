@@ -1,5 +1,5 @@
 /*
- * main.glsl - Main Display Vertex Shader
+ * main.glsl - GLSL Shader for main display drawing
  * ======================================
  * Uses glsl version 430
  */

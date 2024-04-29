@@ -12,16 +12,16 @@
 #define MAX_TILES		0x4000
 #define MAX_SPRITES		2048
 #define MAX_LAYERS		16
-#define MAX_BGS			16
+#define MAX_TILEMAPS	16
 #define MAX_COLORS		2048
 #define MAX_PALETTES	(MAX_COLORS >> 4)
 
 
 /*Layer types*/
 #define LAYER_TYPE_NONE				0
-#define LAYER_TYPE_BG_NORMAL		1
-#define LAYER_TYPE_BG_SCROLL		2
-#define LAYER_TYPE_BG_AFFINE		3
+#define LAYER_TYPE_MAP_NORMAL		1
+#define LAYER_TYPE_MAP_SCROLL		2
+#define LAYER_TYPE_MAP_AFFINE		3
 #define LAYER_TYPE_SPRITE			4
 
 
@@ -41,22 +41,27 @@
 #define FLIP_XY			0x3
 
 /*Sprite Size*/
-#define SIZE_8		0x0
-#define SIZE_16		0x1
-#define SIZE_24		0x2
-#define SIZE_32		0x3
-#define SIZE_40		0x4
-#define SIZE_48		0x5
-#define SIZE_56		0x6
-#define SIZE_64		0x7
-#define SIZE_72		0x8
-#define SIZE_80		0x9
-#define SIZE_88		0xA
-#define SIZE_96		0xB
-#define SIZE_104	0xC
-#define SIZE_112	0xD
-#define SIZE_120	0xE
-#define SIZE_128	0xF
+#define SIZE_8			0x0
+#define SIZE_16			0x1
+#define SIZE_24			0x2
+#define SIZE_32			0x3
+#define SIZE_40			0x4
+#define SIZE_48			0x5
+#define SIZE_56			0x6
+#define SIZE_64			0x7
+#define SIZE_72			0x8
+#define SIZE_80			0x9
+#define SIZE_88			0xA
+#define SIZE_96			0xB
+#define SIZE_104		0xC
+#define SIZE_112		0xD
+#define SIZE_120		0xE
+#define SIZE_128		0xF
+
+#define TILEMAP_SIZE_64x64		0x0
+#define TILEMAP_SIZE_128x64		0x1
+#define TILEMAP_SIZE_64x128		0x2
+#define TILEMAP_SIZE_128x128	0x3
 
 /*Window IDs*/
 enum WindowIds {
@@ -98,8 +103,8 @@ enum WindowIds {
 
 /*== Structs ==*/
 
-/* BACKGROUND TILES
- * tile = [pal : 8][none : 8][vf : 1][hf : 1][tile_num : 14]
+/* TILEMAP ELEMENTS
+ * telem = [pal : 8][none : 8][vf : 1][hf : 1][tile_num : 14]
  */
 
 
@@ -118,8 +123,8 @@ typedef struct Sprite_t {
 
 /* Graphics Loading Functions */
 void kt_TileData(u32 tile_ofs, u32 tile_count, const u32* data);
-void kt_PaletteData(u32 color_ofs, u32 color_count, const u32* data);
-void kt_BgData(u32 bg_num, u32 bg_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const u32* data);
+void kt_ClutData(u32 color_ofs, u32 color_count, const u32* data);
+void kt_TilemapData(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const u32* data);
 
 void kt_BackColorSet(u32 color);
 void kt_ColorOffsetSet(s32 r, s32 g, s32 b);
@@ -128,14 +133,14 @@ void kt_ColorLinesSet(u32 active, u32 fill_mode);
 
 
 /*Layers*/
-void kt_LayerBg(u32 layer, u32 type, u32 bg_num, u32 bg_size);
-void kt_LayerBgBoxSet(u32 layer, u32 x, u32 y, u32 w, u32 h);
-void kt_LayerBgOffsetSet(u32 layer, u32 x_ofs, u32 y_ofs);
-void kt_LayerBgBlendSet(u32 layer, u32 active, u8 alpha);
-void kt_LayerBgMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y);
+void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size);
+void kt_LayerMapBoxSet(u32 layer, u32 x, u32 y, u32 w, u32 h);
+void kt_LayerMapOffsetSet(u32 layer, u32 x_ofs, u32 y_ofs);
+void kt_LayerMapBlendSet(u32 layer, u32 active, u8 alpha);
+void kt_LayerMapMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y);
 void kt_LayerSprite(u32 layer, Sprite *spr, u32 count);
-void kt_LayerBlendModeSet(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func);
 
+void kt_LayerBlendModeSet(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func);
 void kt_LayerWindowSet(u32 layer, u32 act_windows);
 void kt_LayerClear(u32 layer);
 void kt_LayerClearAll(void);

@@ -10,6 +10,7 @@
 
 #include "shaders/main.inc"
 #include "shaders/sprite.inc"
+#include "shaders/tmap.inc"
 
 
 struct VideoData_t {
@@ -174,6 +175,10 @@ void ogl_Init(void)
 #endif
 	prog_spr = __kt_CreateSimpleGLProgram((const char*)sprite_glsl);
 #ifdef KT_DEBUG
+	printf("Compiling Tilemap Program\n");
+#endif
+	prog_bg = __kt_CreateSimpleGLProgram((const char*)tmap_glsl);
+#ifdef KT_DEBUG
 	printf("Compiling Main Program\n");
 #endif
 	prog_final = __kt_CreateSimpleGLProgram((const char*)main_glsl);
@@ -279,7 +284,7 @@ void ogl_Draw(void)
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x200, GL_RED_INTEGER, GL_UNSIGNED_INT, tile_mem);
 	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_2D, tex_bg);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x100, GL_RED_INTEGER, GL_UNSIGNED_INT, bg_mem);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x100, GL_RED_INTEGER, GL_UNSIGNED_INT, tmap_mem);
 	glActiveTexture(GL_TEXTURE0+2);
 	glBindTexture(GL_TEXTURE_2D, tex_pal);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x10, 0x80, GL_RGBA, GL_UNSIGNED_BYTE, pal_mem);
@@ -300,10 +305,23 @@ void ogl_Draw(void)
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < MAX_LAYERS; ++i) {
 		//Set the blending mode for the layer
-		u32 blnd = lr->blnd;
-		__kt_BlendModeSet((blnd & 0xf), ((blnd >> 4) & 0xf), ((blnd >> 8) & 0x3));
+		u8 blnd = lr->blnd;
+		__kt_BlendModeSet((blnd & 0x7), ((blnd >> 3) & 0x7), ((blnd >> 6) & 0x3));
 		//Draw the layer
 		switch (lr->type) {
+		case LAYER_TYPE_MAP_NORMAL: {
+			//Since blending is activated per spirte we configure on the fly
+			glUseProgram(prog_bg);
+			if (blnd_act ^ lr->map_attr >> 31) {
+				blnd_act = lr->map_attr >> 31;
+				if (blnd_act) {
+					glEnable(GL_BLEND);
+				} else {
+					glDisable(GL_BLEND);
+				}
+			}
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		} break;
 		case LAYER_TYPE_SPRITE: {
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_spr);
@@ -320,6 +338,7 @@ void ogl_Draw(void)
 				glDrawArrays(GL_TRIANGLE_STRIP, j << 2, 4);
 			}
 		} break;
+
 		default: break;
 		}
 		++lr;
