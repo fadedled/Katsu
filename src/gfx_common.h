@@ -17,8 +17,8 @@ typedef struct Matrix_t {
 
 /* LAYER STRUCTURE
  * type: controls what is shown
- * pos = [pos_y : 16][pos_x : 16]  - top-left corner shown
- * size = [height : 16][width : 16]  - size of layer startng from top-left corner
+ * rect_pos = [pos_y : 16][pos_x : 16]  - top-left corner shown
+ * rect_size = [height : 16][width : 16]  - size of layer startng from top-left corner
  * map_attr: [blend : 1][tmap : 4][tmap_size : 2][mos_y : 4][mos_x : 4][alpha : 8] - attributes for backgorund layer
  * map_ofs: [ofs_y : 16][ofs_x : 16] - offset of backgorund layer (unused for scroll bg)
  * blnd: [func : 2][dst_alpha : 3][src_alpha : 3]  - Blending function and alpha source and destination
@@ -34,14 +34,14 @@ typedef struct Matrix_t {
 
 typedef struct Layer_t {
 	u32 type;
-	u32 pos;
-	u32 size;
+	u32 rect_pos;
+	u32 rect_size;
 	u32 map_attr;
 	u32 map_ofs;
-	u32 udata_count;
-	void *udata_arr;
 	u8 blnd;
 	u8 win_act;
+	u32 udata_count;
+	void *udata_arr;
 } Layer;
 
 

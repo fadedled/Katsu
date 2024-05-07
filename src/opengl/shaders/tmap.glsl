@@ -15,17 +15,23 @@ layout(std140, binding = 0) uniform video_data
 //=====================================
 // Vertex Shader
 //=====================================
+layout(location = 0) uniform uvec2 lay_rect;
+layout(location = 1) uniform uvec4 map;
+
+
 layout(location = 0) out vec2 uv;
 layout(location = 1) out flat float blend;
+
 
 void main()
 {
 	const vec2 cl = vec2(1.0, 0.0);
-	vec2 tmap_ofs = vec2(40, 25);
-	vec2 tmap_size = vec2(100, 64);
-	blend = 1.0;
+	vec2 tmap_pos = vec2(lay_rect.x  & 0xFFFFu, lay_rect.x >> 16);
+	vec2 tmap_size = vec2(lay_rect.y & 0xFFFFu, lay_rect.y >> 16);
+	blend = float(map.x & 0xFF) / 255.0;
 	uv = vec2(gl_VertexID & 1, gl_VertexID >> 1) * tmap_size;
-	vec2 pos = ((uv + tmap_ofs) / (vec2(424.0, -240.0) / 2.0)) + vec2(-1.0, 1.0);
+	vec2 pos = ((uv + tmap_pos) / (vec2(424.0, -240.0) / 2.0)) + vec2(-1.0, 1.0);
+	uv += vec2(uvec2(map.y, map.y >> 16) & 0xFFFFu);
 	gl_Position = vec4(pos, 0.0, 1.0);
 }
 
@@ -76,13 +82,13 @@ void main()
 	uint pal = tile >> 24;
 	uint flip_x = -((tile >> 14) & 1u);
 	uint flip_y = -((tile >> 15) & 1u);
-	uint chr = ((flip_y ^ pix.y) & 7u) + ((tile & 0x3FFFu) << 3u) + 8;
+	uint chr = ((flip_y ^ pix.y) & 7u) + ((tile & 0x3FFFu) << 3u);
 	uint shft = ((flip_x ^ pix.x) & 7u) << 2u;
 	uint idx = (texelFetch(tile_mem, ivec2(chr & 0xffu, chr >> 8u), 0).r >> shft) & 0xfu;
 	//Color 0 is transparent
-	//if (idx == 0u) {
-	//	discard;
-	//}
+	if (idx == 0u) {
+		discard;
+	}
 	//get final color
 	frag_color = vec4(texelFetch(pal_mem, ivec2(idx, pal), 0).rgb, blend);
 }

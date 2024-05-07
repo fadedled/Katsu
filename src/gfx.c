@@ -23,15 +23,19 @@ u32 window[2][0x100];
 u32 blend_mode;
 Layer layer_mem[16];
 
+
+
+
 /* Graphics Loading Functions */
-void kt_TileData(u32 tile_ofs, u32 tile_count, const u32* data)
+void kt_TilesetLoad(u32 tile_ofs, u32 tile_count, const void* data)
 {
 	tile_ofs = ((tile_ofs & (MAX_TILES - 1)) << 3);
 	tile_count <<= 3;
 
 	if (data) {
+		u32 *ptr = (u32*) data;
 		for (u32 i = 0; i < tile_count; ++i) {
-			tile_mem[tile_ofs++] = data[i];
+			tile_mem[tile_ofs++] = ptr[i];
 			tile_ofs &= ((MAX_TILES << 3) - 1);
 		}
 		//Set the first tile as zero
@@ -52,13 +56,15 @@ void kt_TileData(u32 tile_ofs, u32 tile_count, const u32* data)
 	}
 }
 
-void kt_ClutData(u32 color_ofs, u32 color_count, const u32* data)
+
+void kt_PaletteLoad(u32 color_ofs, u32 color_count, const void* data)
 {
 	color_ofs &= (MAX_COLORS - 1);
 
 	if (data) {
+		u32 *ptr = (u32*) data;
 		for (u32 i = 0; i < color_count; ++i) {
-			pal_mem[color_ofs++] = data[i];
+			pal_mem[color_ofs++] = ptr[i];
 			color_ofs &= (MAX_COLORS - 1);
 		}
 	} else {
@@ -69,45 +75,10 @@ void kt_ClutData(u32 color_ofs, u32 color_count, const u32* data)
 	}
 }
 
-void kt_TilemapData(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const u32* data)
+
+void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
 {
 
-}
-
-void kt_BackColorSet(u32 color)
-{
-	backcolor = color;
-}
-
-
-void kt_ColorOffsetSet(s32 r, s32 g, s32 b)
-{
-	r = MIN(MAX(r, -255), 255);
-	g = MIN(MAX(g, -255), 255);
-	b = MIN(MAX(b, -255), 255);
-	coloroffs = COLOROFFS(r, g, b);
-}
-
-
-void kt_ColorLinesSet(u32 active, u32 fill_mode)
-{
-	active = active ? 0x10 : 0;
-	colorline_cnt = active | (fill_mode & (MAX_COLORLINE_FILL - 1));
-}
-
-
-void kt_ColorLinesData(const u32* data, u32 count)
-{
-	count &= 0xFF;
-	if (data) {
-		for (u32 i = 0; i < count; ++i) {
-			colorline[i] = data[i];
-		}
-	} else {
-		for (u32 i = 0; i < count; ++i) {
-			colorline[i] = 0;
-		}
-	}
 }
 
 
@@ -117,55 +88,67 @@ void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size)
 {
 	layer &= 0xF;
 	layer_mem[layer].type = type & 0x3;
-	layer_mem[layer].pos = 0;
-	layer_mem[layer].size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
+	layer_mem[layer].rect_pos = 0;
+	layer_mem[layer].rect_size = (VIDEO_MAX_HEIGHT << 16) | (VIDEO_MAX_WIDTH & 0xFFFFu);
 	layer_mem[layer].map_attr = 0;
 	layer_mem[layer].udata_count = 0;
 	layer_mem[layer].udata_arr = NULL;
 }
 
-void kt_LayerMapBoxSet(u32 layer, u32 x, u32 y, u32 w, u32 h)
-{
 
-}
-
-void kt_LayerMapOffsetSet(u32 layer, u32 x_ofs, u32 y_ofs)
-{
-
-}
-
-void kt_LayerMapBlendSet(u32 layer, u32 active, u8 alpha)
-{
-
-}
-
-void kt_LayerMapMosaicSet(u32 layer, u32 active, u32 mos_x, u32 mos_y)
-{
-
-}
-
-void kt_LayerSprite(u32 layer, Sprite *spr, u32 count)
+void kt_LayerMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
 {
 	layer &= 0xF;
-	if (count && spr) {
+	layer_mem[layer].map_ofs = (x_ofs & 0xFFFFu) | (y_ofs << 16);
+}
+
+
+void kt_LayerMapAlpha(u32 layer, u32 active, u8 alpha)
+{
+	layer &= 0xF;
+	active = active ? 0x80000000u : 0x0;
+	layer_mem[layer].map_attr &= ~0x800000FFu;
+	layer_mem[layer].map_attr |= (active | (alpha & 0xFFu));
+}
+
+
+void kt_LayerMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y)
+{
+
+}
+
+
+void kt_LayerSprite(u32 layer, u32 spr_count, Sprite *data)
+{
+	layer &= 0xF;
+	if (spr_count && data) {
 		layer_mem[layer].type = LAYER_TYPE_SPRITE;
-		layer_mem[layer].udata_count = count & (MAX_SPRITES - 1);
-		layer_mem[layer].udata_arr = (void *) spr;
+		layer_mem[layer].udata_count = spr_count & (MAX_SPRITES - 1);
+		layer_mem[layer].udata_arr = (void *) data;
 	} else {
 		layer_mem[layer].type = LAYER_TYPE_NONE;
 	}
 }
 
 
-void kt_LayerWindowSet(u32 layer, u32 act_windows)
+void kt_LayerRect(u32 layer, u32 x, u32 y, u32 w, u32 h)
 {
-
+	layer &= 0xF;
+	layer_mem[layer].rect_pos = (x & 0xFFFFu) | (y << 16);
+	layer_mem[layer].rect_size = (w & 0xFFFFu) | (h << 16);
 }
 
-void kt_LayerBlendModeSet(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
+
+void kt_LayerBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
 {
 	layer &= 0xF;
 	layer_mem[layer].blnd = (src_alpha & 0x7) | ((dst_alpha & 0x7) << 3) | ((func & 0x3) << 6);
+}
+
+
+void kt_LayerWindow(u32 layer, u32 act_windows)
+{
+
 }
 
 
@@ -173,12 +156,13 @@ void kt_LayerClear(u32 layer)
 {
 	layer &= 0xF;
 	layer_mem[layer].type = LAYER_TYPE_NONE;
-	layer_mem[layer].pos = 0;
-	layer_mem[layer].size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
+	layer_mem[layer].rect_pos = 0;
+	layer_mem[layer].rect_size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
 	layer_mem[layer].map_attr = 0;
 	layer_mem[layer].udata_count = 0;
 	layer_mem[layer].udata_arr = NULL;
 }
+
 
 void kt_LayerClearAll(void)
 {
@@ -192,7 +176,7 @@ void kt_LayerClearAll(void)
 
 
 /*Matrices*/
-void kt_MatrixSet(u32 mat, f32 a, f32 b, f32 c, f32 d)
+void kt_MatrixLoad(u32 mat, f32 a, f32 b, f32 c, f32 d)
 {
 
 }
@@ -210,10 +194,52 @@ void kt_WindowBox(u32 win, u32 x, u32 y, u32 w, u32 h)
 
 }
 
-void kt_WindowLine(u32 win, const u32* data, u32 count)
+void kt_WindowLine(u32 win, u32 fill_mode, u32 line_count, const void* data)
 {
 
 }
+
+
+
+/* Color Related Functions */
+void kt_BackColor(u32 color)
+{
+	backcolor = color;
+}
+
+
+void kt_OffsetColor(s32 r, s32 g, s32 b)
+{
+	r = MIN(MAX(r, -255), 255);
+	g = MIN(MAX(g, -255), 255);
+	b = MIN(MAX(b, -255), 255);
+	coloroffs = COLOROFFS(r, g, b);
+}
+
+
+void kt_ColorLineSetParams(u32 fill_mode, u32 line_offset)
+{
+	//active = active ? 0x10 : 0;
+	//line_offset
+	colorline_cnt = (fill_mode & (MAX_COLORLINE_FILL - 1));
+}
+
+
+void kt_ColorLineLoad(u32 line_count, const void* data)
+{
+	line_count &= 0xFF;
+	if (data) {
+		u32 *ptr = (u32*) data;
+		for (u32 i = 0; i < line_count; ++i) {
+			colorline[i] = ptr[i];
+		}
+	} else {
+		for (u32 i = 0; i < line_count; ++i) {
+			colorline[i] = 0;
+		}
+	}
+}
+
 
 
 /*Utils*/
@@ -222,13 +248,9 @@ void kt_Reset(void)
 	kt_LayerClearAll();
 }
 
-void kt_BlendModeSet(u32 src_alpha, u32 dst_alpha, u32 func)
-{
 
-}
-
-u32  kt_ColorLerp(u32 clr0, u32 clr1, u8 blend)
+u32  kt_LerpColor(u32 c0, u32 c1, u8 t)
 {
-	return  (((clr0 & 0xFF00FF) + ((((clr1 & 0xFF00FF) - (clr0 & 0xFF00FF))*blend) >> 8)) & 0xFF00FF) +
-			(((clr0 & 0x00FF00) + ((((clr1 & 0x00FF00) - (clr0 & 0x00FF00))*blend) >> 8)) & 0x00FF00);
+	return  (((c0 & 0xFF00FF) + ((((c1 & 0xFF00FF) - (c0 & 0xFF00FF))*t) >> 8)) & 0xFF00FF) +
+			(((c0 & 0x00FF00) + ((((c1 & 0x00FF00) - (c0 & 0x00FF00))*t) >> 8)) & 0x00FF00);
 }
