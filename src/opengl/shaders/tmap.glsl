@@ -21,6 +21,8 @@ layout(location = 1) uniform uvec4 map;
 
 layout(location = 0) out vec2 uv;
 layout(location = 1) out flat float blend;
+layout(location = 2) out flat uvec2 map_size;
+layout(location = 3) out flat uint tmap_num;
 
 
 void main()
@@ -32,6 +34,8 @@ void main()
 	uv = vec2(gl_VertexID & 1, gl_VertexID >> 1) * tmap_size;
 	vec2 pos = ((uv + tmap_pos) / (vec2(424.0, -240.0) / 2.0)) + vec2(-1.0, 1.0);
 	uv += vec2(uvec2(map.y, map.y >> 16) & 0xFFFFu);
+	map_size = (map.xx >> uvec2(11, 12)) & 0x200u;
+	tmap_num = (map.x >> 4) & 0xF000u;
 	gl_Position = vec4(pos, 0.0, 1.0);
 }
 
@@ -43,6 +47,8 @@ void main()
 layout(origin_upper_left) in vec4 gl_FragCoord;
 layout(location = 0) in vec2 uv;
 layout(location = 1) in flat float blend;
+layout(location = 2) in flat uvec2 map_size;
+layout(location = 3) in flat uint tmap_num;
 
 layout(location = 0) out vec4 frag_color;
 
@@ -75,7 +81,9 @@ void main()
 	//if (bool((p.x | p.y) & 0x400u)) {
 	//	discard;
 	//}
-	uint tl = ((pix.y & 0x1F8u) << 4u) + ((pix.x & 0x1F8u) >> 3u);// + bgmap;
+	uint map_width = map_size.x >> 9;
+	uint tmap_ofs = (((pix.x & map_size.x) + ((pix.y & map_size.y) << map_width)) << 3) + tmap_num;
+	uint tl = ((pix.y & 0x1F8u) << 3u) + ((pix.x & 0x1F8u) >> 3u) + (tmap_ofs & 0xF000u);
 	uint tile = texelFetch(tmap_mem, ivec2(tl & 0xffu, tl >> 8u), 0).r;
 
 	//get palette index

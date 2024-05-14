@@ -28,7 +28,7 @@
 /*Sprites*/
 #define SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
 //XXX: Standarize size
-#define SPR_TILE(tile_num, flip, hsize, vsize, pal)		(((pal) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
+#define SPR_CHR(tile_num, flip, hsize, vsize, pal)		(((pal) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
 #define SPR_BLEND(alpha)								((0x80000000u) | ((alpha) & 0xFFu))
 #define SPR_MAT(mat_num)								((mat_num) & 0xFFu)
@@ -62,6 +62,8 @@
 #define TILEMAP_SIZE_128x64		0x1
 #define TILEMAP_SIZE_64x128		0x2
 #define TILEMAP_SIZE_128x128	0x3
+
+#define TMAP_CHR(tile_num, flip, pal) 		(((pal) << 24) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 
 /*Window IDs*/
 enum WindowIds {
@@ -103,27 +105,29 @@ enum WindowIds {
 /*== Structs ==*/
 
 /* TILEMAP ELEMENTS
- * telem = [pal : 8][none : 8][vf : 1][hf : 1][tile_num : 14]
+ * chr = [pal : 8][none : 8][vf : 1][hf : 1][tile_num : 14]
  */
 
 /* SPRITE STRUCTURE
  * pos  = [pos_y : 16][pos_x : 16]
- * tile = [pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tile_num : 14]
+ * chr = [pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tile_num : 14]
  * sfx  = [blend : 1][hue : 15][hue_alpha : 8][alpha : 8]
  * mat  = [none : 24][mat_num : 8]
  */
 typedef struct Sprite_t {
 	u32 pos;
-	u32 tile;
+	u32 chr;
 	u32 sfx;
 	u32 mat;
 } Sprite;
 
 
 /* Graphics Loading Functions */
-void kt_TilesetLoad(u32 tile_ofs, u32 tile_count, const void* data);
+void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data);
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
-void kt_PaletteLoad(u32 color_ofs, u32 color_count, const void* data);
+void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 chr);
+void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data);
+void kt_PaletteSetColor(u32 color_num, u32 color);
 
 /*Layers*/
 void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size);

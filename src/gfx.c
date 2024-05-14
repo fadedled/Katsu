@@ -25,18 +25,17 @@ Layer layer_mem[16];
 
 
 
-
 /* Graphics Loading Functions */
-void kt_TilesetLoad(u32 tile_ofs, u32 tile_count, const void* data)
+void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data)
 {
-	tile_ofs = ((tile_ofs & (MAX_TILES - 1)) << 3);
+	tile_num = ((tile_num & (MAX_TILES - 1)) << 3);
 	tile_count <<= 3;
 
 	if (data) {
 		u32 *ptr = (u32*) data;
 		for (u32 i = 0; i < tile_count; ++i) {
-			tile_mem[tile_ofs++] = ptr[i];
-			tile_ofs &= ((MAX_TILES << 3) - 1);
+			tile_mem[tile_num++] = ptr[i];
+			tile_num &= ((MAX_TILES << 3) - 1);
 		}
 		//Set the first tile as zero
 		tile_mem[0] = 0;
@@ -50,35 +49,67 @@ void kt_TilesetLoad(u32 tile_ofs, u32 tile_count, const void* data)
 
 	} else {
 		for (u32 i = 0; i < tile_count; ++i) {
-			tile_mem[tile_ofs++] = 0;
-			tile_ofs &= ((MAX_TILES << 3) - 1);
+			tile_mem[tile_num++] = 0;
+			tile_num &= ((MAX_TILES << 3) - 1);
 		}
 	}
 }
 
 
-void kt_PaletteLoad(u32 color_ofs, u32 color_count, const void* data)
+void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 value)
 {
-	color_ofs &= (MAX_COLORS - 1);
+	u32 ofs = tmap * (64 * 64);
+	x &= 0x3Fu;
+	y &= 0x3Fu;
+	tmap_mem[ofs + (y << 6) + x] = value;
+}
+
+void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
+{
+	/*x &= 0x7Fu;
+	y = (y & 0x7Fu) << 7u;
+	w &= 0x7Fu;
+	h &= 0x7Fu;
+	tmap &= (MAX_TILEMAPS-1);
+	Check for different sizes of bg
+	u32 *bg_mem = _plm + BG0_MEM + (BG_SIZE * bg);
+	stride = (data ? stride - w : 0);
+	while (h--) {
+		u32 w_tmp = w;
+		u32 x_tmp = x;
+		while (w_tmp--) {
+			bg_mem[y + x_tmp] = (data ? *data++ : 0);
+			x_tmp = (x_tmp + 1) & 0x7Fu;
+		}
+		y = (y + 1) & 0x3F80u;
+		data += stride;
+	}
+	*/
+}
+
+
+void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data)
+{
+	color_num &= (MAX_COLORS - 1);
 
 	if (data) {
 		u32 *ptr = (u32*) data;
 		for (u32 i = 0; i < color_count; ++i) {
-			pal_mem[color_ofs++] = ptr[i];
-			color_ofs &= (MAX_COLORS - 1);
+			pal_mem[color_num++] = ptr[i];
+			color_num &= (MAX_COLORS - 1);
 		}
 	} else {
 		for (u32 i = 0; i < color_count; ++i) {
-			pal_mem[color_ofs++] = 0;
-			color_ofs &= (MAX_COLORS - 1);
+			pal_mem[color_num++] = 0;
+			color_num &= (MAX_COLORS - 1);
 		}
 	}
 }
 
-
-void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
+void kt_PaletteSetColor(u32 color_num, u32 color)
 {
-
+	color_num &= (MAX_COLORS - 1);
+	pal_mem[color_num] = color;
 }
 
 
@@ -90,7 +121,7 @@ void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size)
 	layer_mem[layer].type = type & 0x3;
 	layer_mem[layer].rect_pos = 0;
 	layer_mem[layer].rect_size = (VIDEO_MAX_HEIGHT << 16) | (VIDEO_MAX_WIDTH & 0xFFFFu);
-	layer_mem[layer].map_attr = 0;
+	layer_mem[layer].map_attr = ((size & 0x3) << 20) | ((tmap & 0xF) << 16);
 	layer_mem[layer].udata_count = 0;
 	layer_mem[layer].udata_arr = NULL;
 }

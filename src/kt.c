@@ -14,9 +14,14 @@
 
 static KTExitFunc kt_exit_func = 0x0;
 
+static u32 is_inited = 0;
+
 //Inits katsu
 u32 kt_Init(void)
 {
+	if (is_inited) {
+		return -1;
+	}
 	u32 err = KT_OK;
 
 	kt_VideoOutputSet(VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
@@ -40,7 +45,7 @@ u32 kt_Init(void)
 	}
 	//Init the corresponding graphics API
 	ogl_Init();
-
+	is_inited = 1;
 	return err;
 
 err_audio:
@@ -53,6 +58,9 @@ err_joypad:
 //Exits program
 void kt_Exit(u32 exit_code)
 {
+	if (!is_inited) {
+		return;
+	}
 
 	if (kt_exit_func) {
 		if (kt_exit_func(exit_code) == KT_EXIT_CANCEL) {

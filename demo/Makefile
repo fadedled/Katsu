@@ -26,7 +26,7 @@ OFILES         := $(OFILES_SOURCES)
 	@$(CC) -c -o $@ $< $(CFLAGS) $(INCLUDE)
 
 
-$(TARGET): $(OFILES)
+$(TARGET): $(OFILES) ../lib/libkatsu.a
 	@echo "Generating binary executable:" $@
 	$(CC) -o $@ $< $(CFLAGS) $(INCLUDE) -L$(LIBDIRS) $(LIBS)
 

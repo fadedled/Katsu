@@ -19,7 +19,7 @@ typedef struct Matrix_t {
  * type: controls what is shown
  * rect_pos = [pos_y : 16][pos_x : 16]  - top-left corner shown
  * rect_size = [height : 16][width : 16]  - size of layer startng from top-left corner
- * map_attr: [blend : 1][tmap : 4][tmap_size : 2][mos_y : 4][mos_x : 4][alpha : 8] - attributes for backgorund layer
+ * map_attr: [blend : 1][norep : 1][tmap_size : 2][tmap : 4][mos_y : 4][mos_x : 4][alpha : 8] - attributes for backgorund layer
  * map_ofs: [ofs_y : 16][ofs_x : 16] - offset of backgorund layer (unused for scroll bg)
  * blnd: [func : 2][dst_alpha : 3][src_alpha : 3]  - Blending function and alpha source and destination
  * win_act: [spr_win : 1][win1 : 1][win0 : 1][out_win : 1]  - Window Activation
