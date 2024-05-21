@@ -190,13 +190,13 @@ void ogl_Init(void)
 	glBindTexture(GL_TEXTURE_2D, tex_tiles);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexStorage2D( GL_TEXTURE_2D, 1, GL_R32UI, 0x100, 0x200);
+	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8UI, 0x100, 0x200);
 	/*Texture for backgrounds*/
 	glGenTextures(1, &tex_bg);
 	glBindTexture(GL_TEXTURE_2D, tex_bg);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexStorage2D( GL_TEXTURE_2D, 1, GL_R32UI, 0x100, 0x100);
+	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8UI, 0x100, 0x100);
 	/*Texture for palettes*/
 	glGenTextures(1, &tex_pal);
 	glBindTexture(GL_TEXTURE_2D, tex_pal);
@@ -281,10 +281,10 @@ void ogl_Draw(void)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_tiles);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x200, GL_RED_INTEGER, GL_UNSIGNED_INT, tile_mem);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x200, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, tile_mem);
 	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_2D, tex_bg);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x100, GL_RED_INTEGER, GL_UNSIGNED_INT, tmap_mem);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x100, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, tmap_mem);
 	glActiveTexture(GL_TEXTURE0+2);
 	glBindTexture(GL_TEXTURE_2D, tex_pal);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x10, 0x80, GL_RGBA, GL_UNSIGNED_BYTE, pal_mem);

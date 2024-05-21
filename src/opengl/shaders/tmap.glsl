@@ -84,15 +84,17 @@ void main()
 	uint map_width = map_size.x >> 9;
 	uint tmap_ofs = (((pix.x & map_size.x) + ((pix.y & map_size.y) << map_width)) << 3) + tmap_num;
 	uint tl = ((pix.y & 0x1F8u) << 3u) + ((pix.x & 0x1F8u) >> 3u) + (tmap_ofs & 0xF000u);
-	uint tile = texelFetch(tmap_mem, ivec2(tl & 0xffu, tl >> 8u), 0).r;
+	uvec4 tile = texelFetch(tmap_mem, ivec2(tl & 0xffu, tl >> 8u), 0);
 
 	//get palette index
-	uint pal = tile >> 24;
-	uint flip_x = -((tile >> 14) & 1u);
-	uint flip_y = -((tile >> 15) & 1u);
-	uint chr = ((flip_y ^ pix.y) & 7u) + ((tile & 0x3FFFu) << 3u);
-	uint shft = ((flip_x ^ pix.x) & 7u) << 2u;
-	uint idx = (texelFetch(tile_mem, ivec2(chr & 0xffu, chr >> 8u), 0).r >> shft) & 0xfu;
+	uint pal = tile.x;
+	uint flip_x = -((tile.z >> 6) & 1u);
+	uint flip_y = -((tile.z >> 7) & 1u);
+	uint chr = ((flip_y ^ pix.y) & 7u) + ((((tile.z << 8) | tile.w) & 0x3FFFu) << 3u);
+	uint byte = ((flip_x ^ pix.x) >> 1) & 0x3;
+	uint shft = ((flip_x ^ pix.x) & 1u) << 2u;
+	uint idx = (texelFetch(tile_mem, ivec2(chr & 0xffu, chr >> 8u), 0)[byte] >> shft) & 0xfu;
+
 	//Color 0 is transparent
 	if (idx == 0u) {
 		discard;

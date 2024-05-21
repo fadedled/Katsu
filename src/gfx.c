@@ -10,9 +10,9 @@
 
 #define COLOROFFS(r, g, b)	(u32) ((((r) & 0x1FFu)) | (((g) & 0x1FFu) << 9) | (((b) & 0x1FFu) << 18))
 
-u32 tile_mem[0x20000];
-u32 pal_mem[0x800];
-u32 tmap_mem[0x10000];
+u8 tile_mem[0x80000];
+u8 pal_mem[0x2000];
+u8 tmap_mem[0x40000];
 mat mat_mem[0x100];
 u32 backcolor;
 u32 coloroffs;
@@ -30,38 +30,41 @@ void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data)
 {
 	tile_num = ((tile_num & (MAX_TILES - 1)) << 3);
 	tile_count <<= 3;
-
+	u32 *dst = (u32*) tile_mem;
 	if (data) {
-		u32 *ptr = (u32*) data;
+		u32 *src = (u32*) data;
 		for (u32 i = 0; i < tile_count; ++i) {
-			tile_mem[tile_num++] = ptr[i];
+			dst[tile_num++] = src[i];
 			tile_num &= ((MAX_TILES << 3) - 1);
 		}
 		//Set the first tile as zero
-		tile_mem[0] = 0;
-		tile_mem[1] = 0;
-		tile_mem[2] = 0;
-		tile_mem[3] = 0;
-		tile_mem[4] = 0;
-		tile_mem[5] = 0;
-		tile_mem[6] = 0;
-		tile_mem[7] = 0;
+		dst[0] = 0;
+		dst[1] = 0;
+		dst[2] = 0;
+		dst[3] = 0;
+		dst[4] = 0;
+		dst[5] = 0;
+		dst[6] = 0;
+		dst[7] = 0;
 
 	} else {
 		for (u32 i = 0; i < tile_count; ++i) {
-			tile_mem[tile_num++] = 0;
+			dst[tile_num++] = 0;
 			tile_num &= ((MAX_TILES << 3) - 1);
 		}
 	}
 }
 
 
-void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 value)
+void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal)
 {
-	u32 ofs = tmap * (64 * 64);
 	x &= 0x3Fu;
 	y &= 0x3Fu;
-	tmap_mem[ofs + (y << 6) + x] = value;
+	u32 ofs = (((tmap & 0xf) * (64 * 64)) + (y << 6) + x) << 2;
+	tmap_mem[ofs] = pal;
+	tmap_mem[ofs+1] = 0;
+	tmap_mem[ofs+2] = ((flip & 0x3) << 6) | ((tile_num & 0x3F00) >> 8);
+	tmap_mem[ofs+3] = tile_num & 0xFF;
 }
 
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
@@ -91,25 +94,27 @@ void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, 
 void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data)
 {
 	color_num &= (MAX_COLORS - 1);
-
+	u32 *dst = (u32*) pal_mem;
 	if (data) {
-		u32 *ptr = (u32*) data;
+		u32 *src = (u32*) data;
 		for (u32 i = 0; i < color_count; ++i) {
-			pal_mem[color_num++] = ptr[i];
+			dst[color_num++] = src[i];
 			color_num &= (MAX_COLORS - 1);
 		}
 	} else {
 		for (u32 i = 0; i < color_count; ++i) {
-			pal_mem[color_num++] = 0;
+			dst[color_num++] = 0;
 			color_num &= (MAX_COLORS - 1);
 		}
 	}
 }
 
-void kt_PaletteSetColor(u32 color_num, u32 color)
+void kt_PaletteSetColor(u32 color_num, u8 r, u8 g, u8 b)
 {
-	color_num &= (MAX_COLORS - 1);
-	pal_mem[color_num] = color;
+	u32 ofs = (color_num & (MAX_COLORS - 1)) << 2;
+	pal_mem[ofs] = r;
+	pal_mem[ofs+1] = g;
+	pal_mem[ofs+2] = b;
 }
 
 

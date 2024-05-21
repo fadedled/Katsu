@@ -63,7 +63,6 @@
 #define TILEMAP_SIZE_64x128		0x2
 #define TILEMAP_SIZE_128x128	0x3
 
-#define TMAP_CHR(tile_num, flip, pal) 		(((pal) << 24) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 
 /*Window IDs*/
 enum WindowIds {
@@ -104,9 +103,19 @@ enum WindowIds {
 
 /*== Structs ==*/
 
-/* TILEMAP ELEMENTS
- * chr = [pal : 8][none : 8][vf : 1][hf : 1][tile_num : 14]
+/* TILEMAP CHARACTERS
+ * pal = [pal : 8]
+ * _pad = [none : 8]
+ * tl0 = [vf : 1][hf : 1][tile_hi : 6]
+ * tl1 = [tile_low : 8]
  */
+typedef struct Chr_t {
+	u8 pal;
+	u8 _pad;
+	u8 tl0;
+	u8 tl1;
+} Chr;
+
 
 /* SPRITE STRUCTURE
  * pos  = [pos_y : 16][pos_x : 16]
@@ -125,11 +134,11 @@ typedef struct Sprite_t {
 /* Graphics Loading Functions */
 void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data);
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
-void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 chr);
+void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal);
 void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data);
-void kt_PaletteSetColor(u32 color_num, u32 color);
+void kt_PaletteSetColor(u32 color_num, u8 r, u8 g, u8 b);
 
-/*Layers*/
+/* Layers */
 void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size);
 void kt_LayerMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
 void kt_LayerMapAlpha(u32 layer, u32 active, u8 alpha);
@@ -141,7 +150,7 @@ void kt_LayerWindow(u32 layer, u32 act_windows);
 void kt_LayerClear(u32 layer);
 void kt_LayerClearAll(void);
 
-/*Matrices*/
+/* Matrices */
 void kt_MatrixLoad(u32 mat, f32 a, f32 b, f32 c, f32 d);
 void kt_MatrixRotoscale(u32 mat, f32 x_scale, f32 y_scale, f32 angle);
 

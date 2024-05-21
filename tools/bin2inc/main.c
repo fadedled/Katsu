@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 /* Integers */
@@ -81,9 +82,17 @@ int main(int argc, char* argv[])
 	char output_filename[256];
 	char file_base[256];
 	char *filename;
+	u32 skip_comments = 0;
 	if (argc < 2) {
-		printf("Katsu GLSL to inc file converter:\n"
-				"Usage: %s <Input File>\n", argv[0]);
+		printf("Katsu Binary to inc file converter:\n"
+				"Usage: %s [-nc] <Input File>\n"
+				"\t-nc : Skip C style one line comments.", argv[0]);
+	}
+
+	if (argc > 2) {
+		if (strcmp(argv[1], "-nc") == 0) {
+			skip_comments = 1;
+		}
 	}
 
 	filename = argv[argc-1];
@@ -106,11 +115,13 @@ int main(int argc, char* argv[])
 	u32 will_copy = 1;
 	u32 new_size = 0;
 	for (u32 i = 0; i < file_size; i++) {
-		if (*src_data == '/' && *(src_data+1) == '/') {
-			will_copy = 0;
-		}
-		if (!will_copy && *src_data == '\n') {
-			will_copy = 1;
+		if (skip_comments) {
+			if (*src_data == '/' && *(src_data+1) == '/') {
+				will_copy = 0;
+			}
+			if (!will_copy && *src_data == '\n') {
+				will_copy = 1;
+			}
 		}
 		if (will_copy) {
 			*dst_data = *src_data;

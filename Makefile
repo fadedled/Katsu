@@ -7,7 +7,7 @@ LIBDIR   :=	lib
 BUILD    :=	build
 INCLUDES :=	include
 SOURCES  :=	src src/platform/linux src/opengl
-CFLAGS	 :=	-O2 -Wall -fPIC -DKT_DEBUG
+CFLAGS	 :=	-O2 -Wall -fPIC #-DKT_DEBUG
 GLSLDIR  := 	src/opengl/shaders
 
 #All files to compile
@@ -35,7 +35,7 @@ $(DIRS):
 
 %.inc: %.glsl
 	@echo $(notdir $<)
-	@tools/kt-text2inc $<
+	@tools/kt-bin2inc -nc $<
 
 %.o: %.c 
 	@echo $(notdir $<)

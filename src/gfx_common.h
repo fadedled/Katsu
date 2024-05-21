@@ -47,9 +47,9 @@ typedef struct Layer_t {
 
 #define S9TOS32(x)		((-((s32)(x) & 0x100) | ((s32)(x) & 0xFF)))
 
-extern u32 tile_mem[0x20000];
-extern u32 pal_mem[0x800];
-extern u32 tmap_mem[0x10000];
+extern u8 tile_mem[0x80000];
+extern u8 pal_mem[0x2000];
+extern u8 tmap_mem[0x40000];
 extern mat mat_mem[0x100];
 extern u32 backcolor;
 extern u32 coloroffs;
