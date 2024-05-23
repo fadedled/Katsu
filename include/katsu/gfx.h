@@ -98,75 +98,83 @@ enum WindowIds {
 #define MAT_IDENTITY						0
 #define MAX_MATRIX							256
 
-#define COLOR_INIT(r, g, b, a)		((u32)(r) | ((u32)(g)<<8) | ((u32)(b)<<16) | ((u32)(a)<<24))
-
 
 /*== Structs ==*/
 
 /* TILEMAP CHARACTERS
- * pal = [pal : 8]
+ * pal  = [pal : 8]
  * _pad = [none : 8]
- * tl0 = [vf : 1][hf : 1][tile_hi : 6]
- * tl1 = [tile_low : 8]
+ * tl0  = [vf : 1][hf : 1][tile_hi : 6]
+ * tl1  = [tile_low : 8]
  */
-typedef struct Chr_t {
+typedef struct KTChr_t {
 	u8 pal;
 	u8 _pad;
 	u8 tl0;
 	u8 tl1;
-} Chr;
+} KTChr;
 
 
 /* SPRITE STRUCTURE
- * pos  = [pos_y : 16][pos_x : 16]
+ * pos = [pos_y : 16][pos_x : 16]
  * chr = [pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tile_num : 14]
- * sfx  = [blend : 1][hue : 15][hue_alpha : 8][alpha : 8]
- * mat  = [none : 24][mat_num : 8]
+ * sfx = [blend : 1][hue : 15][hue_alpha : 8][alpha : 8]
+ * mat = [none : 24][mat_num : 8]
  */
-typedef struct Sprite_t {
+typedef struct KTSpr_t {
 	u32 pos;
 	u32 chr;
 	u32 sfx;
 	u32 mat;
-} Sprite;
+} KTSpr;
+
+
+
+/* COLOR STRUCTURE */
+typedef struct KTColor_t {
+	u8 r;
+	u8 b;
+	u8 g;
+	u8 a;
+} KTColor;
 
 
 /* Graphics Loading Functions */
 void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data);
-void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
+// void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
 void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal);
 void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data);
 void kt_PaletteSetColor(u32 color_num, u8 r, u8 g, u8 b);
 
-/* Layers */
+/* Layer Functions */
 void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size);
 void kt_LayerMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
 void kt_LayerMapAlpha(u32 layer, u32 active, u8 alpha);
-void kt_LayerMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y);
-void kt_LayerSprite(u32 layer, u32 spr_count, Sprite *data);
+// void kt_LayerMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y);
+void kt_LayerSprite(u32 layer, u32 spr_count, KTSpr *data);
 void kt_LayerRect(u32 layer, u32 x, u32 y, u32 w, u32 h);
 void kt_LayerBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func);
-void kt_LayerWindow(u32 layer, u32 act_windows);
+// void kt_LayerWindow(u32 layer, u32 act_windows);
 void kt_LayerClear(u32 layer);
 void kt_LayerClearAll(void);
 
-/* Matrices */
-void kt_MatrixLoad(u32 mat, f32 a, f32 b, f32 c, f32 d);
-void kt_MatrixRotoscale(u32 mat, f32 x_scale, f32 y_scale, f32 angle);
+/* Matrix Functions */
+// void kt_MatrixLoad(u32 mat, f32 a, f32 b, f32 c, f32 d);
+// void kt_MatrixRotoscale(u32 mat, f32 x_scale, f32 y_scale, f32 angle);
 
-/* Windows */
-void kt_WindowBox(u32 win, u32 x, u32 y, u32 w, u32 h);
-void kt_WindowLine(u32 win, u32 fill_mode, u32 line_count, const void* data);
+/* Window Functions */
+// void kt_WindowBox(u32 win, u32 x, u32 y, u32 w, u32 h);
+// void kt_WindowLine(u32 win, u32 fill_mode, u32 line_count, const void* data);
 
 /* Color Related Functions */
-void kt_BackColor(u32 color);
+void kt_BackColor(u8 r, u8 g, u8 b);
 void kt_OffsetColor(s32 r, s32 g, s32 b);
-void kt_ColorLineLoad(u32 line_count, const void* data);
-void kt_ColorLineSetParams(u32 fill_mode, u32 line_offset);
+// void kt_ColorLineLoad(u32 line_count, const void* data);
+// void kt_ColorLineSetParams(u32 fill_mode, u32 line_offset);
 
-/*Utils*/
+/* Misc. Functions */
 void kt_Reset(void);
-u32  kt_LerpColor(u32 color0, u32 color1, u8 blend);
+// u32  kt_LerpColor(u32 color0, u32 color1, u8 blend);
 
 
 

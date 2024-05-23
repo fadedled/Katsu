@@ -185,21 +185,20 @@ u32  __kt_VideoInit(void)
 
 	//Generate the keyboard mappings
 	joy_state[0].active = 1;
-	wkey_mapping[0] = 0xE04B;// XKeysymToKeycode(kt_x11.dpy, XK_Left);
-	wkey_mapping[1] = 0xE04D;//XKeysymToKeycode(kt_x11.dpy, XK_Right);
-	wkey_mapping[2] = 0xE048;//XKeysymToKeycode(kt_x11.dpy, XK_Up);
-	wkey_mapping[3] = 0xE050;//XKeysymToKeycode(kt_x11.dpy, XK_Down);
-	wkey_mapping[4] = 0x002C;//XKeysymToKeycode(kt_x11.dpy, XK_Z);
-	wkey_mapping[5] = 0x002D;//XKeysymToKeycode(kt_x11.dpy, XK_X);
-	wkey_mapping[6] = 0x001E;//XKeysymToKeycode(kt_x11.dpy, XK_A);
-	wkey_mapping[7] = 0x001F;//XKeysymToKeycode(kt_x11.dpy, XK_S);
-	wkey_mapping[8] = 0x0010;//XKeysymToKeycode(kt_x11.dpy, XK_Q);
-	wkey_mapping[9] = 0x0011;//XKeysymToKeycode(kt_x11.dpy, XK_W);
-	wkey_mapping[10] = 0x0012;//XKeysymToKeycode(kt_x11.dpy, XK_E);
-	wkey_mapping[11] = 0x0020;//XKeysymToKeycode(kt_x11.dpy, XK_D);
-	wkey_mapping[12] = 0x001C;// XKeysymToKeycode(kt_x11.dpy, XK_Return);
-	wkey_mapping[13] = 0x0036;//XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
-
+	wkey_mapping[0]  = 0xE04B;  // Left
+	wkey_mapping[1]  = 0xE04D;  // Right
+	wkey_mapping[2]  = 0xE048;  // Up
+	wkey_mapping[3]  = 0xE050;  // Down
+	wkey_mapping[4]  = 0x002C;  // Z
+	wkey_mapping[5]  = 0x002D;  // X
+	wkey_mapping[6]  = 0x001E;  // A
+	wkey_mapping[7]  = 0x001F;  // S
+	wkey_mapping[8]  = 0x0010;  // Q
+	wkey_mapping[9]  = 0x0011;  // W
+	wkey_mapping[10] = 0x0012;  // E
+	wkey_mapping[11] = 0x0020;  // D
+	wkey_mapping[12] = 0x001C;  // Return
+	wkey_mapping[13] = 0x0036;  // Shift_R
 
 	kt_Reset();
 	ShowWindow(kt_win.hwin, SW_SHOW);

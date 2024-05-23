@@ -44,7 +44,7 @@ u32 fb_main;
 u32 rb_depth;
 
 
-Sprite sprite_verts[MAX_SPRITES * 4];
+KTSpr sprite_verts[MAX_SPRITES * 4];
 u32 vert_start[MAX_SPRITES];
 u32 vert_count[MAX_SPRITES];
 
@@ -54,7 +54,7 @@ static void __kt_BuildVertexData(void)
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < MAX_LAYERS; ++i) {
 		if (lr->type == LAYER_TYPE_SPRITE && lr->udata_arr) {
-			Sprite *spr = (Sprite *) lr->udata_arr;
+			KTSpr *spr = (KTSpr *) lr->udata_arr;
 			for (u32 i = 0; i < lr->udata_count && count < (MAX_SPRITES * 4); ++i) {
 				sprite_verts[count] = *spr;
 				sprite_verts[count+1] = *spr;
@@ -165,7 +165,7 @@ void ogl_Init(void)
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data), NULL, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(Sprite), (void*) 0);
+	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(KTSpr), (void*) 0);
 	glEnable(GL_TEXTURE_2D);
 
 	/*XXX: Uniform buffer object ???*/
@@ -267,9 +267,9 @@ void ogl_Draw(void)
 	video_data.color_offset_b = ((f32) S9TOS32(coloroffs >> 18) / 255.0);
 	video_data.color_offset_a = 1.0;
 
-	f32 backcol_r = (backcolor & 0xFF) / 255.0;
+	f32 backcol_r = ((backcolor>>16) & 0xFF) / 255.0;
 	f32 backcol_g = ((backcolor>>8) & 0xFF) / 255.0;
-	f32 backcol_b = ((backcolor>>16) & 0xFF) / 255.0;
+	f32 backcol_b = (backcolor & 0xFF) / 255.0;
 
 	//Update the buffers
 	glBindVertexArray(main_vao);
@@ -327,7 +327,7 @@ void ogl_Draw(void)
 		case LAYER_TYPE_SPRITE: {
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_spr);
-			Sprite *spr = (Sprite *) lr->udata_arr;
+			KTSpr *spr = (KTSpr *) lr->udata_arr;
 			for (u32 j = 0; j < lr->udata_count; ++j) {
 				if (blnd_act ^ spr[j].sfx >> 31) {
 					blnd_act = spr[j].sfx >> 31;

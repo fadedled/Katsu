@@ -9,6 +9,7 @@ INCLUDES :=	include
 SOURCES  :=	src src/platform/linux src/opengl
 CFLAGS	 :=	-O2 -Wall -fPIC #-DKT_DEBUG
 GLSLDIR  := 	src/opengl/shaders
+BIN2INC	 := 	tools/kt-bin2inc
 
 #All files to compile
 DIRS     := $(LIBDIR) $(BUILD)
@@ -22,7 +23,7 @@ OBJS     := $(CFILES:.c=.o)
 .PHONY: clean static dynamic $(DIRS)
 
 #Targets
-static: $(DIRS) $(GLSLINCS) $(OBJS)
+static: $(BIN2INC) $(DIRS) $(GLSLINCS) $(OBJS)
 	@echo "Generating static library libkatsu.a"
 	@ar rcs $(LIBDIR)/libkatsu.a $(foreach obj, $(notdir $(OBJS)), $(BUILD)/$(obj)) 
 
@@ -30,12 +31,15 @@ dynamic: static
 	@echo "Generating dynamic library libkatsu.so"
 	@$(CC) -shared -o  $(LIBDIR)/libkatsu.so $(LIBDIR)/libkatsu.a $(CFLAGS) $(INCLUDE)
 
+$(BIN2INC):
+	$(MAKE) -C tools 
+	
 $(DIRS):
 	@mkdir -p $@
 
 %.inc: %.glsl
 	@echo $(notdir $<)
-	@tools/kt-bin2inc -nc $<
+	@$(BIN2INC) -nc $<
 
 %.o: %.c 
 	@echo $(notdir $<)
@@ -43,4 +47,5 @@ $(DIRS):
 
 clean:
 	@echo "clean ..."
-	@rm -f -d $(BUILD)/*.o $(LIBDIR)/*.a $(LIBDIR)/*.so $(GLSLDIR)/*.inc $(DIRS)
+	@rm -f -d $(BUILD)/*.o $(LIBDIR)/*.a $(LIBDIR)/*.so $(GLSLDIR)/*.inc $(DIRS) 
+	@$(MAKE) -C tools clean

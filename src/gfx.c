@@ -154,7 +154,7 @@ void kt_LayerMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y)
 }
 
 
-void kt_LayerSprite(u32 layer, u32 spr_count, Sprite *data)
+void kt_LayerSprite(u32 layer, u32 spr_count, KTSpr *data)
 {
 	layer &= 0xF;
 	if (spr_count && data) {
@@ -238,9 +238,9 @@ void kt_WindowLine(u32 win, u32 fill_mode, u32 line_count, const void* data)
 
 
 /* Color Related Functions */
-void kt_BackColor(u32 color)
+void kt_BackColor(u8 r, u8 g, u8 b)
 {
-	backcolor = color;
+	backcolor = ((u32)r << 16) | ((u32)g << 8) | ((u32)b);
 }
 
 

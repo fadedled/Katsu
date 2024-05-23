@@ -38,14 +38,14 @@ enum WinId {
 #define JOY_BIT_RIGHT     0x1u
 #define JOY_BIT_UP        0x2u
 #define JOY_BIT_DOWN      0x3u
-#define JOY_BIT_A       	0x4u
+#define JOY_BIT_A         0x4u
 #define JOY_BIT_B         0x5u
 #define JOY_BIT_X         0x6u
-#define JOY_BIT_Y       	0x7u
-#define JOY_BIT_L       	0x8u
+#define JOY_BIT_Y         0x7u
+#define JOY_BIT_L         0x8u
 #define JOY_BIT_R         0x9u
 #define JOY_BIT_TL        0xAu
-#define JOY_BIT_TR       	0xBu
+#define JOY_BIT_TR        0xBu
 #define JOY_BIT_STR       0xCu
 #define JOY_BIT_SEL       0xDu
 

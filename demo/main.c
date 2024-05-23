@@ -30,7 +30,7 @@ int main() {
 	u32 y = 20;
 	u32 bg_pal_size =  (u32)((u32)&_binary_res_palettes_bg_data_pal_end - (u32)&_binary_res_palettes_bg_data_pal_start);
 	u32 nmap_tile_size =  (u32)((u32)&_binary_res_tiles_norm_map_tiles_4bpp_end - (u32)&_binary_res_tiles_norm_map_tiles_4bpp_start) / 32;
-	Sprite spr[4] = {0};
+	KTSpr spr[4] = {0};
 	//kt_TilesetLoad(0, 12, bg_pal_size);
 	kt_TilesetLoad(32*2, nmap_tile_size , &_binary_res_tiles_norm_map_tiles_4bpp_start);
 	kt_VideoTitleSet("Test program");
@@ -95,9 +95,9 @@ int main() {
 		spr[2].pos = SPR_POS(x, y);
 
 		if (kt_JoyButtonHeld(0) & JOY_A) {
-			kt_BackColor(0x505050);
+			kt_BackColor(0x50, 0x50, 0x50);
 		} else {
-			kt_BackColor(0x202050);
+			kt_BackColor(0x50, 0x20, 0x20);
 		}
 		kt_Draw();
 	}
