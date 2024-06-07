@@ -14,7 +14,7 @@ u8 tile_mem[0x80000];
 u8 pal_mem[0x2000];
 u8 tmap_mem[0x40000];
 mat mat_mem[0x100];
-u32 backcolor;
+KTColor backcolor;
 u32 coloroffs;
 u32 colorline_cnt;
 u32 colorline[0x100];
@@ -28,14 +28,14 @@ Layer layer_mem[16];
 /* Graphics Loading Functions */
 void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data)
 {
-	tile_num = ((tile_num & (MAX_TILES - 1)) << 3);
+	tile_num = ((tile_num & (KT_MAX_TILES - 1)) << 3);
 	tile_count <<= 3;
 	u32 *dst = (u32*) tile_mem;
 	if (data) {
 		u32 *src = (u32*) data;
 		for (u32 i = 0; i < tile_count; ++i) {
 			dst[tile_num++] = src[i];
-			tile_num &= ((MAX_TILES << 3) - 1);
+			tile_num &= ((KT_MAX_TILES << 3) - 1);
 		}
 		//Set the first tile as zero
 		dst[0] = 0;
@@ -50,7 +50,7 @@ void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data)
 	} else {
 		for (u32 i = 0; i < tile_count; ++i) {
 			dst[tile_num++] = 0;
-			tile_num &= ((MAX_TILES << 3) - 1);
+			tile_num &= ((KT_MAX_TILES << 3) - 1);
 		}
 	}
 }
@@ -67,15 +67,23 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal)
 	tmap_mem[ofs+3] = tile_num & 0xFF;
 }
 
+
+static void __kt_TilemapLoad64x64(u32 tmap, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
+{
+
+}
+
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
 {
-	/*x &= 0x7Fu;
+	/*
+	x &= 0x7Fu;
 	y = (y & 0x7Fu) << 7u;
 	w &= 0x7Fu;
 	h &= 0x7Fu;
-	tmap &= (MAX_TILEMAPS-1);
-	Check for different sizes of bg
-	u32 *bg_mem = _plm + BG0_MEM + (BG_SIZE * bg);
+	tmap &= (KT_MAX_TILEMAPS-1);
+	u32 *dst = (u32*) (tmap_mem[tmap * (64 * 64)]);
+	u32 *src = (u32*) data;
+	//Check for different sizes of bg
 	stride = (data ? stride - w : 0);
 	while (h--) {
 		u32 w_tmp = w;
@@ -86,60 +94,80 @@ void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, 
 		}
 		y = (y + 1) & 0x3F80u;
 		data += stride;
-	}
-	*/
+	}*/
 }
 
 
 void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data)
 {
-	color_num &= (MAX_COLORS - 1);
+	color_num &= (KT_MAX_COLORS - 1);
 	u32 *dst = (u32*) pal_mem;
 	if (data) {
 		u32 *src = (u32*) data;
 		for (u32 i = 0; i < color_count; ++i) {
 			dst[color_num++] = src[i];
-			color_num &= (MAX_COLORS - 1);
+			color_num &= (KT_MAX_COLORS - 1);
 		}
 	} else {
 		for (u32 i = 0; i < color_count; ++i) {
 			dst[color_num++] = 0;
-			color_num &= (MAX_COLORS - 1);
+			color_num &= (KT_MAX_COLORS - 1);
 		}
 	}
 }
 
-void kt_PaletteSetColor(u32 color_num, u8 r, u8 g, u8 b)
+void kt_PaletteSetColor(u32 color_num, KTColor color)
 {
-	u32 ofs = (color_num & (MAX_COLORS - 1)) << 2;
-	pal_mem[ofs] = r;
-	pal_mem[ofs+1] = g;
-	pal_mem[ofs+2] = b;
+	u32 ofs = (color_num & (KT_MAX_COLORS - 1)) << 2;
+	pal_mem[ofs] = color.r;
+	pal_mem[ofs+1] = color.g;
+	pal_mem[ofs+2] = color.b;
 }
 
 
 
 /*Layers*/
-void kt_LayerMap(u32 layer, u32 type, u32 tmap, u32 size)
+void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size)
 {
-	layer &= 0xF;
-	layer_mem[layer].type = type & 0x3;
-	layer_mem[layer].rect_pos = 0;
-	layer_mem[layer].rect_size = (VIDEO_MAX_HEIGHT << 16) | (VIDEO_MAX_WIDTH & 0xFFFFu);
-	layer_mem[layer].map_attr = ((size & 0x3) << 20) | ((tmap & 0xF) << 16);
-	layer_mem[layer].udata_count = 0;
-	layer_mem[layer].udata_arr = NULL;
+	kt_LayerClear(layer);
+	kt_LayerSetType(layer, type);
+	kt_LayerSetMapSize(layer, tmap, map_size);
 }
 
 
-void kt_LayerMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
+void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data)
+{
+	u32 type = (spr_count && data ? KT_LAYER_SPRITE : KT_LAYER_NONE);
+	u32 count = (type == KT_LAYER_SPRITE ? spr_count & (KT_MAX_SPRITES - 1) : 0);
+	kt_LayerClear(layer);
+	kt_LayerSetType(layer, type);
+	kt_LayerSetAppData(layer, count, data);
+}
+
+
+void kt_LayerSetType(u32 layer, u32 type)
+{
+	layer &= 0xF;
+	layer_mem[layer].type = type & 0x7;
+}
+
+
+void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size)
+{
+	layer &= 0xF;
+	layer_mem[layer].map_attr &= ~0x003F0000u;
+	layer_mem[layer].map_attr = ((map_size & 0x3) << 20) | ((tmap & 0xF) << 16);
+}
+
+
+void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
 {
 	layer &= 0xF;
 	layer_mem[layer].map_ofs = (x_ofs & 0xFFFFu) | (y_ofs << 16);
 }
 
 
-void kt_LayerMapAlpha(u32 layer, u32 active, u8 alpha)
+void kt_LayerSetMapAlpha(u32 layer, u32 active, u8 alpha)
 {
 	layer &= 0xF;
 	active = active ? 0x80000000u : 0x0;
@@ -148,26 +176,7 @@ void kt_LayerMapAlpha(u32 layer, u32 active, u8 alpha)
 }
 
 
-void kt_LayerMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y)
-{
-
-}
-
-
-void kt_LayerSprite(u32 layer, u32 spr_count, KTSpr *data)
-{
-	layer &= 0xF;
-	if (spr_count && data) {
-		layer_mem[layer].type = LAYER_TYPE_SPRITE;
-		layer_mem[layer].udata_count = spr_count & (MAX_SPRITES - 1);
-		layer_mem[layer].udata_arr = (void *) data;
-	} else {
-		layer_mem[layer].type = LAYER_TYPE_NONE;
-	}
-}
-
-
-void kt_LayerRect(u32 layer, u32 x, u32 y, u32 w, u32 h)
+void kt_LayerSetMapRect(u32 layer, u32 x, u32 y, u32 w, u32 h)
 {
 	layer &= 0xF;
 	layer_mem[layer].rect_pos = (x & 0xFFFFu) | (y << 16);
@@ -175,35 +184,68 @@ void kt_LayerRect(u32 layer, u32 x, u32 y, u32 w, u32 h)
 }
 
 
-void kt_LayerBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
+void kt_LayerSetMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y)
+{
+	//XXX: this function is not finished
+	layer &= 0xF;
+	layer_mem[layer].map_attr &= ~0x0000FF00u;
+	layer_mem[layer].map_attr = ((mos_x & 0xF) << 8) | ((mos_y & 0xF) << 12);
+}
+
+
+void kt_LayerSetBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
 {
 	layer &= 0xF;
 	layer_mem[layer].blnd = (src_alpha & 0x7) | ((dst_alpha & 0x7) << 3) | ((func & 0x3) << 6);
 }
 
 
-void kt_LayerWindow(u32 layer, u32 act_windows)
+void kt_LayerSetChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs)
 {
+	layer &= 0xF;
+	layer_mem[layer].chr_ofs = (pal_ofs << 16) | (tile_ofs & 0xFFFFu);
+}
 
+
+void kt_LayerSetAppData(u32 layer, u32 num_elems, void* data)
+{
+	layer &= 0xF;
+	if (num_elems && data) {
+		layer_mem[layer].data_count = num_elems;
+		layer_mem[layer].data_ptr = data;
+	} else {
+		layer_mem[layer].data_count = 0;
+		layer_mem[layer].data_ptr = NULL;
+	}
+}
+
+
+void kt_LayerSetWindow(u32 layer, u32 act_windows)
+{
+	layer &= 0xF;
+	layer_mem[layer].win_act = act_windows;
 }
 
 
 void kt_LayerClear(u32 layer)
 {
 	layer &= 0xF;
-	layer_mem[layer].type = LAYER_TYPE_NONE;
+	layer_mem[layer].type = KT_LAYER_NONE;
 	layer_mem[layer].rect_pos = 0;
-	layer_mem[layer].rect_size = (VIDEO_MAX_WIDTH << 16) | (VIDEO_MAX_HEIGHT & 0xFFFFu);
+	layer_mem[layer].rect_size = (KT_VIDEO_MAX_WIDTH << 16) | (KT_VIDEO_MAX_HEIGHT & 0xFFFFu);
 	layer_mem[layer].map_attr = 0;
-	layer_mem[layer].udata_count = 0;
-	layer_mem[layer].udata_arr = NULL;
+	layer_mem[layer].map_ofs = 0;
+	layer_mem[layer].blnd = 0x0;
+	layer_mem[layer].win_act = 0xF;
+	layer_mem[layer].data_count = 0;
+	layer_mem[layer].data_ptr = NULL;
 }
 
 
 void kt_LayerClearAll(void)
 {
 	u32 i = 0;
-	while (i < MAX_LAYERS) {
+	while (i < KT_MAX_LAYERS) {
 		kt_LayerClear(i);
 		++i;
 	}
@@ -238,9 +280,9 @@ void kt_WindowLine(u32 win, u32 fill_mode, u32 line_count, const void* data)
 
 
 /* Color Related Functions */
-void kt_BackColor(u8 r, u8 g, u8 b)
+void kt_BackColor(KTColor color)
 {
-	backcolor = ((u32)r << 16) | ((u32)g << 8) | ((u32)b);
+	backcolor = color;
 }
 
 
@@ -257,7 +299,7 @@ void kt_ColorLineSetParams(u32 fill_mode, u32 line_offset)
 {
 	//active = active ? 0x10 : 0;
 	//line_offset
-	colorline_cnt = (fill_mode & (MAX_COLORLINE_FILL - 1));
+	colorline_cnt = (fill_mode & (KT_MAX_COLORLINE_FILL - 1));
 }
 
 
@@ -281,7 +323,12 @@ void kt_ColorLineLoad(u32 line_count, const void* data)
 /*Utils*/
 void kt_Reset(void)
 {
+	const KTColor black_color = {0};
+	kt_BackColor(black_color);
+	kt_OffsetColor(0, 0, 0);
 	kt_LayerClearAll();
+	kt_TilesetLoad(0, KT_MAX_TILES, NULL);
+	kt_PaletteLoad(0, KT_MAX_COLORS, NULL);
 }
 
 

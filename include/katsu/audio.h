@@ -8,8 +8,8 @@
 
 #include <katsu/types.h>
 
-#define AUDIO_SAMPLE_RATE       48000
-#define AUDIO_SAMPLE_BUFFER     2048
+#define KT_AUDIO_SAMPLE_RATE       48000
+#define KT_AUDIO_SAMPLE_BUFFER     2048
 
 
 typedef void (*KTAudioFunc)(u16 *stram, u32 length);

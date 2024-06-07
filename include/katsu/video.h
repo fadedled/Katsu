@@ -2,6 +2,11 @@
  * video.h
  */
 
+/*!
+ * \file video.h
+ * \brief Video subsystem
+ *
+ */
 
 #ifndef __KT_VIDEO_H__
 #define __KT_VIDEO_H__
@@ -9,51 +14,74 @@
 #include <katsu/types.h>
 
 
-#define VIDEO_MAX_WIDTH     424
-#define VIDEO_MAX_HEIGHT    240
-#define VIDEO_MIN_WIDTH     32
-#define VIDEO_MIN_HEIGHT    VIDEO_MIN_WIDTH
+#define KT_VIDEO_MAX_WIDTH     424
+#define KT_VIDEO_MAX_HEIGHT    240
+#define KT_VIDEO_MIN_WIDTH     32
+#define KT_VIDEO_MIN_HEIGHT    KT_VIDEO_MIN_WIDTH
 
 
 /*Fill Modes*/
 enum ViFillModes {
 /*Fills with all the internal video (only output pixels are shown)*/
-	VIDEO_FILL_SCALE,		/*Preserves aspect ratio*/
-	VIDEO_FILL_STRECH,		/*Ignores aspect ratio*/
-	VIDEO_FILL_INTSCALE,	/*Uses integer scaling*/
+	KT_VIDEO_FILL_SCALE,		/*Preserves aspect ratio*/
+	KT_VIDEO_FILL_STRECH,		/*Ignores aspect ratio*/
+	KT_VIDEO_FILL_INTSCALE,		/*Uses integer scaling*/
 /*Fills with only the output pixels*/
-	VIDEO_FILL_OUT_SCALE,
-	VIDEO_FILL_OUT_STRECH,
-	VIDEO_FILL_OUT_INTSCALE,
-	VIDEO_MAX_FILL_MODES
+	KT_VIDEO_FILL_OUT_SCALE,
+	KT_VIDEO_FILL_OUT_STRECH,
+	KT_VIDEO_FILL_OUT_INTSCALE,
+	KT_VIDEO_MAX_FILL_MODES
 };
 
 
 /*Frame Size*/
 enum ViFrames {
-	VIDEO_FRAME_1X,
-	VIDEO_FRAME_2X,
-	VIDEO_FRAME_3X,
-	VIDEO_FRAME_4X,
-	VIDEO_FRAME_FULLSCREEN,
-	VIDEO_MAX_FRAME
+	KT_VIDEO_FRAME_1X,
+	KT_VIDEO_FRAME_2X,
+	KT_VIDEO_FRAME_3X,
+	KT_VIDEO_FRAME_4X,
+	KT_VIDEO_FRAME_FULLSCREEN,
+	KT_VIDEO_MAX_FRAME
 };
 
 
 /*Filter type*/
 enum ViFilters {
-	VIDEO_FILTER_SHARP,
-	VIDEO_FILTER_SOFT,
-	VIDEO_FILTER_CRT,
-	VIDEO_FILTER_CRT_SOFT,
-	VIDEO_FILTER_LCD,
-	VIDEO_FILTER_CUSTOM,
-	VIDEO_MAX_FILTER
+	KT_VIDEO_FILTER_SHARP,
+	KT_VIDEO_FILTER_SOFT,
+	KT_VIDEO_FILTER_CRT,
+	KT_VIDEO_FILTER_CRT_SOFT,
+	KT_VIDEO_FILTER_LCD,
+	KT_VIDEO_FILTER_CUSTOM,
+	KT_VIDEO_MAX_FILTER
 };
 
 
-/*Video Functions*/
+/* ============================================================================
+ * Video Functions
+ * ============================================================================
+ */
+/*!
+ * \fn void kt_VideoOutputSet(u32 w, u32 h)
+ * \brief Sets the size of the output.
+ * \details Both dimensions must be equal or greater than 32.
+ *
+ * \param[in] w Width of the output.
+ * \param[in] h Height of the output.
+ *
+ * \return none
+ */
 void kt_VideoOutputSet(u32 w, u32 h);
+
+/*!
+ * \fn void kt_VideoOutputGet(u32 *w, u32 *h)
+ * \brief Gets the size of the output.
+ *
+ * \param[out] w Pointer where the width of the output will be stored.
+ * \param[out] h Pointer where the height of the output will be stored.
+ *
+ * \return none
+ */
 void kt_VideoOutputGet(u32 *w, u32 *h);
 
 void kt_VideoFillModeSet(u32 fill_mode);

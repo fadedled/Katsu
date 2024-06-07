@@ -44,18 +44,18 @@ u32 fb_main;
 u32 rb_depth;
 
 
-KTSpr sprite_verts[MAX_SPRITES * 4];
-u32 vert_start[MAX_SPRITES];
-u32 vert_count[MAX_SPRITES];
+KTSpr sprite_verts[KT_MAX_SPRITES * 4];
+u32 vert_start[KT_MAX_SPRITES];
+u32 vert_count[KT_MAX_SPRITES];
 
 static void __kt_BuildVertexData(void)
 {
 	u32 count = 0;
 	Layer *lr = layer_mem;
-	for (u32 i = 0; i < MAX_LAYERS; ++i) {
-		if (lr->type == LAYER_TYPE_SPRITE && lr->udata_arr) {
-			KTSpr *spr = (KTSpr *) lr->udata_arr;
-			for (u32 i = 0; i < lr->udata_count && count < (MAX_SPRITES * 4); ++i) {
+	for (u32 i = 0; i < KT_MAX_LAYERS; ++i) {
+		if (lr->type == KT_LAYER_SPRITE && lr->data_ptr) {
+			KTSpr *spr = (KTSpr *) lr->data_ptr;
+			for (u32 i = 0; i < lr->data_count && count < (KT_MAX_SPRITES * 4); ++i) {
 				sprite_verts[count] = *spr;
 				sprite_verts[count+1] = *spr;
 				sprite_verts[count+2] = *spr;
@@ -209,18 +209,18 @@ void ogl_Init(void)
 	glBindTexture(GL_TEXTURE_2D, tex_win);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
+	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
 
 	glGenTextures(1, &tex_mfb);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
+	glTexStorage2D( GL_TEXTURE_2D, 1, GL_RGBA8, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
 
 	/*Gen a depth render buffer*/
 	glGenRenderbuffers(1, &rb_depth);
 	glBindRenderbuffer(GL_RENDERBUFFER, rb_depth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
 
 	/*Gen a depth render buffer*/
 	u32 drawbuffs[2] = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT};
@@ -248,7 +248,7 @@ void ogl_Init(void)
 
 	glBindVertexArray(0);
 	/*Init the arrays used fot glMultiDrawArrays*/
-	for (u32 i = 0; i < MAX_SPRITES; ++i) {
+	for (u32 i = 0; i < KT_MAX_SPRITES; ++i) {
 		vert_start[i] = i << 2;
 		vert_count[i] = 4;
 	}
@@ -267,9 +267,9 @@ void ogl_Draw(void)
 	video_data.color_offset_b = ((f32) S9TOS32(coloroffs >> 18) / 255.0);
 	video_data.color_offset_a = 1.0;
 
-	f32 backcol_r = ((backcolor>>16) & 0xFF) / 255.0;
-	f32 backcol_g = ((backcolor>>8) & 0xFF) / 255.0;
-	f32 backcol_b = (backcolor & 0xFF) / 255.0;
+	f32 backcol_r = (backcolor.r & 0xFF) / 255.0;
+	f32 backcol_g = (backcolor.g & 0xFF) / 255.0;
+	f32 backcol_b = (backcolor.b & 0xFF) / 255.0;
 
 	//Update the buffers
 	glBindVertexArray(main_vao);
@@ -295,7 +295,7 @@ void ogl_Draw(void)
 
 	//Draw all layers
 	glBindFramebuffer(GL_FRAMEBUFFER, fb_main);
-	glViewport(0, 0, VIDEO_MAX_WIDTH, VIDEO_MAX_HEIGHT);
+	glViewport(0, 0, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
 	glClearColor(backcol_r, backcol_g, backcol_b, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//XXX: Test
@@ -303,13 +303,13 @@ void ogl_Draw(void)
 	glDisable(GL_BLEND);
 
 	Layer *lr = layer_mem;
-	for (u32 i = 0; i < MAX_LAYERS; ++i) {
+	for (u32 i = 0; i < KT_MAX_LAYERS; ++i) {
 		//Set the blending mode for the layer
 		u8 blnd = lr->blnd;
 		__kt_BlendModeSet((blnd & 0x7), ((blnd >> 3) & 0x7), ((blnd >> 6) & 0x3));
 		//Draw the layer
 		switch (lr->type) {
-		case LAYER_TYPE_MAP_NORMAL: {
+		case KT_LAYER_MAP_NORMAL: {
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_bg);
 			glUniform2ui(0, lr->rect_pos, lr->rect_size);
@@ -324,11 +324,11 @@ void ogl_Draw(void)
 			}
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		} break;
-		case LAYER_TYPE_SPRITE: {
+		case KT_LAYER_SPRITE: {
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_spr);
-			KTSpr *spr = (KTSpr *) lr->udata_arr;
-			for (u32 j = 0; j < lr->udata_count; ++j) {
+			KTSpr *spr = (KTSpr *) lr->data_ptr;
+			for (u32 j = 0; j < lr->data_count; ++j) {
 				if (blnd_act ^ spr[j].sfx >> 31) {
 					blnd_act = spr[j].sfx >> 31;
 					if (blnd_act) {
@@ -357,7 +357,7 @@ void ogl_Draw(void)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);
 
-	u32 filter_mode = (vstate.frame_w > VIDEO_MAX_WIDTH * 2  || vstate.frame_h > VIDEO_MAX_HEIGHT * 2 ? GL_LINEAR : GL_NEAREST);
+	u32 filter_mode = (vstate.frame_w > KT_VIDEO_MAX_WIDTH * 2  || vstate.frame_h > KT_VIDEO_MAX_HEIGHT * 2 ? GL_LINEAR : GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mode);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

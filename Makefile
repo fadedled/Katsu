@@ -47,5 +47,9 @@ $(DIRS):
 
 clean:
 	@echo "clean ..."
-	@rm -f -d $(BUILD)/*.o $(LIBDIR)/*.a $(LIBDIR)/*.so $(GLSLDIR)/*.inc $(DIRS) 
+	@rm -f -d $(BUILD)/*.o $(LIBDIR)/*.a $(LIBDIR)/*.so $(GLSLDIR)/*.inc $(DIRS)
 	@$(MAKE) -C tools clean
+	
+docs:
+	@echo "Generating docs..."
+	doxygen Doxyfile

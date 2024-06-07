@@ -7,8 +7,8 @@
 #define __KT_VIDEO_COMMON_H__
 
 
-#define VIDEO_ATTR_TITLE	0
-#define VIDEO_ATTR_FRAME	1
+#define KT_VIDEO_ATTR_TITLE		0
+#define KT_VIDEO_ATTR_FRAME		1
 
 typedef struct VideoState_t {
 	u32 output_w;

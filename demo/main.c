@@ -38,35 +38,35 @@ int main() {
 	//kt_PaletteLoad(SPR_PALETTE_OFS, 16, test_pal_PAL);
 	system_Init(15);
 
-	spr[0].pos = SPR_POS(20, 40);
-	spr[0].chr = SPR_CHR(0, 0, SIZE_16, SIZE_24, 0);
-	spr[0].sfx = SPR_HUE(0xFFFF, 0x00) | SPR_BLEND(0x80);
-	spr[0].mat = 0;
+	spr[0].pos = KT_SPR_POS(20, 40);
+	spr[0].chr = KT_SPR_CHR(0, 0, KT_SIZE_16, KT_SIZE_24, 0);
+	spr[0].sfx = KT_SPR_HUE(0xFFFF, 0x00) | KT_SPR_BLEND(0x80);
+	spr[0].mtx = 0;
 
-	spr[1].pos = SPR_POS(60, 120);
-	spr[1].chr = SPR_CHR(0, 0, SIZE_32, SIZE_16, 0);
-	spr[1].sfx = SPR_HUE(0x00FF, 0x00);
-	spr[1].mat = 0;
+	spr[1].pos = KT_SPR_POS(60, 120);
+	spr[1].chr = KT_SPR_CHR(0, 0, KT_SIZE_32, KT_SIZE_16, 0);
+	spr[1].sfx = 0;
+	spr[1].mtx = 0;
 
-	spr[2].pos = SPR_POS(40, 20);
-	spr[2].chr = SPR_CHR(12, 0, SIZE_64, SIZE_48, 1);
-	spr[2].sfx = SPR_HUE(0x00FF, 0x00);
-	spr[2].mat = 0;
+	spr[2].pos = KT_SPR_POS(40, 20);
+	spr[2].chr = KT_SPR_CHR(12, 0, KT_SIZE_64, KT_SIZE_48, 1);
+	spr[2].sfx = KT_SPR_HUE(0x00FF, 0x80);
+	spr[2].mtx = 0;
 
 
-	kt_LayerSprite(1, 3, spr);
-	kt_LayerMap(0, LAYER_TYPE_MAP_NORMAL, 0, TILEMAP_SIZE_64x64);
-	kt_VideoFrameSet(VIDEO_FRAME_2X);
+	kt_LayerInitSprite(1, 3, spr);
+	kt_LayerInitMap(0, KT_LAYER_MAP_NORMAL, 0, KT_MAP_SIZE_64x64);
+	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 
-	kt_TilemapSetChr(0, 4, 4, 1, FLIP_NONE, 0);
-	kt_TilemapSetChr(0, 5, 4, 1, FLIP_X, 0);
-	kt_TilemapSetChr(0, 4, 2, 1, FLIP_XY, 0);
-	kt_TilemapSetChr(0, 7, 6, 1, FLIP_NONE, 0);
+	kt_TilemapSetChr(0, 4, 4, 1, KT_FLIP_NONE, 0);
+	kt_TilemapSetChr(0, 5, 4, 1, KT_FLIP_X, 0);
+	kt_TilemapSetChr(0, 4, 2, 1, KT_FLIP_XY, 0);
+	kt_TilemapSetChr(0, 7, 6, 1, KT_FLIP_NONE, 0);
 	for (int i = 0; i < 64;++i) {
 		for (int j = 0; j < 64;++j) {
-		kt_TilemapSetChr(1, i, j, 1, FLIP_NONE, 0);
-		kt_TilemapSetChr(2, i, j, 5, FLIP_NONE, 0);
-		kt_TilemapSetChr(3, i, j, 3, FLIP_NONE, 0);
+		kt_TilemapSetChr(1, i, j, 1, KT_FLIP_NONE, 0);
+		kt_TilemapSetChr(2, i, j, 5, KT_FLIP_NONE, 0);
+		kt_TilemapSetChr(3, i, j, 3, KT_FLIP_NONE, 0);
 		}
 	}
 
@@ -78,9 +78,10 @@ int main() {
 	system_WindowLabel("");
 	system_WindowLabel("OPTION");
 	system_WindowEnd();
-	kt_LayerMap(15, LAYER_TYPE_MAP_NORMAL, 15, TILEMAP_SIZE_64x64);
+	kt_LayerInitMap(15, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
 
-
+	KTColor col_a = {0x50, 0x50, 0x50, 0x0};
+	KTColor col_b = {0x50, 0x20, 0x20, 0x0};
 	while (1) {
 		kt_Poll();
 
@@ -90,14 +91,14 @@ int main() {
 		kt_OffsetColor(x - 50, x - 50, y - 50);
 
 		//kt_LayerRect(0, 10, 15, x+30, y+40);
-		kt_LayerMapOffset(0, x, y);
+		kt_LayerSetMapOffset(0, x, y);
 
-		spr[2].pos = SPR_POS(x, y);
+		spr[2].pos = KT_SPR_POS(x, y);
 
 		if (kt_JoyButtonHeld(0) & JOY_A) {
-			kt_BackColor(0x50, 0x50, 0x50);
+			kt_BackColor(col_a);
 		} else {
-			kt_BackColor(0x50, 0x20, 0x20);
+			kt_BackColor(col_b);
 		}
 		kt_Draw();
 	}

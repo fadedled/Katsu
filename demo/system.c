@@ -24,7 +24,7 @@ void system_Clear()
 {
 	for (u32 y = 0; y < 64; y++) {
 		for (u32 x = 0; x < 64; x++) {
-			kt_TilemapSetChr(sys_tmap, x, y, 0, FLIP_NONE, 0);
+			kt_TilemapSetChr(sys_tmap, x, y, 0, KT_FLIP_NONE, 0);
 		}
 	}
 }
@@ -37,11 +37,11 @@ u32 system_WindowBegin(u32 x, u32 y, u32 width)
 	if (!win_width)
 		return 0;
 
-	kt_TilemapSetChr(sys_tmap, win_x, win_y, 3, FLIP_Y, 0);
+	kt_TilemapSetChr(sys_tmap, win_x, win_y, 3, KT_FLIP_Y, 0);
 	for (u32 i = 1; i < win_width; ++i) {
-		kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 4, FLIP_Y, 0);
+		kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 4, KT_FLIP_Y, 0);
 	}
-	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 3, FLIP_XY, 0);
+	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 3, KT_FLIP_XY, 0);
 	win_y++;
 	return 1;
 }
@@ -50,24 +50,24 @@ u32 system_WindowLabel(char *str)
 {
 	if (!win_width)
 		return 0;
-	kt_TilemapSetChr(sys_tmap, win_x, win_y, 5, FLIP_NONE, 0);
+	kt_TilemapSetChr(sys_tmap, win_x, win_y, 5, KT_FLIP_NONE, 0);
 	u32 str_end = 0;
 	for (u32 i = 1; i < win_width; ++i) {
 		if (!str_end) {
 			if (*str >= 'A' && *str <= 'Z') {
-				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, *str - 'A' + 16, FLIP_NONE, 0);
+				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, *str - 'A' + 16, KT_FLIP_NONE, 0);
 			} else {
-				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 43, FLIP_NONE, 0);
+				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 43, KT_FLIP_NONE, 0);
 			}
 			if (*str == '\0') {
 				str_end = 1;
 			}
 			str++;
 		} else {
-			kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 43, FLIP_NONE, 0);
+			kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 43, KT_FLIP_NONE, 0);
 		}
 	}
-	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 5, FLIP_X, 0);
+	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 5, KT_FLIP_X, 0);
 	win_y++;
 	return 1;
 }
@@ -76,11 +76,11 @@ u32 system_WindowEnd()
 {
 	if (!win_width)
 		return 0;
-	kt_TilemapSetChr(sys_tmap, win_x, win_y, 3, FLIP_NONE, 0);
+	kt_TilemapSetChr(sys_tmap, win_x, win_y, 3, KT_FLIP_NONE, 0);
 	for (u32 i = 1; i< win_width; ++i) {
-		kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 4, FLIP_NONE, 0);
+		kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 4, KT_FLIP_NONE, 0);
 	}
-	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 3, FLIP_X, 0);
+	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 3, KT_FLIP_X, 0);
 	win_width = 0;
 	return 1;
 }
