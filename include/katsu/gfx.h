@@ -45,10 +45,10 @@
 /*! \addtogroup layer_type Layer type
  * @{
  */
-#define KT_LAYER_NONE				0			/*!< Layer is not drawn. */
+#define KT_LAYER_NONE			0			/*!< Layer is not drawn. */
 #define KT_LAYER_MAP_NORMAL		1			/*!< Draws a normal map on screen. */
-#define KT_LAYER_MAP_LINE_X		2			/*!< Draws a map on screen where line scroll is possible (vertical or horizontal). */
-#define KT_LAYER_MAP_AFFINE		3			/*!< Draws a map on screen with a 3d matrix applied. */
+#define KT_LAYER_MAP_LINE		2			/*!< Draws a map on screen where line scrolling is possible (vertical or horizontal). */
+#define KT_LAYER_MAP_ROTATION	3			/*!< Draws a map on screen with a 3D matrix applied. */
 #define KT_LAYER_SPRITE			4			/*!< Draws a set of sprites. */
 /*! @} */
 
@@ -339,7 +339,7 @@ void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size);
 void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
 
 /*!
- * \fn void kt_LayerSetMapAlpha(u32 layer, u32 active, u8 alpha)
+ * \fn void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha)
  * \brief This function sets the transparency value of a map layer.
  * \details The blending function used for the layer can be set by using
  * kt_LayerSetBlendMode.
@@ -350,11 +350,11 @@ void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
  *
  * \return none
  */
-void kt_LayerSetMapAlpha(u32 layer, u32 active, u8 alpha);
+void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha);
 
 /*!
  * \fn void kt_LayerSetMapRect(u32 layer, u32 x, u32 y, u32 w, u32 h)
- * \brief Defines the rectangle where the map layer will be drawn.
+ * \brief Defines a rectangle on the screen where the map layer will be drawn.
  * \details The function both the width and the height should be values
  * greater than zero, note that the (x, y) values are not signed.
  *
@@ -383,24 +383,7 @@ void kt_LayerSetMapRect(u32 layer, u32 x, u32 y, u32 w, u32 h);
 void kt_LayerSetMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y);
 
 /*!
- * \fn void kt_LayerSetBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
- * \brief Sets the layer's transparency blending mode (only for blending active).
- * \details For map layers the alpha values can be set with \ref kt_LayerSetMapAlpha, for
- * sprite layers, each sprite will have thier own alpha values. The funciton does the following:
- *
- * \code final_color = src_color * <src_alpha> <func> dst_color * <dst_alpha> \endcode
- *
- * \param[in] layer \ref layer_id.
- * \param[in] src_alpha \ref blnd_val.
- * \param[in] dst_alpha \ref blnd_val.
- * \param[in] func \ref blnd_modes.
- *
- * \return none
- */
-void kt_LayerSetBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func);
-
-/*!
- * \fn void kt_LayerSetChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs)
+ * \fn void kt_LayerSetMapChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs)
  * \brief Sets all character's tile and palette offset for map layers.
  * \details For map layers the tile ID and the palette used for each character can be
  * offset by a constant value by using this funciton.
@@ -411,7 +394,24 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func);
  *
  * \return none
  */
-void kt_LayerSetChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs);
+void kt_LayerSetMapChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs);
+
+/*!
+ * \fn void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func)
+ * \brief Sets the layer's transparency blending mode (only for blending active).
+ * \details For map layers the alpha values can be set with \ref kt_LayerSetMapBlend, for
+ * sprite layers, each sprite will have thier own alpha values. The funciton does the following:
+ *
+ * \code final_color = src_color * <src_factor> <func> dst_color * <dst_factor> \endcode
+ *
+ * \param[in] layer \ref layer_id.
+ * \param[in] src_factor \ref blnd_val.
+ * \param[in] dst_factor \ref blnd_val.
+ * \param[in] func \ref blnd_modes.
+ *
+ * \return none
+ */
+void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
 
 
 /*!

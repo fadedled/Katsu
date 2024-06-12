@@ -167,7 +167,7 @@ void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
 }
 
 
-void kt_LayerSetMapAlpha(u32 layer, u32 active, u8 alpha)
+void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha)
 {
 	layer &= 0xF;
 	active = active ? 0x80000000u : 0x0;
@@ -193,17 +193,17 @@ void kt_LayerSetMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y)
 }
 
 
-void kt_LayerSetBlendMode(u32 layer, u32 src_alpha, u32 dst_alpha, u32 func)
-{
-	layer &= 0xF;
-	layer_mem[layer].blnd = (src_alpha & 0x7) | ((dst_alpha & 0x7) << 3) | ((func & 0x3) << 6);
-}
-
-
-void kt_LayerSetChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs)
+void kt_LayerSetMapChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs)
 {
 	layer &= 0xF;
 	layer_mem[layer].chr_ofs = (pal_ofs << 16) | (tile_ofs & 0xFFFFu);
+}
+
+
+void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func)
+{
+	layer &= 0xF;
+	layer_mem[layer].blnd = (src_factor & 0x7) | ((dst_factor & 0x7) << 3) | ((func & 0x3) << 6);
 }
 
 
