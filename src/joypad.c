@@ -40,5 +40,5 @@ u32 kt_JoyButtonDown(u32 joy_id)
 s8 kt_JoyStick(u32 joy_id, u32 stick_id)
 {
 	joy_id &= MAX_JOYPADS-1;
-	return joy_state[joy_id].stick[stick_id];
+	return joy_state[joy_id].stick[stick_id & 0x3];
 }

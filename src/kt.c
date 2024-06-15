@@ -80,12 +80,20 @@ void kt_ExitFuncSet(KTExitFunc func)
 	kt_exit_func = func;
 }
 
+#define JOY_SEARCH_ALARM		120
+u32 joy_search_timer = 0;
 
 //Polls joypads and window events
 void kt_Poll(void)
 {
+	//TODO: This should not be automatic...
+	if (joy_search_timer == JOY_SEARCH_ALARM) {
+		__kt_JoypadSearchAndOpen();
+		joy_search_timer = 0;
+	}
 	__kt_JoypadPoll();
 	__kt_VideoPoll();
+	joy_search_timer++;
 }
 
 

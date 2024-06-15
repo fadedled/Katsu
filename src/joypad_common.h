@@ -19,9 +19,11 @@ typedef struct JoypadState_t {
 
 extern JoypadState joy_state[MAX_JOYPADS];
 
+
 u32  __kt_JoypadInit(void);
 void __kt_JoypadExit(void);
 void __kt_JoypadAttrSet(u32 attr, u32 val);
+void __kt_JoypadSearchAndOpen(void);
 void __kt_JoypadPoll(void);
 
 
