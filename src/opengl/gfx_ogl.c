@@ -313,7 +313,7 @@ void ogl_Draw(void)
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_bg);
 			glUniform2ui(0, lr->rect_pos, lr->rect_size);
-			glUniform4ui(1, lr->map_attr, lr->map_ofs, 0, 0);
+			glUniform4ui(1, lr->map_attr, lr->map_ofs, lr->chr_ofs, 0);
 			if (blnd_act ^ lr->map_attr >> 31) {
 				blnd_act = lr->map_attr >> 31;
 				if (blnd_act) {

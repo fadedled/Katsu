@@ -215,7 +215,8 @@ typedef struct KTColor_t {
  * \return none
  */
 void kt_TilesetLoad(u32 tile_id, u32 tile_count, const void* data);
-// void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
+
+void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
 
 
 /*!

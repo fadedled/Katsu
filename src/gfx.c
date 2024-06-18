@@ -68,33 +68,20 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal)
 }
 
 
-static void __kt_TilemapLoad64x64(u32 tmap, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
-{
-
-}
-
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
 {
-	/*
-	x &= 0x7Fu;
-	y = (y & 0x7Fu) << 7u;
-	w &= 0x7Fu;
-	h &= 0x7Fu;
-	tmap &= (KT_MAX_TILEMAPS-1);
-	u32 *dst = (u32*) (tmap_mem[tmap * (64 * 64)]);
+
 	u32 *src = (u32*) data;
-	//Check for different sizes of bg
-	stride = (data ? stride - w : 0);
-	while (h--) {
-		u32 w_tmp = w;
-		u32 x_tmp = x;
-		while (w_tmp--) {
-			bg_mem[y + x_tmp] = (data ? *data++ : 0);
-			x_tmp = (x_tmp + 1) & 0x7Fu;
+	u32 *dst = (u32*) tmap_mem;
+	for (u32 j = 0; j < h; ++j) {
+		//TODO: use the size parameter
+		for (u32 i = 0; i < w; ++i) {
+			u32 ofs = (((tmap & 0xf) * (64 * 64)) + ((j + y) << 6) + (i + x));
+			dst[ofs & 0xFFFFu] = src[i];
 		}
-		y = (y + 1) & 0x3F80u;
-		data += stride;
-	}*/
+		src += stride;
+	}
+
 }
 
 
@@ -231,8 +218,7 @@ void kt_LayerClear(u32 layer)
 {
 	layer &= 0xF;
 	layer_mem[layer].type = KT_LAYER_NONE;
-	layer_mem[layer].rect_pos = 0;
-	layer_mem[layer].rect_size = (KT_VIDEO_MAX_WIDTH << 16) | (KT_VIDEO_MAX_HEIGHT & 0xFFFFu);
+	kt_LayerSetMapRect(layer, 0, 0, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
 	layer_mem[layer].map_attr = 0;
 	layer_mem[layer].map_ofs = 0;
 	layer_mem[layer].blnd = 0x0;

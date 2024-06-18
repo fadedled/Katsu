@@ -23,7 +23,8 @@ layout(location = 0) out vec2 uv;
 layout(location = 1) out flat float blend;
 layout(location = 2) out flat uvec2 map_size;
 layout(location = 3) out flat uint tmap_num;
-
+layout(location = 4) out flat uint tile_ofs;
+layout(location = 5) out flat uint pal_ofs;
 
 void main()
 {
@@ -36,6 +37,8 @@ void main()
 	uv += vec2(uvec2(map.y, map.y >> 16) & 0xFFFFu);
 	map_size = (map.xx >> uvec2(11, 12)) & 0x200u;
 	tmap_num = (map.x >> 4) & 0xF000u;
+	pal_ofs = (map.z >> 16) & 0xFFFFu;
+	tile_ofs = map.z & 0xFFFFu;
 	gl_Position = vec4(pos, 0.0, 1.0);
 }
 
@@ -49,6 +52,9 @@ layout(location = 0) in vec2 uv;
 layout(location = 1) in flat float blend;
 layout(location = 2) in flat uvec2 map_size;
 layout(location = 3) in flat uint tmap_num;
+layout(location = 4) in flat uint tile_ofs;
+layout(location = 5) in flat uint pal_ofs;
+
 
 layout(location = 0) out vec4 frag_color;
 
@@ -87,10 +93,10 @@ void main()
 	uvec4 tile = texelFetch(tmap_mem, ivec2(tl & 0xffu, tl >> 8u), 0);
 
 	//get palette index
-	uint pal = tile.x;
+	uint pal = (tile.x + pal_ofs) & 0xFFu;
 	uint flip_x = -((tile.z >> 6) & 1u);
 	uint flip_y = -((tile.z >> 7) & 1u);
-	uint chr = ((flip_y ^ pix.y) & 7u) + ((((tile.z << 8) | tile.w) & 0x3FFFu) << 3u);
+	uint chr = ((flip_y ^ pix.y) & 7u) + (((((tile.z << 8) | tile.w) + tile_ofs) & 0x3FFFu) << 3u);
 	uint byte = ((flip_x ^ pix.x) >> 1) & 0x3;
 	uint shft = ((flip_x ^ pix.x) & 1u) << 2u;
 	uint idx = (texelFetch(tile_mem, ivec2(chr & 0xffu, chr >> 8u), 0)[byte] >> shft) & 0xfu;

@@ -89,6 +89,7 @@ static void __kt_JoyClose(u32 joy_id)
 	}
 }
 
+time_t last_mtime;
 
 void __kt_JoypadSearchAndOpen(void)
 {
@@ -102,6 +103,12 @@ void __kt_JoypadSearchAndOpen(void)
 	if (joy_dev[kb_joy].fd != -1) {
 		return;
 	}
+	/* Check if files in input dir have changed */
+	stat("/dev/input", &sb);
+	if (last_mtime == sb.st_mtim.tv_sec) {
+		return;
+	}
+	last_mtime = sb.st_mtim.tv_sec;
 
 	//Attempt to find a new joystick
 	int ndev = scandir("/dev/input", &nlist, __isEvdevJoystick, alphasort);
@@ -267,8 +274,6 @@ void __kt_JoypadPoll(void)
 											case ABS_HAT0X: {
 												u32 val = (sval > 16 ? 2u : (sval < -16));
 												btn = (btn & (~3u)) | val;
-												printf("X sval : %d\n", sval);
-												printf("%d\n", btn);
 											} break;
 											case ABS_X: {
 												joy_state[i].stick[JOY_STICK_LX] = sval;

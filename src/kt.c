@@ -80,7 +80,7 @@ void kt_ExitFuncSet(KTExitFunc func)
 	kt_exit_func = func;
 }
 
-#define JOY_SEARCH_ALARM		120
+#define JOY_SEARCH_ALARM		60
 u32 joy_search_timer = 0;
 
 //Polls joypads and window events

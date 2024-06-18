@@ -5,14 +5,14 @@ TARGET   :=	demo
 BUILD    :=	build
 INCLUDES :=	../include
 LIBDIRS :=	../lib
-SOURCES  :=	.
+SOURCES  :=	. res
 CFLAGS	 :=	-O2 -Wall
 RESLIB :=	res/tiles res/palettes
 
 LIBS     := -lGL -lpthread -lpulse-simple -lX11 -ldl -lkatsu
 
 #All files to compile
-CFILES	 :=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CFILES	 :=	$(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CPPFILES :=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 TILEFILES :=	$(foreach dir,$(RESLIB),$(wildcard $(dir)/*.4bpp))
 PALFILES :=	$(foreach dir,$(RESLIB),$(wildcard $(dir)/*.pal))
