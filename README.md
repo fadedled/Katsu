@@ -31,7 +31,7 @@ Run the ```make``` command, this will generate the static library ```lib\libkats
 
 ## Installing Katsu for your project
 
-Simply copy the static library to your projects ```lib``` folder, you must also copy the ```include\katsu``` to your projects ```include``` folder.
+Simply copy the static library to your project's ```lib``` folder, you must also copy the ```include\katsu``` to your project's ```include``` folder.
 
 
 ## Using and compiling your project
@@ -101,7 +101,7 @@ To compile the documentation you will need to have doxygen installed, then run, 
 $> make docs
 ```
 
-The Katsu Developer Manual is a work-in-progress, but the current version can be found here:
+The Katsu Developer Manual is a work-in-progress, the current version can be found here:
 
 [Katsu Developer Manual](./res/katsu_dev_man.pdf)
 

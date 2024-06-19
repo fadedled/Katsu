@@ -9,6 +9,7 @@ layout(std140, binding = 0) uniform video_data
 	vec2 frame;
 	vec2 outdims;
 	vec4 color_offset;
+	vec4 mtx_mem[256];
 };
 
 #ifdef VERTEX_SHADER

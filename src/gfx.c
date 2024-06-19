@@ -4,6 +4,7 @@
 
 #include <katsu/kt.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "video_common.h"
 #include "gfx_common.h"
@@ -13,7 +14,7 @@
 u8 tile_mem[0x80000];
 u8 pal_mem[0x2000];
 u8 tmap_mem[0x40000];
-mat mat_mem[0x100];
+mtx mtx_mem[KT_MAX_MTX];
 KTColor backcolor;
 u32 coloroffs;
 u32 colorline_cnt;
@@ -240,14 +241,30 @@ void kt_LayerClearAll(void)
 
 
 /*Matrices*/
-void kt_MatrixLoad(u32 mat, f32 a, f32 b, f32 c, f32 d)
+void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
 {
-
+	u32 i = mtx_idx & 0xFF;
+	if (i == KT_MTX_IDENTITY) {
+		return;
+	}
+	mtx_mem[i].a = a;
+	mtx_mem[i].b = b;
+	mtx_mem[i].c = c;
+	mtx_mem[i].d = d;
 }
 
-void kt_MatrixRotoscale(u32 mat, f32 x_scale, f32 y_scale, f32 angle)
+void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
 {
+	//Rotation matrix
+	f32 sn = sin(angle);
+	f32 cs = cos(angle);
 
+	f32 a = cs * x_scale;
+	f32 b = -sn * y_scale;
+	f32 c = sn * x_scale;
+	f32 d = cs * x_scale;
+
+	kt_MtxSet(mtx_idx, a, b, c, d);
 }
 
 
@@ -315,6 +332,15 @@ void kt_Reset(void)
 	kt_LayerClearAll();
 	kt_TilesetLoad(0, KT_MAX_TILES, NULL);
 	kt_PaletteLoad(0, KT_MAX_COLORS, NULL);
+
+	/*Init matrix memory*/
+	mtx_mem[0].a = 1.0f;
+	mtx_mem[0].b = 0.0f;
+	mtx_mem[0].c = 0.0f;
+	mtx_mem[0].d = 1.0f;
+	for (u32 i = 1; i < KT_MAX_MTX; ++i) {
+		kt_MtxSet(i, 0.0, 0.0, 0.0, 0.0);
+	}
 }
 
 

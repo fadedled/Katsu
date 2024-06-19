@@ -13,7 +13,7 @@ typedef struct Matrix_t {
 	f32 b;
 	f32 c;
 	f32 d;
-} mat;
+} mtx;
 
 /* LAYER STRUCTURE
  * type: controls what is shown
@@ -52,7 +52,7 @@ typedef struct Layer_t {
 extern u8 tile_mem[0x80000];
 extern u8 pal_mem[0x2000];
 extern u8 tmap_mem[0x40000];
-extern mat mat_mem[0x100];
+extern mtx mtx_mem[KT_MAX_MTX];
 extern KTColor backcolor;
 extern u32 coloroffs;
 extern u32 colorline_cnt;

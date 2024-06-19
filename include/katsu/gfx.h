@@ -468,8 +468,8 @@ void kt_LayerClearAll(void);
  * Matrix Functions
  * ============================================================================
  */
-// void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d);
-// void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle);
+void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d);
+void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle);
 
 
 /* ============================================================================

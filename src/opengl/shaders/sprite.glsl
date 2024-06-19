@@ -9,6 +9,7 @@ layout(std140, binding = 0) uniform video_data
 	vec2 frame;
 	vec2 outdims;
 	vec4 color_offset;
+	vec4 mtx_mem[256];
 };
 
 #ifdef VERTEX_SHADER
@@ -43,7 +44,8 @@ void main()
 	ivec2 hsize = ((ivec2(sprite.yy >> uvec2(16u, 20u)) & 0xf) + 1) << 2;
 	uv = vec2(((hsize << 1) * vert));
 	/*Matrix transformation*/
-	vec4 mtx = vec4(1.0, 0.0, 0.0, 1.0);//matrix[sprite.w & 0xFFu];
+	vec4 flip = 1.0 - vec4((sprite.y >> 13) & 2u, 0, 0, (sprite.y >> 14) & 2u);
+	vec4 mtx = mtx_mem[sprite.w & 0xFFu] * flip;
 	vec2 center_uv = uv - vec2(hsize);
 	center_uv = vec2(dot(center_uv, mtx.xy), dot(center_uv, mtx.zw));
 	uvec2 uofs = uvec2(sprite.x, sprite.x >> 16u) & 0xFFFFu;

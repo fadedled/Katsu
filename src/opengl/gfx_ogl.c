@@ -162,7 +162,7 @@ void ogl_Init(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sprite_verts), NULL, GL_DYNAMIC_DRAW);
 	glGenBuffers(1, &video_data_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, video_data_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data) + sizeof(mtx_mem), NULL, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(KTSpr), (void*) 0);
@@ -277,6 +277,7 @@ void ogl_Draw(void)
 	glBindBuffer(GL_UNIFORM_BUFFER, video_data_ubo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(sprite_verts), sprite_verts);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(video_data), &video_data);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(video_data), sizeof(mtx_mem), &mtx_mem);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, video_data_ubo);
 
 	glActiveTexture(GL_TEXTURE0);

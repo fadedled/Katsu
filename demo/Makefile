@@ -9,7 +9,7 @@ SOURCES  :=	. res
 CFLAGS	 :=	-O2 -Wall
 RESLIB :=	res/tiles res/palettes
 
-LIBS     := -lGL -lpthread -lpulse-simple -lX11 -ldl -lkatsu
+LIBS     := -lGL -lpthread -lpulse-simple -lX11 -lm -ldl -lkatsu
 
 #All files to compile
 CFILES	 :=	$(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))

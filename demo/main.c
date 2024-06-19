@@ -47,25 +47,28 @@ int main() {
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + nmap_tile_size, 0, KT_SIZE_16, KT_SIZE_16, bg_pal_size / 16);
 	spr[0].sfx = 0;
-	spr[0].mtx = 0;
+	spr[0].mtx = KT_MTX_IDENTITY;
 
 	spr[1].pos = KT_SPR_POS(40, 20);
 	spr[1].chr = KT_SPR_CHR(12, 0, KT_SIZE_16, KT_SIZE_16, 1);
 	spr[1].sfx = KT_SPR_HUE(0x00FF, 0x60);
-	spr[1].mtx = 0;
+	spr[1].mtx = KT_MTX_IDENTITY;
 
 	spr[2].pos = KT_SPR_POS(60, 120);
 	spr[2].chr = KT_SPR_CHR(0, 0, KT_SIZE_32, KT_SIZE_16, 0);
 	spr[2].sfx = KT_SPR_BLEND(0x80);
-	spr[2].mtx = 0;
+	spr[2].mtx = 1;
 
 	spr[3].pos = KT_SPR_POS(40, 20);
 	spr[3].chr = KT_SPR_CHR(12, 0, KT_SIZE_24, KT_SIZE_32, 1);
 	spr[3].sfx = KT_SPR_HUE(0x00FF, 0x80);
-	spr[3].mtx = 0;
+	spr[3].mtx = KT_MTX_IDENTITY;
+
+	kt_MtxSet(1, 2.3, 0.0, 0.6, -2.3);
+	kt_MtxSetRotoscale(1, 2.3, 2.3, 0.4);
 
 	kt_LayerInitSprite(KT_LAYER1, 4, spr);
-	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
+	kt_VideoFrameSet(KT_VIDEO_FRAME_1X);
 
 	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm0);
 	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm1);
