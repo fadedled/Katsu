@@ -65,7 +65,7 @@ int main() {
 	spr[3].mtx = KT_MTX_IDENTITY;
 
 	kt_MtxSet(1, 2.3, 0.0, 0.6, -2.3);
-	kt_MtxSetRotoscale(1, 2.3, 2.3, 0.4);
+
 
 	kt_LayerInitSprite(KT_LAYER1, 4, spr);
 	kt_VideoFrameSet(KT_VIDEO_FRAME_1X);
@@ -91,6 +91,10 @@ int main() {
 	KTColor col_a = {0x50, 0x50, 0x50, 0x0};
 	KTColor col_b = {0x50, 0x20, 0x20, 0x0};
 	u32 x2 = 60, y2 = 120;
+	f32 rot = 0.0;
+
+	kt_VideoFillModeSet(KT_VIDEO_FILL_OUT_INTSCALE);
+	kt_VideoOutputSet(160, 240);
 	while (1) {
 		kt_Poll();
 
@@ -109,6 +113,10 @@ int main() {
 		spr[1].pos = KT_SPR_POS(-x + 307, -y + 234);
 		spr[3].pos = KT_SPR_POS(x, y);
 		spr[2].pos = KT_SPR_POS(x2, y2);
+
+		f32 rot_inc = ((btns2 >> JOY_BIT_R) & 0x1) - ((btns2 >> JOY_BIT_L) & 0x1);
+		rot += rot_inc / 256.0;
+		kt_MtxSetRotoscale(1, 8, 8, 0.31);
 
 		if (kt_JoyButtonHeld(0) & JOY_A) {
 			kt_BackColor(col_a);

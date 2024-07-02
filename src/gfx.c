@@ -11,10 +11,10 @@
 
 #define COLOROFFS(r, g, b)	(u32) ((((r) & 0x1FFu)) | (((g) & 0x1FFu) << 9) | (((b) & 0x1FFu) << 18))
 
-u8 tile_mem[0x80000];
-u8 pal_mem[0x2000];
-u8 tmap_mem[0x40000];
-mtx mtx_mem[KT_MAX_MTX];
+u8 tile_mem[KT_MAX_TILES * 32];
+u8 pal_mem[KT_MAX_COLORS * 4];
+u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
+KTMtx mtx_mem[KT_MAX_MTX];
 KTColor backcolor;
 u32 coloroffs;
 u32 colorline_cnt;
@@ -184,7 +184,7 @@ void kt_LayerSetMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y)
 void kt_LayerSetMapChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs)
 {
 	layer &= 0xF;
-	layer_mem[layer].chr_ofs = (pal_ofs << 16) | (tile_ofs & 0xFFFFu);
+	layer_mem[layer].chr_ofs = ((pal_ofs & 0x7Fu) << 16) | (tile_ofs & 0xFFFFu);
 }
 
 
@@ -247,10 +247,10 @@ void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
 	if (i == KT_MTX_IDENTITY) {
 		return;
 	}
-	mtx_mem[i].a = a;
-	mtx_mem[i].b = b;
-	mtx_mem[i].c = c;
-	mtx_mem[i].d = d;
+	mtx_mem[i].a = MIN(MAX(a, -8.0), 8.0);
+	mtx_mem[i].b = MIN(MAX(b, -8.0), 8.0);
+	mtx_mem[i].c = MIN(MAX(c, -8.0), 8.0);
+	mtx_mem[i].d = MIN(MAX(d, -8.0), 8.0);
 }
 
 void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)

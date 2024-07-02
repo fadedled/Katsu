@@ -268,8 +268,6 @@ void __kt_JoypadPoll(void)
 											case ABS_HAT0Y: {
 												u32 val = (sval > 16 ? 2u : (sval < -16));
 												btn = (btn & (~(3u << 2))) | (val << 2);
-												printf("Y sval : %d\n", sval);
-												printf("%d\n", btn);
 											} break;
 											case ABS_HAT0X: {
 												u32 val = (sval > 16 ? 2u : (sval < -16));

@@ -55,7 +55,7 @@
 /*Sprites*/
 
 #define KT_SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
-#define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		(((pal) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
+#define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		((((pal & 0x7F)) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define KT_SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
 #define KT_SPR_BLEND(alpha)								((0x80000000u) | ((alpha) & 0xFFu))
 #define KT_SPR_MTX(mtx_idx)								((mtx_idx) & 0xFFu)
@@ -74,7 +74,7 @@
 /*! \addtogroup spr_size Sprite size
  * @{
  */
-#define KT_SIZE_8				0x0
+#define KT_SIZE_8			0x0
 #define KT_SIZE_16			0x1
 #define KT_SIZE_24			0x2
 #define KT_SIZE_32			0x3
@@ -171,9 +171,9 @@ typedef struct KTChr_t {
  *
  * \code
  * pos = [pos_y : 16][pos_x : 16]
- * chr = [pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tid : 14]
+ * chr = [- : 1][pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tid : 14]
  * sfx = [trs_act : 1][hue : 15][hue_alpha : 8][alpha : 8]
- * mtx = [none : 24][mtx_idx : 8]
+ * mtx = [-: 24][mtx_idx : 8]
  * \endcode
  */
 typedef struct KTSpr_t {
@@ -468,7 +468,31 @@ void kt_LayerClearAll(void);
  * Matrix Functions
  * ============================================================================
  */
+/*!
+ * \fn void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
+ * \brief Sets the values of a given matrix in Matrix Memory.
+ *
+ * \param[in] mtx_idx Index of matrix to set (should be non-zero)
+ * \param[in] a
+ * \param[in] b
+ * \param[in] c
+ * \param[in] d
+ *
+ * \return none
+ */
 void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d);
+
+/*!
+ * \fn void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
+ * \brief Sets a rotation and a scale on a given matrix in Matrix Memory.
+ *
+ * \param[in] mtx_idx Index of matrix to set (should be non-zero)
+ * \param[in] x_scale Horizontal scaling factor.
+ * \param[in] y_scale Vertical scaling factor.
+ * \param[in] angle Angle of rotation in radians.
+ *
+ * \return none
+ */
 void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle);
 
 

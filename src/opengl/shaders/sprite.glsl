@@ -55,7 +55,7 @@ void main()
 	gl_Position = vec4(pos, 0.0, 1.0);
 
 	tile = (sprite.y & 0x3FFFu) << 3;
-	pal = (sprite.y >> 24) & 0xFFu;
+	pal = (sprite.y >> 24) & 0x7Fu;
 	width = uint(hsize.x >> 2);
 	hue = u16toRGBA((sprite.z >> 16u) & 0x7FFFu, (sprite.z >> 8u) & 0xFFu);
 	if ((sprite.z >> 31) == 1) {

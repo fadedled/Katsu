@@ -25,12 +25,16 @@ void kt_VideoOutputGet(u32 *w, u32 *h)
 
 void kt_VideoFillModeSet(u32 fill_mode)
 {
-	vstate.fill_mode = fill_mode;
+	if (fill_mode < KT_VIDEO_MAX_FILL_MODES) {
+		vstate.fill_mode = fill_mode;
+	}
 }
 
 void kt_VideoFilterSet(u32 filter)
 {
-	vstate.filter_mode = filter;
+	if (filter < KT_VIDEO_MAX_FILTER) {
+		vstate.filter_mode = filter;
+	}
 }
 
 

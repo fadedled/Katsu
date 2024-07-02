@@ -94,7 +94,7 @@ void main()
 	uvec4 tile = texelFetch(tmap_mem, ivec2(tl & 0xffu, tl >> 8u), 0);
 
 	//get palette index
-	uint pal = (tile.x + pal_ofs) & 0xFFu;
+	uint pal = (tile.x + pal_ofs) & 0x7Fu;
 	uint flip_x = -((tile.z >> 6) & 1u);
 	uint flip_y = -((tile.z >> 7) & 1u);
 	uint chr = ((flip_y ^ pix.y) & 7u) + (((((tile.z << 8) | tile.w) + tile_ofs) & 0x3FFFu) << 3u);
