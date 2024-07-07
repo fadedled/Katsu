@@ -348,58 +348,6 @@ void ogl_Draw(void)
 	}
 
 
-	u32 out_w = 0;
-	u32 out_h = 0;
-	switch (vstate.fill_mode) {
-		case KT_VIDEO_FILL_SCALE: {
-			f32 aspect = (f32) KT_VIDEO_MAX_WIDTH / (f32) KT_VIDEO_MAX_HEIGHT;
-			f32 frame_aspect = (f32) vstate.frame_w / (f32) vstate.frame_h;
-			if (aspect <= frame_aspect) {
-				out_h = vstate.frame_h;
-				out_w = out_h * aspect;
-			} else {
-				out_w = vstate.frame_w;
-				out_h = out_w / aspect;
-			}
-			out_w = (vstate.output_w * out_w) / KT_VIDEO_MAX_WIDTH;
-			out_h = (vstate.output_h * out_h) / KT_VIDEO_MAX_HEIGHT;
-		} break;
-		case KT_VIDEO_FILL_STRECH: {
-			out_w = vstate.frame_w;
-			out_h = vstate.frame_h;
-			out_w = (vstate.output_w * out_w) / KT_VIDEO_MAX_WIDTH;
-			out_h = (vstate.output_h * out_h) / KT_VIDEO_MAX_HEIGHT;
-		} break;
-		case KT_VIDEO_FILL_INTSCALE: {
-			out_w = KT_VIDEO_MAX_WIDTH * (vstate.frame_w / KT_VIDEO_MAX_WIDTH);
-			out_h = KT_VIDEO_MAX_HEIGHT * (vstate.frame_h / KT_VIDEO_MAX_HEIGHT);
-			out_w = (vstate.output_w * out_w) / KT_VIDEO_MAX_WIDTH;
-			out_h = (vstate.output_h * out_h) / KT_VIDEO_MAX_HEIGHT;
-		} break;
-		case KT_VIDEO_FILL_OUT_SCALE: {
-			f32 aspect = (f32) vstate.output_w / (f32) vstate.output_h;
-			f32 frame_aspect = (f32) vstate.frame_w / (f32) vstate.frame_h;
-			if (aspect <= frame_aspect) {
-				out_h = vstate.frame_h;
-				out_w = out_h * aspect;
-			} else {
-				out_w = vstate.frame_w;
-				out_h = out_w / aspect;
-			}
-		} break;
-		case KT_VIDEO_FILL_OUT_STRECH: {
-			out_w = vstate.frame_w;
-			out_h = vstate.frame_h;
-		} break;
-		case KT_VIDEO_FILL_OUT_INTSCALE: {
-			out_w = vstate.output_w * (vstate.frame_w / vstate.output_w);
-			out_h = vstate.output_h * (vstate.frame_h / vstate.output_h);
-		} break;
-	}
-
-	u32 out_x = (vstate.frame_w - out_w) / 2;
-	u32 out_y = (vstate.frame_h - out_h) / 2;
-
 	//Draw final image
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(prog_final);
@@ -409,7 +357,7 @@ void ogl_Draw(void)
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glViewport(out_x, out_y, out_w, out_h);
+	glViewport(vstate.frame_output_x, vstate.frame_output_y, vstate.frame_output_w, vstate.frame_output_h);
 	//XXX: Upload final color/width/hegiht
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_mfb);

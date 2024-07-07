@@ -171,7 +171,7 @@ typedef struct KTChr_t {
  *
  * \code
  * pos = [pos_y : 16][pos_x : 16]
- * chr = [- : 1][pal : 8][vsize : 4][hsize : 4][vf : 1][hf : 1][tid : 14]
+ * chr = [- : 1][pal : 7][vsize : 4][hsize : 4][vf : 1][hf : 1][tid : 14]
  * sfx = [trs_act : 1][hue : 15][hue_alpha : 8][alpha : 8]
  * mtx = [-: 24][mtx_idx : 8]
  * \endcode

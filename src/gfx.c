@@ -62,7 +62,7 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal)
 	x &= 0x3Fu;
 	y &= 0x3Fu;
 	u32 ofs = (((tmap & 0xf) * (64 * 64)) + (y << 6) + x) << 2;
-	tmap_mem[ofs] = pal;
+	tmap_mem[ofs] = pal & 0x7F;
 	tmap_mem[ofs+1] = 0;
 	tmap_mem[ofs+2] = ((flip & 0x3) << 6) | ((tile_num & 0x3F00) >> 8);
 	tmap_mem[ofs+3] = tile_num & 0xFF;
@@ -71,7 +71,6 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal)
 
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
 {
-
 	u32 *src = (u32*) data;
 	u32 *dst = (u32*) tmap_mem;
 	for (u32 j = 0; j < h; ++j) {
@@ -82,7 +81,6 @@ void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, 
 		}
 		src += stride;
 	}
-
 }
 
 

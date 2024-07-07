@@ -53,6 +53,7 @@ static LRESULT CALLBACK __kt_WinCallback(HWND win, UINT msg, WPARAM wparam, LPAR
 			GetClientRect(kt_win.hwin, &cli_rect);
 			vstate.frame_w = cli_rect.right - cli_rect.left;
 			vstate.frame_h = cli_rect.bottom - cli_rect.top;
+			__kt_UpdateOutputDims();
 		} break;
 		case WM_DESTROY: {
 		} break;

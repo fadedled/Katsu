@@ -186,6 +186,7 @@ void __kt_VideoPoll(void)
 				XConfigureEvent conf_ev = xev.xconfigure;
 					vstate.frame_w = conf_ev.width;
 					vstate.frame_h = conf_ev.height;
+					__kt_UpdateOutputDims();
 			} break;
 		}
 	}

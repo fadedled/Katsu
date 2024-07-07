@@ -19,19 +19,19 @@ for Katsu's 2D rendering capabilities.
 
 ## Build from source
 
-Katsu is meant to be used as a static library since it's so small, to build Katsu from source do the following:
+Katsu is meant to be used as a static library since it's so small, to build Katsu and it's tools (these will be placed in the ```tools``` folder) from source do the following:
 
 ### Windows
 
-Run the batch file ```build_win.bat```, this will generate the static library ```lib\katsu.lib```.
+Run the batch file ```build_win.bat```, this will generate the static library ```lib/katsu.lib```. If you want to build the included demo you can 
 
 ### Linux
 
-Run the ```make``` command, this will generate the static library ```lib\libkatsu.a```.
+Run the ```make``` command, this will generate the static library ```lib/libkatsu.a```.
 
 ## Installing Katsu for your project
 
-Simply copy the static library to your project's ```lib``` folder, you must also copy the ```include\katsu``` to your project's ```include``` folder.
+Simply copy the static library to your project's ```lib``` folder, you must also copy the ```include/katsu``` to your project's ```include``` folder.
 
 
 ## Using and compiling your project
@@ -112,6 +112,8 @@ formats, you must make your own tools (though a Katsu asset builder is planned).
 tile generation, you can use the kt-image tool found inside the ```tools``` folder after
 building Katsu, this tool can read most image files and generate Katsu's 4bpp paletted format.
 There might exist some 4bpp tile editors out there tho.
+
+For creating tilemaps, a simple file exporter for the Tiled 2D map editor can be found in ```tools/tiled-extension``` (see it's [readme](./tools/tiled-extension/README.md) for more information).
 
 ## Donation
 **The Katsu project is and will always be free!**

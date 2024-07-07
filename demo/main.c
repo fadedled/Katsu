@@ -68,7 +68,7 @@ int main() {
 
 
 	kt_LayerInitSprite(KT_LAYER1, 4, spr);
-	kt_VideoFrameSet(KT_VIDEO_FRAME_1X);
+	kt_VideoFrameSet(KT_VIDEO_FRAME_4X);
 
 	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm0);
 	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm1);
@@ -93,7 +93,7 @@ int main() {
 	u32 x2 = 60, y2 = 120;
 	f32 rot = 0.0;
 
-	kt_VideoFillModeSet(KT_VIDEO_FILL_OUT_INTSCALE);
+	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
 	kt_VideoOutputSet(160, 240);
 	while (1) {
 		kt_Poll();
