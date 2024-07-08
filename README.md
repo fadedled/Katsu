@@ -23,7 +23,7 @@ Katsu is meant to be used as a static library since it's so small, to build Kats
 
 ### Windows
 
-Run the batch file ```build_win.bat```, this will generate the static library ```lib/katsu.lib```. If you want to build the included demo you can 
+If you are using Visual Studio you must set up the Visual Studio enviroment variables (this can be done in Windows Terminal by selecting the VS enviroment in the arrow dropdown menu). Then just run the ```build_win.bat``` batch file, this creates the static library ```lib/Katsu.lib```.
 
 ### Linux
 
@@ -42,7 +42,7 @@ The following is a very basic example for creating a window and controlling the 
 #include <katsu/kt.h>
 
 int main() {
-    KTColor b_color = {0, 0x80, 0, 0};
+    KTColor bcolor = {0x00, 0x80, 0x00, 0x00};
     /* Init Katsu */
     if (kt_Init()) {
         return 0;
@@ -70,10 +70,10 @@ int main() {
 
 ### Compiling on Windows
 
-You will need Visual Studios MSVC or MinGW installed, link with ```User32.lib```, ```Opengl32.lib``` and ```katsu.lib```. If you are using the console/terminal you should set your environment to use MSVC. Then compile with:
+You will need Visual Studios MSVC or MinGW installed, link with ```User32.lib```, ```Opengl32.lib``` and ```Katsu.lib```. If you are using the console/terminal you should set your environment to use MSVC. Then compile with:
 
 ```
-$> cl -Tc <your_source_code> -I".\include" -link User32.lib Opengl32.lib lib\katsu.lib -OUT:mygame.exe
+$> cl -Tc <your_source_code> -I".\include" -link User32.lib Opengl32.lib Xinput.lib lib\Katsu.lib -OUT:mygame.exe
 $> mygame.exe
 ```
 
@@ -82,7 +82,7 @@ $> mygame.exe
 Development packages for X11, OpenGL, and PulseAudio are needed when compiling your project. You can download them from your package manager as ```libx11-dev```, ```libgl1-mesa-dev``` and ```libpulse-dev``` for Debian-based distros or as ```libX11-devel```, ```mesa-libGL-devel``` and ```pulseaudio-libs-devel``` for RedHat-based distros. After they are installed, you can compile and run from the terminal with:
 
 ```
-$> gcc <your_source_code> -o mygame -I./include -L./lib -lGL -lpthread -lpulse-simple -lX11 -ldl -lkatsu
+$> gcc <your_source_code> -o mygame -I./include -L./lib -lGL -lpthread -lpulse-simple -lX11 -lm -ldl -lkatsu
 $> ./mygame
 ```
 

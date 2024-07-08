@@ -94,7 +94,6 @@ int main() {
 	f32 rot = 0.0;
 
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
-	kt_VideoOutputSet(160, 240);
 	while (1) {
 		kt_Poll();
 
