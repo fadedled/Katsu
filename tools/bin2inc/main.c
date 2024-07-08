@@ -116,7 +116,8 @@ int main(int argc, char* argv[])
 	u32 new_size = 0;
 	for (u32 i = 0; i < file_size; i++) {
 		if (skip_comments) {
-			if (*src_data == '/' && *(src_data+1) == '/') {
+			if ((*src_data == '/' && *(src_data+1) == '/')
+				|| (*src_data == '\\' && *(src_data+1) == '\\')) {
 				will_copy = 0;
 			}
 			if (!will_copy && *src_data == '\n') {
