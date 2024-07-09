@@ -5,18 +5,22 @@
 #include "system.h"
 
 /*Demo Palette*/
-extern u8 _binary_res_palettes_bg_data_pal_start[];
-extern u8 _binary_res_palettes_bg_data_pal_end[];
-extern u8 _binary_res_palettes_spr_data_pal_start[];
-extern u8 _binary_res_palettes_spr_data_pal_end[];
+extern const u8 norm_demo_4bpp_pal[];
+extern const u8 affine_0_demo_4bpp_pal[];
+extern const u8 affine_1_demo_4bpp_pal[];
+extern const u8 system_4bpp_pal[];
+
 
 /*Demo Tiles*/
-extern u8 _binary_res_tiles_norm_map_tiles_4bpp_start[];
-extern u8 _binary_res_tiles_norm_map_tiles_4bpp_end[];
-extern u8 _binary_res_tiles_affine_map_tiles_4bpp_start[];
-extern u8 _binary_res_tiles_affine_map_tiles_4bpp_end[];
-extern u8 _binary_res_tiles_system_spr_4bpp_start[];
-extern u8 _binary_res_tiles_system_spr_4bpp_end[];
+extern const u8 norm_demo_4bpp_data[];
+extern const u8 affine_0_demo_4bpp_data[];
+extern const u8 affine_1_demo_4bpp_data[];
+extern const u8 system_4bpp_data[];
+
+extern const u32 norm_demo_4bpp_tilenum;
+extern const u32 affine_0_demo_4bpp_tilenum;
+extern const u32 affine_1_demo_4bpp_tilenum;
+extern const u32 system_4bpp_tilenum;
 
 extern u8 norm_tm0[];
 extern u8 norm_tm1[];
@@ -32,20 +36,20 @@ int main() {
 	}
 	u32 x = 40;
 	u32 y = 20;
-	u32 bg_pal_size =  (u32)((u32)&_binary_res_palettes_bg_data_pal_end - (u32)&_binary_res_palettes_bg_data_pal_start) / 4;
-	u32 nmap_tile_size =  (u32)((u32)&_binary_res_tiles_norm_map_tiles_4bpp_end - (u32)&_binary_res_tiles_norm_map_tiles_4bpp_start) / 32;
-	u32 sys_spr_tile_size =  (u32)((u32)&_binary_res_tiles_system_spr_4bpp_end - (u32)&_binary_res_tiles_system_spr_4bpp_start) / 32;
+
 	KTSpr spr[4] = {0};
 	//kt_TilesetLoad(0, 12, bg_pal_size);
-	kt_TilesetLoad(32*2, nmap_tile_size , &_binary_res_tiles_norm_map_tiles_4bpp_start);
-	kt_TilesetLoad(32*2 + nmap_tile_size, sys_spr_tile_size , &_binary_res_tiles_system_spr_4bpp_start);
+	kt_TilesetLoad(0, system_4bpp_tilenum , system_4bpp_data);
+	kt_TilesetLoad(system_4bpp_tilenum, norm_demo_4bpp_tilenum , norm_demo_4bpp_data);
 	kt_VideoTitleSet("Test program");
-	kt_PaletteLoad(0, bg_pal_size, &_binary_res_palettes_bg_data_pal_start);
-	kt_PaletteLoad(bg_pal_size, 16, &_binary_res_palettes_spr_data_pal_start);
+	kt_PaletteLoad(0, 16, system_4bpp_pal);
+	kt_PaletteLoad(16, 16, norm_demo_4bpp_pal);
+	kt_PaletteLoad(32, 16, affine_0_demo_4bpp_pal);
+	kt_PaletteLoad(48, 16, affine_1_demo_4bpp_pal);
 	system_Init(15);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
-	spr[0].chr = KT_SPR_CHR(32*2 + nmap_tile_size, 0, KT_SIZE_16, KT_SIZE_16, bg_pal_size / 16);
+	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
 	spr[0].sfx = 0;
 	spr[0].mtx = KT_MTX_IDENTITY;
 
@@ -75,8 +79,8 @@ int main() {
 
 	kt_LayerInitMap(KT_LAYER0, KT_LAYER_MAP_NORMAL, 0, KT_MAP_SIZE_64x64);
 	kt_LayerInitMap(KT_LAYER2, KT_LAYER_MAP_NORMAL, 1, KT_MAP_SIZE_64x64);
-	kt_LayerSetMapChrOffset(KT_LAYER0, 64, 1);
-	kt_LayerSetMapChrOffset(KT_LAYER2, 64, 1);
+	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 1);
+	kt_LayerSetMapChrOffset(KT_LAYER2, system_4bpp_tilenum, 1);
 
 
 	kt_LayerInitMap(KT_LAYER15, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);

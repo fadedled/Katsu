@@ -2,11 +2,6 @@
 #include <katsu/kt.h>
 
 
-extern u8 _binary_res_tiles_system_tiles_4bpp_start[];
-extern u8 _binary_res_tiles_system_tiles_4bpp_end[];
-extern u8 _binary_res_tiles_system_spr_4bpp_start[];
-extern u8 _binary_res_tiles_system_spr_4bpp_end[];
-
 u32 sys_tmap;
 u32 win_x;
 u32 win_y;
@@ -15,8 +10,8 @@ u32 win_width;
 
 void system_Init(u32 tmap)
 {
-	u32 sys_tile_size =  ((u64)(&_binary_res_tiles_system_tiles_4bpp_end) - (u64)(&_binary_res_tiles_system_tiles_4bpp_start)) / 32;
-	kt_TilesetLoad(0, sys_tile_size, &_binary_res_tiles_system_tiles_4bpp_start);
+	//u32 sys_tile_size =  ((u64)(&_binary_res_tiles_system_tiles_4bpp_end) - (u64)(&_binary_res_tiles_system_tiles_4bpp_start)) / 32;
+	//kt_TilesetLoad(0, sys_tile_size, &_binary_res_tiles_system_tiles_4bpp_start);
 	sys_tmap = tmap;
 }
 
@@ -55,16 +50,16 @@ u32 system_WindowLabel(char *str)
 	for (u32 i = 1; i < win_width; ++i) {
 		if (!str_end) {
 			if (*str >= 'A' && *str <= 'Z') {
-				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, *str - 'A' + 16, KT_FLIP_NONE, 0);
+				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, *str, KT_FLIP_NONE, 0);
 			} else {
-				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 43, KT_FLIP_NONE, 0);
+				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, ' ', KT_FLIP_NONE, 0);
 			}
 			if (*str == '\0') {
 				str_end = 1;
 			}
 			str++;
 		} else {
-			kt_TilemapSetChr(sys_tmap, win_x + i, win_y, 43, KT_FLIP_NONE, 0);
+			kt_TilemapSetChr(sys_tmap, win_x + i, win_y, ' ', KT_FLIP_NONE, 0);
 		}
 	}
 	kt_TilemapSetChr(sys_tmap, win_x + win_width, win_y, 5, KT_FLIP_X, 0);

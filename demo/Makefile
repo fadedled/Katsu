@@ -7,19 +7,18 @@ INCLUDES :=	../include
 LIBDIRS :=	../lib
 SOURCES  :=	. res
 CFLAGS	 :=	-O2 -Wall
-RESLIB :=	res/tiles res/palettes
 
 LIBS     := -lGL -lpthread -lpulse-simple -lX11 -lm -ldl -lkatsu
 
 #All files to compile
 CFILES	 :=	$(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
 CPPFILES :=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
-TILEFILES :=	$(foreach dir,$(RESLIB),$(wildcard $(dir)/*.4bpp))
-PALFILES :=	$(foreach dir,$(RESLIB),$(wildcard $(dir)/*.pal))
+TILEFILES :=	$(foreach dir, res/tiles,$(wildcard $(dir)/*.png))
+PALFILES :=	$(foreach dir, res/palettes,$(wildcard $(dir)/*.png))
 
 INCLUDE	 :=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir))
 
-OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(PALFILES:.pal=.o) $(TILEFILES:.4bpp=.o)
+OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(TILEFILES:.png=.o)
 OFILES         := $(OFILES_SOURCES)
 BINFILES       := $(BMPFILES:.bmp=.bin)
 
@@ -29,13 +28,9 @@ BINFILES       := $(BMPFILES:.bmp=.bin)
 	@echo $(notdir $<)
 	@$(CC) -c -o $@ $< $(CFLAGS) $(INCLUDE)
 
-%.o: %.4bpp
+%.c: %.png
 	@echo "Tile File:" $(notdir $<)
-	@$(LD) -r -b binary -o $@ $<
-
-%.o: %.pal
-	@echo "Palette File:" $(notdir $<)
-	@$(LD) -r -b binary -o $@ $<
+	@../tools/kt-image -c -palexp -p res/palettes/$(notdir $(basename $<))_pal.png $<
 
 $(TARGET): $(OFILES) ../lib/libkatsu.a
 	@echo "Generating binary executable:" $@

@@ -20,6 +20,7 @@ u8 pal[16*4] = {
 };
 
 u32 c_file = 0;
+u32 export_pal = 0;
 
 //u32 *pal = bw_pal;
 
@@ -101,6 +102,15 @@ static void write_data(char* out_file,u8 *data, u32 size)
 		fprintf(fp, "};\n\n");
 		fprintf(fp, "const u32 %s_size = %d;\n", name, size);
 		fprintf(fp, "const u32 %s_tilenum = %d;\n", name, size / 32);
+		if (export_pal) {
+			fprintf(fp, "const u8 %s_pal[16*4] = {\n", name);
+			for (u32 i = 0; i < 16 * 4; i += 8) {
+				fprintf(fp, "\t0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X,\n",
+						pal[i  ], pal[i+1], pal[i+2], pal[i+3],
+						pal[i+4], pal[i+5], pal[i+6], pal[i+7]);
+			}
+			fprintf(fp, "};\n\n");
+		}
 		fclose(fp);
 	} else {	// Write the image as binary file.
 		FILE *fp = fopen(out_file, "wb");
@@ -173,7 +183,8 @@ int main(int argc, char* argv[])
 				//"\t-4bpp: Convert to 4bpp tiled image.\n"
 				//"\t-8bpp: Convert to 8bpp tiled image.\n"
 				"\t-c: Output as C source file.\n"
-				"\t-p <Palette image file>: Use palette for paletization.\n", argv[0]
+				"\t-palexp: Export palette inside C file.\n"
+				"\t-p <Palette image file>: Use palette for paletization.\n", argv[0]);
 		return 0;
 	}
 
@@ -196,7 +207,13 @@ int main(int argc, char* argv[])
 			file_ext = "8bpp";
 		} else if (!strcmp("-c", argv[i])) {
 			c_file = 1;
+		} else if (!strcmp("-palexp", argv[i])) {
+			export_pal = 1;
 		}
+	}
+
+	if (!c_file) {
+		export_pal = 0;
 	}
 
 	filename = argv[argc-1];

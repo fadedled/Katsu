@@ -83,20 +83,25 @@ int main(int argc, char* argv[])
 	char file_base[256];
 	char *filename;
 	u32 skip_comments = 0;
+	char *file_ext = "inc";
 	if (argc < 2) {
 		printf("Katsu Binary to inc file converter:\n"
 				"Usage: %s [-nc] <Input File>\n"
-				"\t-nc : Skip C style one line comments.", argv[0]);
+				"\t-s : Skip C style one line comments."
+				"\t-c : Set extension to .c.", argv[0]);
+		return 0;
 	}
 
-	if (argc > 2) {
-		if (strcmp(argv[1], "-nc") == 0) {
+	for (u32 i = 1; i < argc-1; i++) {
+		if (strcmp(argv[1], "-s") == 0) {
 			skip_comments = 1;
+		} else if (strcmp(argv[1], "-c") == 0) {
+			file_ext = "c";
 		}
 	}
 
 	filename = argv[argc-1];
-	cstr_ChangeFilenameExt(filename, output_filename, "inc");
+	cstr_ChangeFilenameExt(filename, output_filename, file_ext);
 	cstr_GenStrVariableName(filename, file_base);
 
 	// Read the file.
