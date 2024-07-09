@@ -28,7 +28,7 @@ extern u8 norm_tm1[];
 #define TMAP_PALETTE_OFS 0
 #define SPR_PALETTE_OFS (4 * 16)
 
-
+KTSpr sys_spr[8] = {0};
 
 int main() {
 	if (kt_Init()) {
@@ -68,6 +68,13 @@ int main() {
 	spr[3].sfx = KT_SPR_HUE(0x00FF, 0x80);
 	spr[3].mtx = KT_MTX_IDENTITY;
 
+	u32 pointer_indx = 0;
+
+	sys_spr[0].pos = KT_SPR_POS(10*8-8, 4*8 +4 + (pointer_indx*8));
+	sys_spr[0].chr = KT_SPR_CHR(128, KT_FLIP_NONE, KT_SIZE_16, KT_SIZE_16, 0);
+	sys_spr[0].sfx = 0;
+	sys_spr[0].mtx = KT_MTX_IDENTITY;
+
 	kt_MtxSet(1, 2.3, 0.0, 0.6, -2.3);
 
 
@@ -83,11 +90,12 @@ int main() {
 	kt_LayerSetMapChrOffset(KT_LAYER2, system_4bpp_tilenum, 1);
 
 
-	kt_LayerInitMap(KT_LAYER15, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
-	system_WindowBegin(KT_LAYER10, 4, 15);
-	system_WindowLabel("HELLO THERE");
-	system_WindowLabel("");
-	system_WindowLabel("DEMO");
+	kt_LayerInitMap(KT_LAYER14, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
+	kt_LayerInitSprite(KT_LAYER15, 2, sys_spr);
+	system_WindowBegin(10, 4, 32);
+	system_WindowLabel("- Normal Map Demo");
+	system_WindowLabel("- Sprite Demo");
+	system_WindowLabel("- ");
 	system_WindowLabel("");
 	system_WindowLabel("OPTION");
 	system_WindowEnd();
@@ -121,10 +129,17 @@ int main() {
 		rot += rot_inc / 256.0;
 		kt_MtxSetRotoscale(1, 8, 8, 0.31);
 
+		if (kt_JoyButtonDown(0) & JOY_DOWN) {
+			pointer_indx = (pointer_indx + 1) & 3;
+		} else if (kt_JoyButtonDown(0) & JOY_UP) {
+			pointer_indx = (pointer_indx - 1) & 3;
+		}
+		sys_spr[0].pos = KT_SPR_POS(10*8-8, 4*8 +4 + (pointer_indx*8));
+
 		if (kt_JoyButtonHeld(0) & JOY_A) {
-			kt_BackColor(col_a);
+			sys_spr[0].chr = KT_SPR_CHR(132, KT_FLIP_NONE, KT_SIZE_16, KT_SIZE_16, 0);
 		} else {
-			kt_BackColor(col_b);
+			sys_spr[0].chr = KT_SPR_CHR(128, KT_FLIP_NONE, KT_SIZE_16, KT_SIZE_16, 0);
 		}
 		kt_Draw();
 	}

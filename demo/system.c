@@ -17,8 +17,8 @@ void system_Init(u32 tmap)
 
 void system_Clear()
 {
-	for (u32 y = 0; y < 64; y++) {
-		for (u32 x = 0; x < 64; x++) {
+	for (u32 y = 0; y < 30; y++) {
+		for (u32 x = 0; x < 54; x++) {
 			kt_TilemapSetChr(sys_tmap, x, y, 0, KT_FLIP_NONE, 0);
 		}
 	}
@@ -41,6 +41,8 @@ u32 system_WindowBegin(u32 x, u32 y, u32 width)
 	return 1;
 }
 
+
+
 u32 system_WindowLabel(char *str)
 {
 	if (!win_width)
@@ -49,13 +51,11 @@ u32 system_WindowLabel(char *str)
 	u32 str_end = 0;
 	for (u32 i = 1; i < win_width; ++i) {
 		if (!str_end) {
-			if (*str >= 'A' && *str <= 'Z') {
-				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, *str, KT_FLIP_NONE, 0);
-			} else {
-				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, ' ', KT_FLIP_NONE, 0);
-			}
 			if (*str == '\0') {
+				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, ' ', KT_FLIP_NONE, 0);
 				str_end = 1;
+			} else {
+				kt_TilemapSetChr(sys_tmap, win_x + i, win_y, *str, KT_FLIP_NONE, 0);
 			}
 			str++;
 		} else {

@@ -304,6 +304,7 @@ void ogl_Draw(void)
 	glDisable(GL_BLEND);
 
 	Layer *lr = layer_mem;
+	u32 spr_indx = 0;
 	for (u32 i = 0; i < KT_MAX_LAYERS; ++i) {
 		//Set the blending mode for the layer
 		u8 blnd = lr->blnd;
@@ -338,7 +339,8 @@ void ogl_Draw(void)
 						glDisable(GL_BLEND);
 					}
 				}
-				glDrawArrays(GL_TRIANGLE_STRIP, j << 2, 4);
+				glDrawArrays(GL_TRIANGLE_STRIP, spr_indx << 2, 4);
+				++spr_indx;
 			}
 		} break;
 
