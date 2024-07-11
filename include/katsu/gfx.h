@@ -242,7 +242,7 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_id, u32 flip, u32 pal);
  * \details This function copies the colors from the application to Color Memory. If the application modifies
  * loaded colors, they must be reloaded for the changes to be shown.
  *
- * \param[in] color_num The first color in Color Memoy to start the copy.
+ * \param[in] color_num The first color in Color Memoy to start the copy, should be between 0 and 2048.
  * \param[in] color_count Number of colors to be copied.
  * \param[in] data Pointer to the color data to be loaded. If NULL is passed, the specified colors are zeroed out.
  *
@@ -256,7 +256,7 @@ void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data);
  * \brief Used to load a single color to Color Memory.
  * \details This function copies the specified color to Color Memory.
  *
- * \param[in] color_num The color in Color Memoy that will be modified.
+ * \param[in] color_num The color in Color Memoy that will be modified, should be between 0 and 2048.
  * \param[in] color The color to load.
  *
  * \return none
