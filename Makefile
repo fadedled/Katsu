@@ -5,9 +5,9 @@ CC       =	gcc
 #Directroies
 LIBDIR   :=	lib
 BUILD    :=	build
-INCLUDES :=	include
+INCLUDES :=	include 
 SOURCES  :=	src src/platform/linux src/opengl
-CFLAGS	 :=	-O2 -Wall -fPIC #-DKT_DEBUG
+CFLAGS	 :=	-O2 -Wall -fPIC `pkg-config --cflags libpipewire-0.3` #-DKT_DEBUG 
 GLSLDIR  := 	src/opengl/shaders
 BIN2INC	 := 	tools/kt-bin2inc
 

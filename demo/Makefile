@@ -6,9 +6,9 @@ BUILD    :=	build
 INCLUDES :=	../include
 LIBDIRS :=	../lib
 SOURCES  :=	. res
-CFLAGS	 :=	-O2 -Wall
+CFLAGS	 :=	-O2 -Wall `pkg-config --cflags libpipewire-0.3`
 
-LIBS     := -lGL -lpthread -lpulse-simple -lX11 -lm -ldl -lkatsu
+LIBS     := -lGL -lpthread `pkg-config --libs libpipewire-0.3` -lX11 -lm -ldl -lkatsu
 
 #All files to compile
 CFILES	 :=	$(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))

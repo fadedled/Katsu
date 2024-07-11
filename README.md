@@ -79,10 +79,10 @@ $> mygame.exe
 
 ### Compiling on Linux
 
-Development packages for X11, OpenGL, and PulseAudio are needed when compiling your project. You can download them from your package manager as ```libx11-dev```, ```libgl1-mesa-dev``` and ```libpulse-dev``` for Debian-based distros or as ```libX11-devel```, ```mesa-libGL-devel``` and ```pulseaudio-libs-devel``` for RedHat-based distros. After they are installed, you can compile and run from the terminal with:
+Development packages for X11, OpenGL, and PipeWire are needed when compiling your project. You can download them from your package manager as ```libx11-dev```, ```libgl1-mesa-dev``` and ```libpipewire-dev``` for Debian-based distros or as ```libX11-devel```, ```mesa-libGL-devel``` and ```pipewire-devel``` for RedHat-based distros. After they are installed, you can compile and run from the terminal with:
 
 ```
-$> gcc <your_source_code> -o mygame -I./include -L./lib -lGL -lpthread -lpulse-simple -lX11 -lm -ldl -lkatsu
+$> gcc <your_source_code> -o mygame -I./include -L./lib `pkg-config --cflags --libs libpipewire-0.3` -lGL -lpthread -lX11 -lm -ldl -lkatsu
 $> ./mygame
 ```
 

@@ -10,11 +10,12 @@
 
 #define KT_AUDIO_SAMPLE_RATE       48000
 #define KT_AUDIO_SAMPLE_BUFFER     2048
+#define KT_AUDIO_CHANNELS          2
 
 
-typedef void (*KTAudioFunc)(u16 *stram, u32 length);
+typedef void (*KTAudioFunc)(s16 *stream, u32 length, void *user_data);
 
-//XXX: void kt_AudioCallbackFunc(KTAudioFunc func);
+void kt_AudioSetCallback(KTAudioFunc func, void *user_data);
 
 
 #endif /*__KT_AUDIO_H__*/

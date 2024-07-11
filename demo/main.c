@@ -2,7 +2,10 @@
 
 #include <katsu/kt.h>
 #include <stdio.h>
+#include <math.h>
 #include "system.h"
+
+#define M_PI_M2 (M_PI + M_PI)
 
 /*Demo Palette*/
 extern const u8 norm_demo_4bpp_pal[];
@@ -24,6 +27,30 @@ extern const u32 system_4bpp_tilenum;
 
 extern u8 norm_tm0[];
 extern u8 norm_tm1[];
+
+u32 note_indx = 0;
+f32 note_freq[16] = {
+	261.63f, 277.18f, 293.66f, 311.13f, 329.63f, 349.23f, 369.99f, 392.0f,
+	415.3f, 440.0f, 466.16f, 493.88f, 220.0f, 220.0f, 220.0f, 220.0f
+};
+
+f64 volume = 0.2;
+f64 audio_accumulator = 0;
+
+void demo_AudioCallback(s16 *stream, u32 n_frames, void *user_data)
+{
+	s16 val;
+	for (u32 i = 0; i < n_frames; i++) {
+		audio_accumulator += M_PI_M2 * note_freq[note_indx] / KT_AUDIO_SAMPLE_RATE;
+		if (audio_accumulator >= M_PI_M2)
+			audio_accumulator -= M_PI_M2;
+		//Convert to 16bit stream
+		val = sin(audio_accumulator) * volume /2.0 * 32767.0;
+		for (u32 ch = 0; ch < KT_AUDIO_CHANNELS; ch++)
+			*stream++ = val;
+	}
+}
+
 
 #define TMAP_PALETTE_OFS 0
 #define SPR_PALETTE_OFS (4 * 16)
@@ -100,11 +127,12 @@ int main() {
 	system_WindowLabel("OPTION");
 	system_WindowEnd();
 
-	KTColor col_a = {0x50, 0x50, 0x50, 0x0};
-	KTColor col_b = {0x50, 0x20, 0x20, 0x0};
+	//KTColor col_a = {0x50, 0x50, 0x50, 0x0};
+	//KTColor col_b = {0x50, 0x20, 0x20, 0x0};
 	u32 x2 = 60, y2 = 120;
 	f32 rot = 0.0;
 
+	kt_AudioSetCallback(demo_AudioCallback, NULL);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
 	while (1) {
 		kt_Poll();
@@ -134,6 +162,13 @@ int main() {
 		} else if (kt_JoyButtonDown(0) & JOY_UP) {
 			pointer_indx = (pointer_indx - 1) & 3;
 		}
+
+		if (kt_JoyButtonDown(0) & JOY_X) {
+			note_indx = (note_indx + 1) & 0xf;
+		} else if (kt_JoyButtonDown(0) & JOY_Y) {
+			note_indx = (note_indx - 1) & 0xf;
+		}
+
 		sys_spr[0].pos = KT_SPR_POS(10*8-8, 4*8 +4 + (pointer_indx*8));
 
 		if (kt_JoyButtonHeld(0) & JOY_A) {
