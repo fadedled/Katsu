@@ -4,6 +4,7 @@
 
 #include <linux/input.h>
 #include <dirent.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -112,57 +113,61 @@ void __kt_JoypadSearchAndOpen(void)
 
 	//Attempt to find a new joystick
 	int ndev = scandir("/dev/input", &nlist, __isEvdevJoystick, alphasort);
-	for (u32 i = 0; i < ndev; ++i) {
-		//get info on file
-		sprintf(filename, "/dev/input/%.64s", nlist[i]->d_name);
-		//See if we can open the file
-		int fd = open((char *) filename, O_RDONLY | O_NONBLOCK);
-		if (fd < 0) {
-			goto no_dev;
-		}
-		//See if device id is already in use
-		stat(filename, &sb);
-		for (u32 j = 0; j < MAX_JOYPADS; ++j) {
-			if (joy_dev[j].rdev == sb.st_rdev) {
+	if (nlist) {
+		for (u32 i = 0; i < ndev; ++i) {
+			//get info on file
+			sprintf(filename, "/dev/input/%.64s", nlist[i]->d_name);
+			//See if we can open the file
+			int fd = open((char *) filename, O_RDONLY | O_NONBLOCK);
+			if (fd < 0) {
 				goto no_dev;
 			}
-		}
-
-		/*Open the device that's not in use*/
-		u64 bit[EV_MAX][NBITS(KEY_MAX)] = {0};
-		s32 abs[6] = {0};
-		u32 type = EV_ABS;
-		u32 ax_code[AXIS_CODE_MAX] = {ABS_HAT0X, ABS_HAT0Y,
-										ABS_X, ABS_Y, ABS_RX, ABS_RY,
-										ABS_Z, ABS_RZ};
-		/*Set the ABS values*/
-		//TODO: Make the code assigment more straightforward
-		ioctl(fd, EVIOCGID, &id);
-		ioctl(fd, EVIOCGBIT(type, KEY_MAX), bit[type]);
-		for (u32 j = 0; j < AXIS_CODE_MAX; ++j) {
-			u32 code = ax_code[j];
-			if (test_bit(code, bit[type])) {
-				ioctl(fd, EVIOCGABS(code), abs);
-				joy_dev[kb_joy].axis_code[j].code = code;
-				joy_dev[kb_joy].axis_code[j].min = abs[1];
-				joy_dev[kb_joy].axis_code[j].max = abs[2];
-				joy_dev[kb_joy].axis_code[j].value = abs[0];
-				joy_dev[kb_joy].axis_code[j].deadzone = abs[4];
+			//See if device id is already in use
+			stat(filename, &sb);
+			for (u32 j = 0; j < MAX_JOYPADS; ++j) {
+				if (joy_dev[j].rdev == sb.st_rdev) {
+					goto no_dev;
+				}
 			}
-		}
-		joy_dev[kb_joy].fd = fd;
-		joy_dev[kb_joy].id = id;
-		joy_dev[kb_joy].rdev = sb.st_rdev;
 
-		/*Find next joypad for keyboard */
-		for (u32 k = 0; k < MAX_JOYPADS; ++k) {
-			if (joy_dev[k].fd == -1) {
-				kb_joy = k;
-				joy_state[kb_joy].active = 1u;
-				break;
+			/*Open the device that's not in use*/
+			u64 bit[EV_MAX][NBITS(KEY_MAX)] = {0};
+			s32 abs[6] = {0};
+			u32 type = EV_ABS;
+			u32 ax_code[AXIS_CODE_MAX] = {ABS_HAT0X, ABS_HAT0Y,
+											ABS_X, ABS_Y, ABS_RX, ABS_RY,
+											ABS_Z, ABS_RZ};
+			/*Set the ABS values*/
+			//TODO: Make the code assigment more straightforward
+			ioctl(fd, EVIOCGID, &id);
+			ioctl(fd, EVIOCGBIT(type, KEY_MAX), bit[type]);
+			for (u32 j = 0; j < AXIS_CODE_MAX; ++j) {
+				u32 code = ax_code[j];
+				if (test_bit(code, bit[type])) {
+					ioctl(fd, EVIOCGABS(code), abs);
+					joy_dev[kb_joy].axis_code[j].code = code;
+					joy_dev[kb_joy].axis_code[j].min = abs[1];
+					joy_dev[kb_joy].axis_code[j].max = abs[2];
+					joy_dev[kb_joy].axis_code[j].value = abs[0];
+					joy_dev[kb_joy].axis_code[j].deadzone = abs[4];
+				}
 			}
-		}
+			joy_dev[kb_joy].fd = fd;
+			joy_dev[kb_joy].id = id;
+			joy_dev[kb_joy].rdev = sb.st_rdev;
+
+			/*Find next joypad for keyboard */
+			for (u32 k = 0; k < MAX_JOYPADS; ++k) {
+				if (joy_dev[k].fd == -1) {
+					kb_joy = k;
+					joy_state[kb_joy].active = 1u;
+					break;
+				}
+			}
 no_dev:
+			free(nlist[i]);
+		}
+		free(nlist);
 	}
 }
 

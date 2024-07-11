@@ -54,6 +54,9 @@ u32  __kt_VideoInit(void)
 		return 1;
 	}
 	XVisualInfo *vinfo = glXGetVisualFromFBConfig(kt_x11.dpy, fbc_arr[0]);
+	if (!vinfo){
+		return 1;
+	}
 
 	XSetWindowAttributes win_attr;
 	win_attr.colormap = XDefaultColormap(kt_x11.dpy, vinfo->screen);
@@ -107,6 +110,7 @@ u32  __kt_VideoInit(void)
 	xkey_mapping[13] = XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
 
 	kt_Reset();
+	XFree(vinfo);
 	XMapWindow(kt_x11.dpy, kt_x11.win);
 	XFlush(kt_x11.dpy);
 	return KT_OK;

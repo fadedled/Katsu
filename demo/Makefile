@@ -8,7 +8,7 @@ LIBDIRS :=	../lib
 SOURCES  :=	. res
 CFLAGS	 :=	-O2 -Wall `pkg-config --cflags libpipewire-0.3`
 
-LIBS     := -lGL -lpthread `pkg-config --libs libpipewire-0.3` -lX11 -lm -ldl -lkatsu
+LIBS     := -lGL `pkg-config --libs libpipewire-0.3` -lX11 -lm -ldl -lkatsu
 
 #All files to compile
 CFILES	 :=	$(foreach dir,$(SOURCES), $(wildcard $(dir)/*.c))
