@@ -111,12 +111,12 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	u32 file_size = file_GetSize(fp);
-	char *data = (char *) calloc(file_size, 1);
+	unsigned char *data = (char *) calloc(file_size, 1);
 	fread(data, 1, file_size, fp);
 	fclose(fp);
 
-	char *src_data = data;
-	char *dst_data = data;
+	unsigned char *src_data = data;
+	unsigned char *dst_data = data;
 	u32 will_copy = 1;
 	u32 new_size = 0;
 	for (u32 i = 0; i < file_size; i++) {

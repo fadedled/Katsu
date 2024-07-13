@@ -2,15 +2,14 @@
  * kt.h
  */
 
+#ifndef __KT_H__
+#define __KT_H__
+
 /*!
  * \file kt.h
  * \brief Katsu general system
  *
  */
-
-#ifndef __KT_H__
-#define __KT_H__
-
 
 #include <katsu/types.h>
 #include <katsu/audio.h>
@@ -31,6 +30,10 @@
 #define MAX(a, b)		((a) > (b) ? (a) : (b))
 #define MIN(a, b)		((a) > (b) ? (b) : (a))
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 enum KtExitCode {
 	KT_EXIT,
 	KT_EXIT_CANCEL,
@@ -47,6 +50,8 @@ void kt_Poll(void);
 void kt_Draw(void);
 
 
-
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /*__KT_H__*/

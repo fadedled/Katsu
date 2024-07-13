@@ -15,19 +15,6 @@
 #include <katsu/types.h>
 
 
-/*! \addtogroup joypad_id Joypad ID
- * @{
- */
-enum WinId {
-	JOY0,
-	JOY1,
-	JOY2,
-	JOY3,
-	MAX_JOYPADS					/*!< Max number of joypads. */
-};
-/*! @} */
-
-
 /*! \addtogroup joypad_btn Joypad Buttons
  * @{
  */
@@ -71,6 +58,25 @@ enum WinId {
 #define JOY_STICK_RX    0x02u
 #define JOY_STICK_RY    0x03u
 /*! @} */
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+
+/*! \addtogroup joypad_id Joypad ID
+ * @{
+ */
+enum WinId {
+	JOY0,
+	JOY1,
+	JOY2,
+	JOY3,
+	MAX_JOYPADS					/*!< Max number of joypads. */
+};
+/*! @} */
+
 
 
 /*Joypad Functions*/
@@ -128,6 +134,8 @@ s8   kt_JoyStick(u32 joy_id, u32 stick_id);
 //XXX: Configure button mappings?
 //XXX: Join stick and dpad?
 
-
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /*__KT_OYPAD_H__*/

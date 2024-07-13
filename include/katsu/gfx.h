@@ -13,6 +13,7 @@
 
 #include <katsu/types.h>
 
+
 /*Graphics Constants*/
 #define KT_MAX_TILES		0x4000
 #define KT_MAX_SPRITES		2048
@@ -146,6 +147,10 @@
 #define KT_MTX_IDENTITY						0
 #define KT_MAX_MTX							256
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
 /*== Structs ==*/
 
@@ -551,6 +556,8 @@ void kt_OffsetColor(s32 r, s32 g, s32 b);
 void kt_Reset(void);
 // u32  kt_LerpColor(KTColor c0, KTColor c1, u8 blend);
 
-
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /*__KT_GFX_H__*/

@@ -57,6 +57,10 @@ enum ViFilters {
 };
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* ============================================================================
  * Video Functions
  * ============================================================================
@@ -91,5 +95,8 @@ void kt_VideoTitleSet(const char* title);
 
 //XXX: High definition mode
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /*__KT_VIDEO_H__*/
