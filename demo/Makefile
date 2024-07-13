@@ -6,7 +6,7 @@ BUILD    :=	build
 INCLUDES :=	../include
 LIBDIRS :=	../lib
 SOURCES  :=	. res
-CFLAGS	 :=	-O2 -Wall `pkg-config --cflags libpipewire-0.3`
+CFLAGS	 :=	-O2 -g -Wall `pkg-config --cflags libpipewire-0.3`
 
 LIBS     := -lGL `pkg-config --libs libpipewire-0.3` -lX11 -lm -ldl -lkatsu
 
