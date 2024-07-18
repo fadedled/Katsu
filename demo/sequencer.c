@@ -43,7 +43,7 @@ static void __sseq_AudioCallback(s16 *stream, u32 n_frames, void *user_data)
 					if (seq.acc[voice] >= M_PI_M2)
 						seq.acc[voice] -= M_PI_M2;
 					//Convert to 16bit stream
-					f64 func = MIN(MAX(sin(seq.acc[voice]) * 16.0, -1.0), 1.0);
+					f64 func = MIN(MAX(sin(seq.acc[voice]), -1.0), 1.0);
 					val += func * seq.volume * 32767.0f * 0.04f;
 				}
 			}

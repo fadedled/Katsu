@@ -19,7 +19,7 @@
 #define KT_MAX_SPRITES		2048
 #define KT_MAX_TILEMAPS		16
 #define KT_MAX_COLORS		2048
-#define KT_MAX_PALETTES		(MAX_COLORS >> 4)
+#define KT_MAX_PALETTES		(KT_MAX_COLORS >> 4)
 
 
 /*! \addtogroup layer_id Number of layer
@@ -123,7 +123,7 @@
 #define KT_COLORLINE_FILL_STRETCH		0
 #define KT_COLORLINE_FILL_REPEAT		1
 #define KT_COLORLINE_FILL_NONE			2
-#define KT_COLORLINE_FILL_DUMMY		3
+#define KT_COLORLINE_FILL_DUMMY			3
 #define KT_MAX_COLORLINE_FILL			4
 
 /*! \addtogroup blnd_modes Blending modes
@@ -221,7 +221,25 @@ typedef struct KTColor_t {
  */
 void kt_TilesetLoad(u32 tile_id, u32 tile_count, const void* data);
 
-void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
+/*!
+ * \fn void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
+ * \brief Used to load a block of characters to Tilemaps.
+ * \details This function copies the characeters found in the application to a tilemap, so if the application modifies
+ * those characters they must be reloaded for the changes to be shown. If a map layer uses more than one tilemap you
+ * can use the same map size on this function to include the other tilemaps.
+ *
+ * \param[in] tmap The first tilemap number (other tilemaps can be modified if you use a map_size other than KT_MAP_SIZE_64x64).
+ * \param[in] map_size \ref tmap_size.
+ * \param[in] x The starting characters x position, where @f$ 0 <= x < Horizontal Map Size @f$.
+ * \param[in] y The starting characters y position, where @f$ 0 <= y < Vertical Map Size @f$.
+ * \param[in] w Width of character block to copy.
+ * \param[in] h Height of character block to copy.
+ * \param[in] stride Width of one row of the pointer data.
+ * \param[in] data Pointer to the character data to be loaded. If NULL is passed, the specified characters are zeroed.
+ *
+ * \return none
+ */
+void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
 
 
 /*!
@@ -243,26 +261,25 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_id, u32 flip, u32 pal);
 
 /*!
  * \fn void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data)
- * \brief Used to load a set of colors to Color Memory.
- * \details This function copies the colors from the application to Color Memory. If the application modifies
- * loaded colors, they must be reloaded for the changes to be shown.
+ * \brief Used to load a set of palettes to Color Memory.
+ * \details This function copies 16-entry palettes from the application to Color Memory. If the application modifies
+ * loaded palettes, they must be reloaded for the changes to be shown.
  *
- * \param[in] color_num The first color in Color Memoy to start the copy, should be between 0 and 2048.
- * \param[in] color_count Number of colors to be copied.
- * \param[in] data Pointer to the color data to be loaded. If NULL is passed, the specified colors are zeroed out.
+ * \param[in] pal Starting palette number, should be between 0 and KT_MAX_PALETTES-1.
+ * \param[in] pal_count Number of palettes to be copied.
+ * \param[in] data Pointer to the palette data to be loaded. If NULL is passed, the specified palettes are zeroed out.
  *
  * \return none
  */
-void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data);
+void kt_PaletteLoad(u32 pal_num, u32 pal_count, const void* data);
 
 
 /*!
  * \fn void kt_PaletteSetColor(u32 color_num, KTColor color)
- * \brief Used to load a single color to Color Memory.
- * \details This function copies the specified color to Color Memory.
+ * \brief Used to modify a single color in Color Memory.
  *
- * \param[in] color_num The color in Color Memoy that will be modified, should be between 0 and 2048.
- * \param[in] color The color to load.
+ * \param[in] color_num The number of the color in Color Memoy that will be modified, should be between 0 and 2048.
+ * \param[in] color The new color.
  *
  * \return none
  */
