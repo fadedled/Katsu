@@ -38,16 +38,6 @@ void kt_TilesetLoad(u32 tile_num, u32 tile_count, const void* data)
 			dst[tile_num++] = src[i];
 			tile_num &= ((KT_MAX_TILES << 3) - 1);
 		}
-		//Set the first tile as zero
-		dst[0] = 0;
-		dst[1] = 0;
-		dst[2] = 0;
-		dst[3] = 0;
-		dst[4] = 0;
-		dst[5] = 0;
-		dst[6] = 0;
-		dst[7] = 0;
-
 	} else {
 		for (u32 i = 0; i < tile_count; ++i) {
 			dst[tile_num++] = 0;

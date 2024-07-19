@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	u32 file_size = file_GetSize(fp);
-	unsigned char *data = (char *) calloc(file_size, 1);
+	unsigned char *data = (unsigned char *) calloc(file_size, 1);
 	fread(data, 1, file_size, fp);
 	fclose(fp);
 

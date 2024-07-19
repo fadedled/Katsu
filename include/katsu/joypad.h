@@ -4,7 +4,7 @@
 
 /*!
  * \file joypad.h
- * \brief Katsu joypad subsystem
+ * \brief Katsu JOYPAD subsystem
  *
  */
 

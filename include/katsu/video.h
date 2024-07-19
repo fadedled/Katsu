@@ -4,7 +4,7 @@
 
 /*!
  * \file video.h
- * \brief Video subsystem
+ * \brief Katsu VIDEO subsystem
  *
  */
 
@@ -72,8 +72,6 @@ extern "C" {
  *
  * \param[in] w Width of the output.
  * \param[in] h Height of the output.
- *
- * \return none
  */
 void kt_VideoOutputSet(u32 w, u32 h);
 
@@ -83,8 +81,6 @@ void kt_VideoOutputSet(u32 w, u32 h);
  *
  * \param[out] w Pointer where the width of the output will be stored.
  * \param[out] h Pointer where the height of the output will be stored.
- *
- * \return none
  */
 void kt_VideoOutputGet(u32 *w, u32 *h);
 

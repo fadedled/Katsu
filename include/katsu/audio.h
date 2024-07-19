@@ -7,7 +7,7 @@
 #define __KT_AUDIO_H__
 
 /*! \file audio.h
- \ brief Audio subsystem functions
+ \ brief Katsu AUDIO subsystem
 
  */
 
@@ -41,8 +41,6 @@ typedef void (*KTAudioFunc)(s16 *stream, u32 length, void *user_data);
  *
  * \param[in] func Callback function fo.
  * \param[in] user_data Pointer to data block that will be passed to func.
- *
- * \return none
  */
 void kt_AudioSetCallback(KTAudioFunc func, void *user_data);
 

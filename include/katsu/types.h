@@ -8,7 +8,7 @@
 
 /*!
  * \file types.h
- * \brief Data type definitions
+ * \brief Built-in type definitions
  *
  */
 

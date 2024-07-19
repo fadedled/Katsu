@@ -4,7 +4,7 @@
 
 /*!
  * \file gfx.h
- * \brief Katsu graphics subsystem
+ * \brief Katsu Graphics subsystem
  *
  */
 
@@ -160,10 +160,10 @@ extern "C" {
  *
  */
 typedef struct KTChr_t {
-	u8 pal;
-	u8 _padding;
-	u8 fthi;
-	u8 tlo;
+	u8 pal;			/*!< Palette number. */
+	u8 _padding;	/*!< Unused, leave at zero. */
+	u8 fthi;		/*!< Flip mode and high 6 bits of tile ID. */
+	u8 tlo;			/*!< Low 8 bits of tile ID. */
 } KTChr;
 
 
@@ -216,8 +216,6 @@ typedef struct KTColor_t {
  * \param[in] tile_id ID of the first tile in Tile Memoy to start the copy.
  * \param[in] tile_count Number of tiles to be copied to Tile Memory.
  * \param[in] data Pointer to the tile data to be loaded. If NULL is passed, the specified tiles are zeroed out.
- *
- * \return none
  */
 void kt_TilesetLoad(u32 tile_id, u32 tile_count, const void* data);
 
@@ -236,8 +234,6 @@ void kt_TilesetLoad(u32 tile_id, u32 tile_count, const void* data);
  * \param[in] h Height of character block to copy.
  * \param[in] stride Width of one row of the pointer data.
  * \param[in] data Pointer to the character data to be loaded. If NULL is passed, the specified characters are zeroed.
- *
- * \return none
  */
 void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data);
 
@@ -253,25 +249,21 @@ void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stri
  * \param[in] tile_id The character's tile ID (Remember that the layer can offset this value).
  * \param[in] flip \ref flip.
  * \param[in] pal Number of the palette used.
- *
- * \return none
  */
 void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_id, u32 flip, u32 pal);
 
 
 /*!
- * \fn void kt_PaletteLoad(u32 color_num, u32 color_count, const void* data)
- * \brief Used to load a set of palettes to Color Memory.
+ * \fn void kt_PaletteLoad(u32 pal, u32 pal_count, const void* data)
+ * \brief Used to load a set of 16 color palettes to Color Memory.
  * \details This function copies 16-entry palettes from the application to Color Memory. If the application modifies
  * loaded palettes, they must be reloaded for the changes to be shown.
  *
  * \param[in] pal Starting palette number, should be between 0 and KT_MAX_PALETTES-1.
  * \param[in] pal_count Number of palettes to be copied.
  * \param[in] data Pointer to the palette data to be loaded. If NULL is passed, the specified palettes are zeroed out.
- *
- * \return none
  */
-void kt_PaletteLoad(u32 pal_num, u32 pal_count, const void* data);
+void kt_PaletteLoad(u32 pal, u32 pal_count, const void* data);
 
 
 /*!
@@ -280,8 +272,6 @@ void kt_PaletteLoad(u32 pal_num, u32 pal_count, const void* data);
  *
  * \param[in] color_num The number of the color in Color Memoy that will be modified, should be between 0 and 2048.
  * \param[in] color The new color.
- *
- * \return none
  */
 void kt_PaletteSetColor(u32 color_num, KTColor color);
 
@@ -301,8 +291,6 @@ void kt_PaletteSetColor(u32 color_num, KTColor color);
  * \param[in] type \ref layer_type (only map layers are expected).
  * \param[in] tmap Number of the first tilemap.
  * \param[in] map_size \ref tmap_size.
- *
- * \return none
  */
 void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
 
@@ -317,8 +305,6 @@ void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
  * \param[in] layer \ref layer_id.
  * \param[in] spr_count Number of sprites in data.
  * \param[in] data A pointer to the sprite array.
- *
- * \return none
  */
 void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data);
 
@@ -330,8 +316,6 @@ void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data);
  *
  * \param[in] layer \ref layer_id.
  * \param[in] type \ref layer_type.
- *
- * \return none
  */
 void kt_LayerSetType(u32 layer, u32 type);
 
@@ -342,8 +326,6 @@ void kt_LayerSetType(u32 layer, u32 type);
  * \param[in] layer \ref layer_id.
  * \param[in] tmap Number of the first tilemap.
  * \param[in] map_size \ref tmap_size.
- *
- * \return none
  */
 void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size);
 
@@ -356,8 +338,6 @@ void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size);
  * \param[in] layer \ref layer_id.
  * \param[in] x_ofs Horizontal map offset.
  * \param[in] y_ofs Vertical map offset.
- *
- * \return none
  */
 void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
 
@@ -370,8 +350,6 @@ void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
  * \param[in] layer \ref layer_id.
  * \param[in] active Wether to do blending or not.
  * \param[in] alpha The blending value.
- *
- * \return none
  */
 void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha);
 
@@ -386,8 +364,6 @@ void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha);
  * \param[in] y Y Position of the top left corner of the rectangle.
  * \param[in] w The rectangle's width.
  * \param[in] h The rectangle's height.
- *
- * \return none
  */
 void kt_LayerSetMapRect(u32 layer, u32 x, u32 y, u32 w, u32 h);
 
@@ -400,8 +376,6 @@ void kt_LayerSetMapRect(u32 layer, u32 x, u32 y, u32 w, u32 h);
  * \param[in] active Wether the effect is active or not.
  * \param[in] mos_x Size of horizontal mosaic.
  * \param[in] mos_y Size of vertical mosaic.
- *
- * \return none
  */
 void kt_LayerSetMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y);
 
@@ -414,8 +388,6 @@ void kt_LayerSetMapMosaic(u32 layer, u32 active, u32 mos_x, u32 mos_y);
  * \param[in] layer \ref layer_id.
  * \param[in] tile_ofs Value to be added to all character's tile IDs.
  * \param[in] pal_ofs Value to be added to all character's palette numbers.
- *
- * \return none
  */
 void kt_LayerSetMapChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs);
 
@@ -431,8 +403,6 @@ void kt_LayerSetMapChrOffset(u32 layer, u32 tile_ofs, u32 pal_ofs);
  * \param[in] src_factor \ref blnd_val.
  * \param[in] dst_factor \ref blnd_val.
  * \param[in] func \ref blnd_modes.
- *
- * \return none
  */
 void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
 
@@ -449,8 +419,6 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
  * \param[in] layer \ref layer_id.
  * \param[in] num_elems The number of elements that the data has.
  * \param[in] data Pointer to the data.
- *
- * \return none
  */
 void kt_LayerSetAppData(u32 layer, u32 num_elems, void* data);
 
@@ -462,8 +430,6 @@ void kt_LayerSetAppData(u32 layer, u32 num_elems, void* data);
  *
  * \param[in] layer \ref layer_id.
  * \param[in] act_windows \ref win_id (can be OR'ed).
- *
- * \return none
  */
 void kt_LayerSetWindow(u32 layer, u32 act_windows);
 
@@ -472,16 +438,12 @@ void kt_LayerSetWindow(u32 layer, u32 act_windows);
  * \brief Resets the layer to startup settings, type is set to KT_LAYER_NONE.
  *
  * \param[in] layer \ref layer_id.
- *
- * \return none
  */
 void kt_LayerClear(u32 layer);
 
 /*!
  * \fn void kt_LayerClear(u32 layer)
  * \brief Calls \ref kt_LayerClear on all layers.
- *
- * \return none
  */
 void kt_LayerClearAll(void);
 
@@ -499,8 +461,6 @@ void kt_LayerClearAll(void);
  * \param[in] b
  * \param[in] c
  * \param[in] d
- *
- * \return none
  */
 void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d);
 
@@ -512,8 +472,6 @@ void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d);
  * \param[in] x_scale Horizontal scaling factor.
  * \param[in] y_scale Vertical scaling factor.
  * \param[in] angle Angle of rotation in radians.
- *
- * \return none
  */
 void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle);
 
@@ -536,8 +494,6 @@ void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle);
  * \brief Sets the back color.
  *
  * \param[in] color Color that will be set.
- *
- * \return none
  */
 void kt_BackColor(KTColor color);
 
@@ -551,8 +507,6 @@ void kt_BackColor(KTColor color);
  * \param[in] r Signed red color component that will be added to the final image.
  * \param[in] g Signed green color component that will be added to the final image.
  * \param[in] b Signed blue color component that will be added to the final image.
- *
- * \return none
  */
 void kt_OffsetColor(s32 r, s32 g, s32 b);
 // void kt_ColorLineLoad(u32 line_count, const void* data);
@@ -567,8 +521,6 @@ void kt_OffsetColor(s32 r, s32 g, s32 b);
 /*!
  * \fn void kt_Reset(void)
  * \brief Resets all Katsu graphics memory to match settings on startup.
- *
- * \return none
  */
 void kt_Reset(void);
 // u32  kt_LerpColor(KTColor c0, KTColor c1, u8 blend);
