@@ -4,9 +4,9 @@
 #include <pipewire/pipewire.h>
 #include <math.h>
 #include <spa/param/audio/format-utils.h>
+#include <stdio.h>
 
-
-
+#define KT_AUDIO_BUFFERSIZE		1024
 
 int dummy_argc = 1;
 char *dummy_argv[] = {"Katsu Application"};
@@ -43,13 +43,11 @@ static void __kt_AudioCallback(void *userdata)
 
 	stride = sizeof(s16) * KT_AUDIO_CHANNELS;
 	n_frames = buf->datas[0].maxsize / stride;
-	if (b->requested)
-		n_frames = SPA_MIN(b->requested, n_frames);
+	n_frames = SPA_MIN(KT_AUDIO_BUFFERSIZE, n_frames);
 
 	if (audio_state.user_callback) {
 		audio_state.user_callback(dst, n_frames, audio_state.user_data);
 	}
-
 
 	buf->datas[0].chunk->offset = 0;
 	buf->datas[0].chunk->stride = stride;
@@ -70,7 +68,7 @@ u32  __kt_AudioInit(void)
 {
 	const struct spa_pod *params[1];
 	u8 buffer[1024];
-	struct spa_pod_builder b = SPA_POD_BUILDER_INIT(buffer, sizeof(buffer));
+	struct spa_pod_builder builder = SPA_POD_BUILDER_INIT(buffer, sizeof(buffer));
 
 	pw_init(&dummy_argc, (char ***) &dummy_argv);
 
@@ -86,7 +84,7 @@ u32  __kt_AudioInit(void)
 			&stream_events,
 			NULL);
 
-	params[0] = spa_format_audio_raw_build(&b, SPA_PARAM_EnumFormat,
+	params[0] = spa_format_audio_raw_build(&builder, SPA_PARAM_EnumFormat,
 											&SPA_AUDIO_INFO_RAW_INIT(
 											.format = SPA_AUDIO_FORMAT_S16,
 											.channels = KT_AUDIO_CHANNELS,
