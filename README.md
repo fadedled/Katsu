@@ -70,19 +70,19 @@ int main() {
 
 ### Compiling on Windows
 
-You will need Visual Studios MSVC or MinGW installed, link with ```User32.lib```, ```Opengl32.lib``` and ```Katsu.lib```. If you are using the console/terminal you should set your environment to use MSVC. Then compile with:
+You will need Visual Studios MSVC or MinGW installed, link with ```User32.lib```, ```Opengl32.lib```, ```Xinput1_4.lib``` and ```Katsu.lib```. If you are using the console/terminal you should set your environment to use MSVC. Then compile with:
 
 ```
-$> cl -Tc <your_source_code> -I".\include" -link User32.lib Opengl32.lib Xinput.lib lib\Katsu.lib -OUT:mygame.exe
+$> cl -Tc <your_source_code> -I".\include" -link User32.lib Opengl32.lib Xinput1_4.lib lib\Katsu.lib -OUT:mygame.exe
 $> mygame.exe
 ```
 
 ### Compiling on Linux
 
-Development packages for X11, OpenGL, and PipeWire are needed when compiling your project. You can download them from your package manager as ```libx11-dev```, ```libgl1-mesa-dev``` and ```libpipewire-dev``` for Debian-based distros or as ```libX11-devel```, ```mesa-libGL-devel``` and ```pipewire-devel``` for RedHat-based distros. After they are installed, you can compile and run from the terminal with:
+Development packages for X11, OpenGL, and PipeWire are needed when compiling your project. You can download them from your package manager as ```libx11-dev```, ```libgl1-mesa-dev``` and ```libpipewire-0.3-dev``` for Debian-based distros or as ```libX11-devel```, ```mesa-libGL-devel``` and ```pipewire-devel``` for RedHat-based distros. After they are installed, you can compile and run from the terminal with:
 
 ```
-$> gcc <your_source_code> -o mygame -I./include -L./lib `pkg-config --cflags --libs libpipewire-0.3` -lGL -lpthread -lX11 -lm -ldl -lkatsu
+$> gcc <your_source_code> -o mygame -I./include -I/usr/include/pipewire-0.3 -I/usr/include/spa-0.2 -D_REENTRANT -L./lib -lGL -lpipewire-0.3 -lX11 -lm -ldl -lkatsu
 $> ./mygame
 ```
 

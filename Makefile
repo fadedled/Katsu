@@ -7,7 +7,7 @@ LIBDIR   :=	lib
 BUILD    :=	build
 INCLUDES :=	include 
 SOURCES  :=	src src/platform/linux src/opengl
-CFLAGS	 :=	-O2 -Wall -fPIC `pkg-config --cflags libpipewire-0.3` #-DKT_DEBUG 
+CFLAGS	 :=	-O2 -Wall -fPIC -I/usr/include/pipewire-0.3 -I/usr/include/spa-0.2 -D_REENTRANT #-DKT_DEBUG 
 GLSLDIR  := 	src/opengl/shaders
 BIN2INC	 := 	tools/kt-bin2inc
 
