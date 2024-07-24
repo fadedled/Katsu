@@ -47,10 +47,10 @@ int main() {
 	kt_TilesetLoad(0, system_4bpp_tilenum , system_4bpp_data);
 	kt_TilesetLoad(system_4bpp_tilenum, norm_demo_4bpp_tilenum , norm_demo_4bpp_data);
 	kt_VideoTitleSet("Test program");
-	kt_PaletteLoad(0, 1, system_4bpp_pal);
-	kt_PaletteLoad(1, 1, norm_demo_4bpp_pal);
-	kt_PaletteLoad(2, 1, affine_0_demo_4bpp_pal);
-	kt_PaletteLoad(3, 1, affine_1_demo_4bpp_pal);
+	kt_PaletteLoad(0, KT_PAL_SIZE_16, system_4bpp_pal);
+	kt_PaletteLoad(1, KT_PAL_SIZE_16, norm_demo_4bpp_pal);
+	kt_PaletteLoad(2, KT_PAL_SIZE_16, affine_0_demo_4bpp_pal);
+	kt_PaletteLoad(3, KT_PAL_SIZE_16, affine_1_demo_4bpp_pal);
 	system_Init(15);
 
 	spr[0].pos = KT_SPR_POS(204, 112);

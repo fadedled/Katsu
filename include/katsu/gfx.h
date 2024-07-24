@@ -20,7 +20,18 @@
 #define KT_MAX_TILEMAPS		16
 #define KT_MAX_COLORS		2048
 #define KT_MAX_PALETTES		(KT_MAX_COLORS >> 4)
+#define KT_MAX_MTX			256
 
+
+/*! \addtogroup pal_size Palette sizes
+ * @{
+ */
+#define KT_PAL_SIZE_16						0x1		/*!< Palette with 16 entries. */
+#define KT_PAL_SIZE_32						0x2		/*!< Palette with 32 entries. */
+#define KT_PAL_SIZE_64						0x4		/*!< Palette with 64 entries. */
+#define KT_PAL_SIZE_128						0x8		/*!< Palette with 128 entries. */
+#define KT_PAL_SIZE_256						0x10	/*!< Palette with 256 entries. */
+/*! @} */
 
 /*! \addtogroup layer_id Number of layer
  * @{
@@ -53,8 +64,17 @@
 #define KT_LAYER_SPRITE			4			/*!< Draws a set of sprites. */
 /*! @} */
 
-/*Sprites*/
 
+/*! \addtogroup tmap_size Map size
+ * @{
+ */
+#define KT_MAP_SIZE_64x64		0x0
+#define KT_MAP_SIZE_128x64		0x1
+#define KT_MAP_SIZE_64x128		0x2
+#define KT_MAP_SIZE_128x128		0x3
+/*! @} */
+
+/* Macros for Sprite init */
 #define KT_SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
 #define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		((((pal & 0x7F)) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define KT_SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
@@ -93,15 +113,6 @@
 #define KT_SIZE_128			0xF
 /*! @} */
 
-
-/*! \addtogroup tmap_size Map size
- * @{
- */
-#define KT_MAP_SIZE_64x64		0x0
-#define KT_MAP_SIZE_128x64		0x1
-#define KT_MAP_SIZE_64x128		0x2
-#define KT_MAP_SIZE_128x128		0x3
-/*! @} */
 
 /*! \addtogroup win_id Window IDs
  * @{
@@ -145,7 +156,6 @@
 /*! @} */
 
 #define KT_MTX_IDENTITY						0
-#define KT_MAX_MTX							256
 
 
 #ifdef __cplusplus
@@ -254,16 +264,16 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_id, u32 flip, u32 pal);
 
 
 /*!
- * \fn void kt_PaletteLoad(u32 pal, u32 pal_count, const void* data)
+ * \fn void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data)
  * \brief Used to load a set of 16 color palettes to Color Memory.
  * \details This function copies 16-entry palettes from the application to Color Memory. If the application modifies
  * loaded palettes, they must be reloaded for the changes to be shown.
  *
  * \param[in] pal Starting palette number, should be between 0 and KT_MAX_PALETTES-1.
- * \param[in] pal_count Number of palettes to be copied.
+ * \param[in] pal_size \ref pal_size.
  * \param[in] data Pointer to the palette data to be loaded. If NULL is passed, the specified palettes are zeroed out.
  */
-void kt_PaletteLoad(u32 pal, u32 pal_count, const void* data);
+void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data);
 
 
 /*!

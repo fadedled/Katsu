@@ -74,10 +74,10 @@ void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, 
 }
 
 
-void kt_PaletteLoad(u32 pal_num, u32 pal_count, const void* data)
+void kt_PaletteLoad(u32 pal_num, u32 pal_size, const void* data)
 {
 	u32 color_num = (pal_num & (KT_MAX_PALETTES - 1)) << 4;
-	u32 color_count = pal_count << 4;
+	u32 color_count = pal_size << 4;
 	u32 *dst = (u32*) pal_mem;
 	if (data) {
 		u32 *src = (u32*) data;

@@ -1,1 +1,10 @@
-/res/dev_man
+res/dev_man
+build
+demo/demo
+demo/*.o
+demo/res/*.o
+demo/res/tiles/*.o
+lib
+src/opengl/shaders/*.inc
+tools/kt-bin2inc
+tools/kt-image
