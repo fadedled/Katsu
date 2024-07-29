@@ -145,6 +145,20 @@ void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
 }
 
 
+void kt_LayerSetMapScale(u32 layer, f32 x_scale, f32 y_scale)
+{
+	u32 xs = 0x400, ys = 0x400;
+	layer &= 0xF;
+	if (x_scale != 0.0) {
+		xs = (u32) ((s32) ((1.0f /x_scale) * 1024.0f));
+	}
+	if (y_scale != 0.0) {
+		ys = (u32) ((s32) ((1.0f / y_scale) * 1024.0f));
+	}
+	layer_mem[layer].map_scale = (xs & 0xFFFFu) | (ys << 16);
+}
+
+
 void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha)
 {
 	layer &= 0xF;
@@ -212,6 +226,7 @@ void kt_LayerClear(u32 layer)
 	kt_LayerSetMapRect(layer, 0, 0, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
 	layer_mem[layer].map_attr = 0;
 	layer_mem[layer].map_ofs = 0;
+	layer_mem[layer].map_scale = 0x04000400;
 	layer_mem[layer].blnd = 0x0;
 	layer_mem[layer].win_act = 0xF;
 	layer_mem[layer].data_count = 0;

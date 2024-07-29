@@ -27,6 +27,7 @@ layout(location = 3) out flat uint tmap_num;
 layout(location = 4) out flat uint tile_ofs;
 layout(location = 5) out flat uint pal_ofs;
 layout(location = 6) out flat uvec2 mos;
+layout(location = 7) out flat uvec2 scale;
 
 void main()
 {
@@ -42,6 +43,7 @@ void main()
 	pal_ofs = (map.z >> 16) & 0xFFFFu;
 	tile_ofs = map.z & 0xFFFFu;
 	mos = (uvec2(map.x >> 8, map.x >> 12) & 0xFu) + 1u;
+	scale = uvec2(map.w, map.w >> 16) & 0xFFFFu;
 	gl_Position = vec4(pos, 0.0, 1.0);
 }
 
@@ -58,6 +60,7 @@ layout(location = 3) in flat uint tmap_num;
 layout(location = 4) in flat uint tile_ofs;
 layout(location = 5) in flat uint pal_ofs;
 layout(location = 6) in flat uvec2 mos;
+layout(location = 7) in flat uvec2 scale;
 
 layout(location = 0) out vec4 frag_color;
 
@@ -87,7 +90,7 @@ void main()
 
 	//get tile
 	//Apply mosaic
-	uvec2 pix = uvec2(uv) - (uvec2(uv) % mos);
+	uvec2 pix = uvec2((uvec2(uv) - (uvec2(uv) % mos)) * scale) / 1024u;
 	//if (bool((p.x | p.y) & 0x400u)) {
 	//	discard;
 	//}

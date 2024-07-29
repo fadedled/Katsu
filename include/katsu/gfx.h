@@ -59,9 +59,8 @@
  */
 #define KT_LAYER_NONE			0			/*!< Layer is not drawn. */
 #define KT_LAYER_MAP_NORMAL		1			/*!< Draws a normal map on screen. */
-#define KT_LAYER_MAP_LINE		2			/*!< Draws a map on screen where line scrolling is possible (vertical or horizontal). */
-#define KT_LAYER_MAP_ROTATION	3			/*!< Draws a map on screen with a 3D matrix applied. */
-#define KT_LAYER_SPRITE			4			/*!< Draws a set of sprites. */
+#define KT_LAYER_MAP_ROTATION	2			/*!< Draws a map on screen with a 3D matrix applied. */
+#define KT_LAYER_SPRITE			3			/*!< Draws a set of sprites. */
 /*! @} */
 
 
@@ -350,6 +349,18 @@ void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size);
  * \param[in] y_ofs Vertical map offset.
  */
 void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
+
+/*!
+ * \fn void kt_LayerSetMapScale(u32 layer, f32 x_scale, f32 y_scale)
+ * \brief This function sets the position offset of a map layer.
+ * \details The range of the offset is different depending on the size of
+ * the map, for example, for 64x64 maps both offsets go from 0 to 512.
+ *
+ * \param[in] layer \ref layer_id.
+ * \param[in] x_ofs Horizontal map offset.
+ * \param[in] y_ofs Vertical map offset.
+ */
+void kt_LayerSetMapScale(u32 layer, f32 x_scale, f32 y_scale);
 
 /*!
  * \fn void kt_LayerSetMapBlend(u32 layer, u32 active, u8 alpha)

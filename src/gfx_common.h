@@ -20,7 +20,8 @@ typedef struct KTMtx_t {
  * rect_pos = [pos_y : 16][pos_x : 16]  - top-left corner shown
  * rect_size = [height : 16][width : 16]  - size of layer startng from top-left corner
  * map_attr: [none : 8][blend : 1][norep : 1][tmap_size : 2][tmap : 4][mos_y : 4][mos_x : 4][alpha : 8] - attributes for backgorund layer
- * map_ofs: [ofs_y : 16][ofs_x : 16] - offset of backgorund layer
+ * map_ofs: [ofs_y : 16][ofs_x : 16] - offset of background layer
+ * map_scale: [scale_y : 16][scale_x : 16] - scale of background layer
  * chr_ofs: [pal_ofs : 16][tile_ofs : 16] - offset of tile and palette for characters
  * blnd: [func : 2][dst_factor : 3][src_factor : 3]  - Blending function and alpha source and destination
  * win_act: [spr_win : 1][win1 : 1][win0 : 1][out_win : 1]  - Window Activation
@@ -39,6 +40,7 @@ typedef struct Layer_t {
 	u32 rect_size;
 	u32 map_attr;
 	u32 map_ofs;
+	u32 map_scale;
 	u32 chr_ofs;
 	u8 blnd;
 	u8 win_act;

@@ -94,6 +94,7 @@ int main() {
 	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 1);
 	kt_LayerSetMapChrOffset(KT_LAYER2, system_4bpp_tilenum, 1);
 
+	kt_LayerSetMapScale(KT_LAYER2, 4.0, 0.25);
 
 	kt_LayerInitMap(KT_LAYER14, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
 	kt_LayerInitSprite(KT_LAYER15, 2, sys_spr);
