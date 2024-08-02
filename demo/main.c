@@ -94,7 +94,7 @@ int main() {
 	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 1);
 	kt_LayerSetMapChrOffset(KT_LAYER2, system_4bpp_tilenum, 1);
 
-	kt_LayerSetMapScale(KT_LAYER2, 4.0, 0.25);
+	kt_LayerSetMapScale(KT_LAYER2, 2.0, 1.0);
 
 	kt_LayerInitMap(KT_LAYER14, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
 	kt_LayerInitSprite(KT_LAYER15, 2, sys_spr);
@@ -129,7 +129,8 @@ int main() {
 		kt_OffsetColor(x - 50, x - 50, y - 50);
 
 		kt_LayerSetMapOffset(KT_LAYER0, x, y);
-		kt_LayerSetMapOffset(KT_LAYER2, x, y);
+		//kt_LayerSetMapOffset(KT_LAYER2, x, y);
+		kt_LayerSetMapOffsetf(KT_LAYER2, (f32)((s32)x) / 2.0, (f32)((s32)y));
 
 		spr[1].pos = KT_SPR_POS(-x + 307, -y + 234);
 		spr[3].pos = KT_SPR_POS(x, y);
