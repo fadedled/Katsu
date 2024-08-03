@@ -351,26 +351,25 @@ void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size);
 void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
 
 /*!
- * \fn void kt_LayerSetMapOffsetf(u32 layer, f32 x_ofs, f32 y_ofs)
- * \brief This function sets the position offset of a map layer in floating point units.
+ * \fn void kt_LayerSetMapOffsetf(u32 layer, u32 x_ofs, u32 y_ofs, u32 frac)
+ * \brief This function sets the position offset of a map layer in fractional units.
  * \details The range of the offset is different depending on the size of
  * the map, for example, for 64x64 maps both offsets go from 0 to 512.
  *
  * \param[in] layer \ref layer_id.
  * \param[in] x_ofs Horizontal map offset.
  * \param[in] y_ofs Vertical map offset.
+ * \param[in] frac number of fractional bits in the offsets (between 0 and 6).
  */
-void kt_LayerSetMapOffsetf(u32 layer, f32 x_ofs, f32 y_ofs);
+void kt_LayerSetMapOffsetf(u32 layer, u32 x_ofs, u32 y_ofs, u32 frac);
 
 /*!
  * \fn void kt_LayerSetMapScale(u32 layer, f32 x_scale, f32 y_scale)
- * \brief This function sets the position offset of a map layer.
- * \details The range of the offset is different depending on the size of
- * the map, for example, for 64x64 maps both offsets go from 0 to 512.
+ * \brief This function sets the scaling of a map layer.
  *
  * \param[in] layer \ref layer_id.
- * \param[in] x_ofs Horizontal map offset.
- * \param[in] y_ofs Vertical map offset.
+ * \param[in] x_scale Horizontal map scaling.
+ * \param[in] y_scale Vertical map scaling.
  */
 void kt_LayerSetMapScale(u32 layer, f32 x_scale, f32 y_scale);
 

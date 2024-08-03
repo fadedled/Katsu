@@ -140,17 +140,14 @@ void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size)
 
 void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
 {
-	layer &= 0xF;
-	layer_mem[layer].map_ofs = ((x_ofs << 6) & 0xFFFFu) | (y_ofs << 22);
+	kt_LayerSetMapOffsetf(layer, x_ofs, y_ofs, 0);
 }
 
-
-void kt_LayerSetMapOffsetf(u32 layer, f32 x_ofs, f32 y_ofs)
+void kt_LayerSetMapOffsetf(u32 layer, u32 x_ofs, u32 y_ofs, u32 frac)
 {
 	layer &= 0xF;
-	u32 xo = (u32) ((s32)(x_ofs * 64.0f));
-	u32 yo = (u32) ((s32)(y_ofs * 64.0f));
-	layer_mem[layer].map_ofs = (xo & 0xFFFFu) | (yo << 16);
+	u32 shft = 6 - MIN(frac, 6);
+	layer_mem[layer].map_ofs = ((x_ofs << shft) & 0xFFFFu) | (y_ofs << (16 + shft));
 }
 
 
@@ -158,10 +155,10 @@ void kt_LayerSetMapScale(u32 layer, f32 x_scale, f32 y_scale)
 {
 	u32 xs = 0x400, ys = 0x400;
 	layer &= 0xF;
-	if (x_scale != 0.0) {
+	if (x_scale > 0.0) {
 		xs = (u32) ((s32) ((1.0f / x_scale) * 1024.0f));
 	}
-	if (y_scale != 0.0) {
+	if (y_scale > 0.0) {
 		ys = (u32) ((s32) ((1.0f / y_scale) * 1024.0f));
 	}
 	layer_mem[layer].map_scale = (xs & 0xFFFFu) | (ys << 16);
