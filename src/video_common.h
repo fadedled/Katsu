@@ -17,6 +17,9 @@ typedef struct VideoState_t {
 	u32 frame_h;
 	u32 fill_mode;
 	u32 filter_mode;
+	u32 res_mode;
+	u32 max_w;
+	u32 max_h;
 
 	u32 frame_output_x;
 	u32 frame_output_y;

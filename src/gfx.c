@@ -229,7 +229,7 @@ void kt_LayerClear(u32 layer)
 {
 	layer &= 0xF;
 	layer_mem[layer].type = KT_LAYER_NONE;
-	kt_LayerSetMapRect(layer, 0, 0, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
+	kt_LayerSetMapRect(layer, 0, 0, vstate.max_w, vstate.max_h);
 	layer_mem[layer].map_attr = 0;
 	layer_mem[layer].map_ofs = 0;
 	layer_mem[layer].map_scale = 0x04000400;

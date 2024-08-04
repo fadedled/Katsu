@@ -6,8 +6,10 @@
 
 layout(std140, binding = 0) uniform video_data
 {
+	vec2 maxdims;
 	vec2 frame;
 	vec2 outdims;
+	vec2 _padding;
 	vec4 color_offset;
 	vec4 mtx_mem[256];
 };
@@ -51,7 +53,7 @@ void main()
 	uvec2 uofs = uvec2(sprite.x, sprite.x >> 16u) & 0xFFFFu;
 	ivec2 iofs = ivec2((-(uofs & 0x8000u)) | uofs) + ivec2(center_uv) + hsize;
 	//XXX: use screen values from the uniform
-	vec2 pos = (vec2(iofs) / (vec2(424.0, -240.0) / 2.0)) + vec2(-1.0, 1.0);
+	vec2 pos = (vec2(iofs) / maxdims) + vec2(-1.0, 1.0);
 	gl_Position = vec4(pos, 0.0, 1.0);
 
 	tile = (sprite.y & 0x3FFFu) << 3;

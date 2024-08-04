@@ -52,6 +52,8 @@ int main() {
 	kt_PaletteLoad(2, KT_PAL_SIZE_16, affine_0_demo_4bpp_pal);
 	kt_PaletteLoad(3, KT_PAL_SIZE_16, affine_1_demo_4bpp_pal);
 	system_Init(15);
+	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
+	kt_VideoSetResolution(KT_VIDEO_RES_MID);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
@@ -96,8 +98,8 @@ int main() {
 
 	kt_LayerSetMapScale(KT_LAYER2, 2.0, 1.5);
 
-	kt_LayerInitMap(KT_LAYER14, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
-	kt_LayerInitSprite(KT_LAYER15, 2, sys_spr);
+	kt_LayerInitMap(KT_LAYER6, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
+	kt_LayerInitSprite(KT_LAYER7, 2, sys_spr);
 	system_WindowBegin(10, 4, 32);
 	system_WindowLabel("- Normal Map Demo");
 	system_WindowLabel("- Sprite Demo");
@@ -112,7 +114,6 @@ int main() {
 	f32 rot = 0.0;
 
 	u32 voice = 0, entrie = 0;
-	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
 	sseq_Open(10, 1.0);
 	sseq_SetSpeed(1.0);
 

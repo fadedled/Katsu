@@ -6,8 +6,10 @@
 
 layout(std140, binding = 0) uniform video_data
 {
+	vec2 maxdims;
 	vec2 frame;
 	vec2 outdims;
+	vec2 _padding;
 	vec4 color_offset;
 	vec4 mtx_mem[256];
 };
@@ -37,7 +39,7 @@ void main()
 	vec2 tmap_size = vec2(lay_rect.y & 0xFFFFu, lay_rect.y >> 16);
 	blend = float(map.x & 0xFF) / 255.0;
 	uv = vec2(gl_VertexID & 1, gl_VertexID >> 1) * tmap_size;
-	vec2 pos = ((uv + tmap_pos) / (vec2(424.0, -240.0) / 2.0)) + vec2(-1.0, 1.0);
+	vec2 pos = ((uv + tmap_pos) / maxdims) + vec2(-1.0, 1.0);
 	tmap_ofs = uvec2(map.y, map.y >> 16) & 0xFFFFu;
 	map_size = (map.xx >> uvec2(11, 12)) & 0x200u;
 	tmap_num = (map.x >> 4) & 0xF000u;

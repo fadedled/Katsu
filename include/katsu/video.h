@@ -19,6 +19,13 @@
 #define KT_VIDEO_MIN_WIDTH     32
 #define KT_VIDEO_MIN_HEIGHT    KT_VIDEO_MIN_WIDTH
 
+#define KT_VIDEO_MID_WIDTH     636
+#define KT_VIDEO_MID_HEIGHT    360
+
+#define KT_VIDEO_HI_WIDTH      848
+#define KT_VIDEO_HI_HEIGHT     480
+
+
 
 /*Fill Modes*/
 enum ViFillModes {
@@ -42,6 +49,15 @@ enum ViFrames {
 	KT_VIDEO_FRAME_4X,
 	KT_VIDEO_FRAME_FULLSCREEN,
 	KT_VIDEO_MAX_FRAME
+};
+
+
+/*Resolution mode*/
+enum ViResolution {
+	KT_VIDEO_RES_NORMAL,
+	KT_VIDEO_RES_MID,
+	KT_VIDEO_RES_HI,
+	KT_VIDEO_MAX_RES
 };
 
 
@@ -83,6 +99,8 @@ void kt_VideoOutputSet(u32 w, u32 h);
  * \param[out] h Pointer where the height of the output will be stored.
  */
 void kt_VideoOutputGet(u32 *w, u32 *h);
+
+void kt_VideoSetResolution(u32 res);
 
 void kt_VideoFillModeSet(u32 fill_mode);
 void kt_VideoFilterSet(u32 filter);
