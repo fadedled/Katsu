@@ -139,8 +139,8 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 		} break;
 		case KT_VIDEO_ATTR_FRAME: {
 			u32 frame = *((u32*)val);
-			u32 w = KT_VIDEO_STD_WIDTH * (frame + 1);
-			u32 h = KT_VIDEO_STD_HEIGHT * (frame + 1);
+			u32 w = vstate.max_w * (frame + 1);
+			u32 h = vstate.max_h * (frame + 1);
 			if (frame == KT_VIDEO_FRAME_FULLSCREEN) {
 
 			}

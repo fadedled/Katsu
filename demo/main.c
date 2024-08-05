@@ -53,7 +53,8 @@ int main() {
 	kt_PaletteLoad(3, KT_PAL_SIZE_16, affine_1_demo_4bpp_pal);
 	system_Init(15);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
-	kt_VideoSetResolution(KT_VIDEO_RES_STD);
+	kt_VideoSetResolution(KT_VIDEO_RES_HI);
+	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
@@ -86,7 +87,6 @@ int main() {
 
 
 	kt_LayerInitSprite(KT_LAYER1, 4, spr);
-	kt_VideoFrameSet(KT_VIDEO_FRAME_4X);
 
 	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm0);
 	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm1);
