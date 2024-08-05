@@ -24,8 +24,8 @@ u32 kt_Init(void)
 	}
 	u32 err = KT_OK;
 
-	kt_VideoSetResolution(KT_VIDEO_RES_NORMAL);
-	kt_VideoOutputSet(KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
+	kt_VideoSetResolution(KT_VIDEO_RES_STD);
+	kt_VideoOutputSet(KT_VIDEO_STD_WIDTH, KT_VIDEO_STD_HEIGHT);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_OUT_SCALE);
 	kt_VideoFilterSet(KT_VIDEO_FILTER_SHARP);
 	//kt_VideoFrameSet(KT_VIDEO_FRAME_2X);

@@ -66,7 +66,7 @@ u32  __kt_VideoInit(void)
 	//XXX: ResizeRedirectMask? ExposureMask?
 
 	kt_x11.win = XCreateWindow(kt_x11.dpy, RootWindow(kt_x11.dpy, vinfo->screen),
-							   0, 0, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT,
+							   0, 0, KT_VIDEO_STD_WIDTH, KT_VIDEO_STD_HEIGHT,
 							   0, vinfo->depth, InputOutput, vinfo->visual,
 							   CWColormap | CWEventMask | CWBackPixel | CWBorderPixel, &win_attr);
 
@@ -139,8 +139,8 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 		} break;
 		case KT_VIDEO_ATTR_FRAME: {
 			u32 frame = *((u32*)val);
-			u32 w = KT_VIDEO_MAX_WIDTH * (frame + 1);
-			u32 h = KT_VIDEO_MAX_HEIGHT * (frame + 1);
+			u32 w = KT_VIDEO_STD_WIDTH * (frame + 1);
+			u32 h = KT_VIDEO_STD_HEIGHT * (frame + 1);
 			if (frame == KT_VIDEO_FRAME_FULLSCREEN) {
 
 			}

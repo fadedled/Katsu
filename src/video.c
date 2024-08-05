@@ -7,9 +7,9 @@ VideoState vstate;
 
 void kt_VideoOutputSet(u32 w, u32 h)
 {
-	if (vstate.res_mode == KT_VIDEO_RES_NORMAL) {
-		w = MIN(w, KT_VIDEO_MAX_WIDTH);
-		h = MIN(h, KT_VIDEO_MAX_HEIGHT);
+	if (vstate.res_mode == KT_VIDEO_RES_STD) {
+		w = MIN(w, KT_VIDEO_STD_WIDTH);
+		h = MIN(h, KT_VIDEO_STD_HEIGHT);
 		w = MAX(w, KT_VIDEO_MIN_WIDTH);
 		h = MAX(h, KT_VIDEO_MIN_HEIGHT);
 		vstate.output_w = w;
@@ -27,8 +27,8 @@ void kt_VideoOutputGet(u32 *w, u32 *h)
 
 void kt_VideoSetResolution(u32 res)
 {
-	vstate.max_w = (KT_VIDEO_MAX_WIDTH >> 1) * (res + 2);
-	vstate.max_h = (KT_VIDEO_MAX_HEIGHT >> 1) * (res + 2);
+	vstate.max_w = (KT_VIDEO_STD_WIDTH >> 1) * (res + 2);
+	vstate.max_h = (KT_VIDEO_STD_HEIGHT >> 1) * (res + 2);
 	vstate.res_mode = res;
 	vstate.output_w = vstate.max_w;
 	vstate.output_h = vstate.max_h;

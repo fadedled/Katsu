@@ -53,7 +53,7 @@ int main() {
 	kt_PaletteLoad(3, KT_PAL_SIZE_16, affine_1_demo_4bpp_pal);
 	system_Init(15);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
-	kt_VideoSetResolution(KT_VIDEO_RES_MID);
+	kt_VideoSetResolution(KT_VIDEO_RES_STD);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
@@ -96,7 +96,7 @@ int main() {
 	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 1);
 	kt_LayerSetMapChrOffset(KT_LAYER2, system_4bpp_tilenum, 1);
 
-	kt_LayerSetMapScale(KT_LAYER2, 2.0, 1.5);
+	//kt_LayerSetMapScale(KT_LAYER2, 2.0, 1.5);
 
 	kt_LayerInitMap(KT_LAYER6, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
 	kt_LayerInitSprite(KT_LAYER7, 2, sys_spr);
@@ -128,10 +128,8 @@ int main() {
 		x2 += ((btns2 >> JOY_BIT_RIGHT) & 0x1) - ((btns2 >> JOY_BIT_LEFT) & 0x1);
 		y2 += ((btns2 >> JOY_BIT_DOWN) & 0x1) - ((btns2 >> JOY_BIT_UP) & 0x1);
 		kt_OffsetColor(x - 50, x - 50, y - 50);
-		f32 fx = (f32) (x / 2.0);
-		f32 fy = (f32) (y / 1.5);
 		kt_LayerSetMapOffset(KT_LAYER0, x, y);
-		kt_LayerSetMapOffsetf(KT_LAYER2, fx * 64.0, fy * 64.0, 6);
+		kt_LayerSetMapOffset(KT_LAYER2, x, y);
 		//kt_LayerSetMapOffsetf(KT_LAYER2, x, y, 1);
 
 		spr[1].pos = KT_SPR_POS(-x + 307, -y + 234);

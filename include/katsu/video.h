@@ -14,13 +14,13 @@
 #include <katsu/types.h>
 
 
-#define KT_VIDEO_MAX_WIDTH     424
-#define KT_VIDEO_MAX_HEIGHT    240
+#define KT_VIDEO_STD_WIDTH     424
+#define KT_VIDEO_STD_HEIGHT    240
 #define KT_VIDEO_MIN_WIDTH     32
 #define KT_VIDEO_MIN_HEIGHT    KT_VIDEO_MIN_WIDTH
 
-#define KT_VIDEO_MID_WIDTH     636
-#define KT_VIDEO_MID_HEIGHT    360
+#define KT_VIDEO_MDN_WIDTH     636
+#define KT_VIDEO_MDN_HEIGHT    360
 
 #define KT_VIDEO_HI_WIDTH      848
 #define KT_VIDEO_HI_HEIGHT     480
@@ -54,8 +54,8 @@ enum ViFrames {
 
 /*Resolution mode*/
 enum ViResolution {
-	KT_VIDEO_RES_NORMAL,
-	KT_VIDEO_RES_MID,
+	KT_VIDEO_RES_STD,
+	KT_VIDEO_RES_MDN,
 	KT_VIDEO_RES_HI,
 	KT_VIDEO_MAX_RES
 };
@@ -94,6 +94,7 @@ void kt_VideoOutputSet(u32 w, u32 h);
 /*!
  * \fn void kt_VideoOutputGet(u32 *w, u32 *h)
  * \brief Gets the size of the output.
+ * \details This function should only be used when a normal resolution is set
  *
  * \param[out] w Pointer where the width of the output will be stored.
  * \param[out] h Pointer where the height of the output will be stored.

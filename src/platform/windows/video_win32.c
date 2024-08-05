@@ -105,8 +105,8 @@ static LRESULT CALLBACK __kt_WinCallback(HWND win, UINT msg, WPARAM wparam, LPAR
 u32  __kt_VideoInit(void)
 {
 	//XXX: No
-	vstate.frame_w = KT_VIDEO_MAX_WIDTH;
-	vstate.frame_h = KT_VIDEO_MAX_HEIGHT;
+	vstate.frame_w = KT_VIDEO_STD_WIDTH;
+	vstate.frame_h = KT_VIDEO_STD_HEIGHT;
 
 	/* Open a window */
 	HGLRC glc_old;
@@ -124,12 +124,12 @@ u32  __kt_VideoInit(void)
 	kt_win.hwin = CreateWindow(CLASS_NAME, "",
 							   WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 							   CW_USEDEFAULT, CW_USEDEFAULT,
-							   KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT,
+							   KT_VIDEO_STD_WIDTH, KT_VIDEO_STD_HEIGHT,
 							   NULL, NULL, wclass.hInstance, NULL);
 	if (!kt_win.hwin){
 		return 1;
 	}
-	__kt_WinResize(kt_win.hwin, KT_VIDEO_MAX_WIDTH, KT_VIDEO_MAX_HEIGHT);
+	__kt_WinResize(kt_win.hwin, KT_VIDEO_STD_WIDTH, KT_VIDEO_STD_HEIGHT);
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 	kt_win.hdc = GetDC(kt_win.hwin);
 	//SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
@@ -224,8 +224,8 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 		} break;
 		case KT_VIDEO_ATTR_FRAME: {
 			u32 frame = *((u32*)val);
-			u32 w = KT_VIDEO_MAX_WIDTH * (frame + 1);
-			u32 h = KT_VIDEO_MAX_HEIGHT * (frame + 1);
+			u32 w = KT_VIDEO_STD_WIDTH * (frame + 1);
+			u32 h = KT_VIDEO_STD_HEIGHT * (frame + 1);
 			if (frame == KT_VIDEO_FRAME_FULLSCREEN) {
 
 			}
