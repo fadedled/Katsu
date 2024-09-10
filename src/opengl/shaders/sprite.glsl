@@ -91,7 +91,7 @@ void main()
 	uvec2 chr_hi = (uvec2(uv) & 0x78u) * uvec2(1, width);
 	uvec2 chr_lo = uvec2(uv) & 0x7u;
 	uint byte = chr_lo.x >> 1;
-	uint shft = (chr_lo.x & 0x1) << 2;
+	uint shft = ((~chr_lo.x) & 0x1) << 2;
 	uvec2 chr = uvec2(tile + chr_hi.x + chr_hi.y + chr_lo.y) & uvec2(0xFF, 0x3FFF);
 	uint idx = (texelFetch(tile_mem, ivec2(chr.x, chr.y >> 8), 0)[byte] >> shft) & 0xfu;
 	//Color 0 is transparent

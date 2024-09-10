@@ -110,7 +110,7 @@ void main()
 	uint flip_y = -((tile.z >> 7) & 1u);
 	uint chr = ((flip_y ^ pix.y) & 7u) + (((((tile.z << 8) | tile.w) + tile_ofs) & 0x3FFFu) << 3u);
 	uint byte = ((flip_x ^ pix.x) >> 1) & 0x3;
-	uint shft = ((flip_x ^ pix.x) & 1u) << 2u;
+	uint shft = (((~flip_x) ^ pix.x) & 1u) << 2u;
 	uint idx = (texelFetch(tile_mem, ivec2(chr & 0xffu, chr >> 8u), 0)[byte] >> shft) & 0xfu;
 
 	//Color 0 is transparent

@@ -53,7 +53,7 @@ int main() {
 	kt_PaletteLoad(3, KT_PAL_SIZE_16, affine_1_demo_4bpp_pal);
 	system_Init(15);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
-	kt_VideoSetResolution(KT_VIDEO_RES_HI);
+	kt_VideoSetResolution(KT_VIDEO_RES_MDN);
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
