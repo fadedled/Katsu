@@ -120,8 +120,8 @@ int main() {
 	sseq_SetSpeed(1.0);
 
 	for (u32 i = 0; i < 256; ++i) {
-		lmap_data[i].ofs_delta = ((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
-		lmap_data[i].scale_x_delta = 0;
+		lmap_data[i].ofs_delta = (i*16) & 0xFFFFu; //((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
+		lmap_data[i].scale_x_delta = (-i) & 0xFFFFu;
 	}
 	kt_LayerSetUserData(KT_LAYER2, 256, lmap_data);
 

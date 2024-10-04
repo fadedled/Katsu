@@ -106,7 +106,7 @@ void main()
 		uv_delta = (linemap_data[iuv.y].xx >> uvec2(0, 16)) & 0xFFFFu;
 		scale_delta.x = linemap_data[iuv.y].y;
 	}
-	uvec2 pix = (((iuv * (scale + scale_delta)) >> 4) + (tmap_ofs + uv_delta)) >> 6;
+	uvec2 pix = (((iuv * ((scale + scale_delta) & 0xFFFFu)) >> 4) + (tmap_ofs + uv_delta)) >> 6;
 	//if (bool((p.x | p.y) & 0x400u)) {
 	//	discard;
 	//}
