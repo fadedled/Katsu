@@ -440,19 +440,19 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
 
 
 /*!
- * \fn void kt_LayerSetAppData(u32 layer, u32 num_elems, void* data)
- * \brief Sets a layer's application data.
- * \details The layer's application data is a pointer to memory allocated by the application
+ * \fn void kt_LayerSetUserData(u32 layer, u32 num_elems, void* data)
+ * \brief Sets a layer's user data.
+ * \details The layer's user data is a pointer to memory allocated by the user
  * , the use of the data depends on the type of the layer.
  * This funtion only copies the address of the data array
- * to the layer, this means that the application must not free the memory while it is still
+ * to the layer, this means that the user must not free the memory while it is still
  * attached to the layer.
  *
  * \param[in] layer \ref layer_id.
  * \param[in] num_elems The number of elements that the data has.
  * \param[in] data Pointer to the data.
  */
-void kt_LayerSetAppData(u32 layer, u32 num_elems, void* data);
+void kt_LayerSetUserData(u32 layer, u32 num_elems, void* data);
 
 /*!
  * \fn void kt_LayerSetWindow(u32 layer, u32 act_windows)

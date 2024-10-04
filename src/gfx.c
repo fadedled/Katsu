@@ -119,7 +119,7 @@ void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data)
 	u32 count = (type == KT_LAYER_SPRITE ? spr_count & (KT_MAX_SPRITES - 1) : 0);
 	kt_LayerClear(layer);
 	kt_LayerSetType(layer, type);
-	kt_LayerSetAppData(layer, count, data);
+	kt_LayerSetUserData(layer, count, data);
 }
 
 
@@ -205,7 +205,7 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func)
 }
 
 
-void kt_LayerSetAppData(u32 layer, u32 num_elems, void* data)
+void kt_LayerSetUserData(u32 layer, u32 num_elems, void* data)
 {
 	layer &= 0xF;
 	if (num_elems && data) {

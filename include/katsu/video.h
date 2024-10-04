@@ -115,8 +115,8 @@ void kt_VideoOutputGet(u32 *w, u32 *h);
  * \details There are three resolutions: Standard (240p), Modern (mostly
  * for applications that want more detailed images), High (480p). This function
  * should be used before \ref kt_VideoFrameSet and \ref kt_VideoOutputSet.
- * \warning Every resolution has it's own rendering capabilities: Standard definition
- * allows 16 layers and 4 rotation layer maps. Modern definition only allows 8 layers and
+ * \warning All resolutions have different rendering capabilities: Standard definition
+ * allows for 16 layers with 4 of them being rotation layer maps. Modern definition only allows 8 layers and
  * 2 rotation layer maps. High definition only allows 4 layers and no rotation layer maps.
  * It is best to clear all layers with \ref kt_LayerClearAll after using this function.
  * \param[in] res \ref res_mode.
