@@ -12,6 +12,7 @@ layout(std140, binding = 0) uniform video_data
 	vec2 _padding;
 	vec4 color_offset;
 	vec4 mtx_mem[256];
+	vec3 linemap_data[1024*3];
 };
 
 #ifdef VERTEX_SHADER
@@ -91,11 +92,17 @@ void main()
 	//vec2 scale_p = uv * (1.0/ (pix_h + 1.0));
 	//vec2 dp = (tmap_mat[layer_indx].xy * scale_p.xx) + (tmap_mat[layer_indx].zw * scale_p.yy);
 	//ivec2 ofs = ivec2(floor(tmap_offset[layer_indx] + dp)); //+ c;
-
+	uvec2 uv_delta = uvec2(0);
+	uvec2 scale_delta = uvec2(0);
+	/*
+	if () {
+		uv_delta = (linemap_data[uint(gl_FragCoord.y)].xx >> uvec2(0, 16)) & 0xFFFFu;
+		scale_delta.x = linemap_data[uint(gl_FragCoord.y)].y;
+	}*/
 	//get tile
 	//Apply mosaic
 	uvec2 iuv = uvec2(uv) - (uvec2(uv) % mos);
-	uvec2 pix = (((iuv * scale) >> 4) + tmap_ofs) >> 6;
+	uvec2 pix = ((((iuv + uv_delta) * (scale + scale_delta)) >> 4) + tmap_ofs) >> 6;
 	//if (bool((p.x | p.y) & 0x400u)) {
 	//	discard;
 	//}

@@ -51,7 +51,9 @@ u32 rb_depth;
 KTSpr sprite_verts[KT_MAX_SPRITES * 4];
 u32 vert_start[KT_MAX_SPRITES];
 u32 vert_count[KT_MAX_SPRITES];
+KTLineMapEntry linemap_data[KT_MAX_LINEMAP_LINES];
 
+//Repeats all Sprite data (the same sprite data per vertex)
 static void __kt_BuildVertexData(void)
 {
 	u32 count = 0;
@@ -67,6 +69,8 @@ static void __kt_BuildVertexData(void)
 				count += 4;
 				++spr;
 			}
+		} else if (lr->type == KT_LAYER_MAP_NORMAL && lr->data_ptr) {
+			//TODO: fill line data
 		}
 		++lr;
 	}
@@ -284,6 +288,7 @@ void ogl_Draw(void)
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(sprite_verts), sprite_verts);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(video_data), &video_data);
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(video_data), sizeof(mtx_mem), &mtx_mem);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(video_data) + sizeof(mtx_mem), sizeof(linemap_data), &linemap_data);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, video_data_ubo);
 
 	glActiveTexture(GL_TEXTURE0);

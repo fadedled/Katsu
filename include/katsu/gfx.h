@@ -15,12 +15,13 @@
 
 
 /*Graphics Constants*/
-#define KT_MAX_TILES		0x4000
-#define KT_MAX_SPRITES		2048
-#define KT_MAX_TILEMAPS		16
-#define KT_MAX_COLORS		2048
-#define KT_MAX_PALETTES		(KT_MAX_COLORS >> 4)
-#define KT_MAX_MTX			256
+#define KT_MAX_TILES				0x4000
+#define KT_MAX_SPRITES				2048
+#define KT_MAX_TILEMAPS				16
+#define KT_MAX_COLORS				2048
+#define KT_MAX_PALETTES				(KT_MAX_COLORS >> 4)
+#define KT_MAX_MTX					256
+#define KT_MAX_LINEMAP_LINES		1024*3
 
 
 /*! \addtogroup pal_size Palette sizes
@@ -170,7 +171,7 @@ extern "C" {
  */
 typedef struct KTChr_t {
 	u8 pal;			/*!< Palette number. */
-	u8 _padding;	/*!< Unused, leave at zero. */
+	u8 _padding;	/*!< Unused, set to zero. */
 	u8 fthi;		/*!< Flip mode and high 6 bits of tile ID. */
 	u8 tlo;			/*!< Low 8 bits of tile ID. */
 } KTChr;
@@ -197,6 +198,19 @@ typedef struct KTSpr_t {
 	u32 mtx;	/*!< Index of affine matrix applied. */
 } KTSpr;
 
+
+/*! \typedef struct KTLineMapEntry_t KTLineMapEntry
+ * \brief Structure used to define line map user data entries.
+ *
+ * \code
+ * ofs_delta = [ofs_y_delta : 16][ofs_x_delta : 16]
+ * scale_x_delta = [- : 16][scale_x_delta : 16]
+ * \endcode
+ */
+typedef struct KTLineMapEntry_t {
+	u32 ofs_delta;		/*!< Change in value of the map offset (uses 10.6 fixed point). */
+	u32	scale_x_delta;	/*!< Change in value of the horizontal scale (uses 10.6 fixed point). */
+} KTLineMapEntry;
 
 
 /*! \typedef struct KTColor_t KTColor
