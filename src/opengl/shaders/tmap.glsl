@@ -12,7 +12,7 @@ layout(std140, binding = 0) uniform video_data
 	vec2 _padding;
 	vec4 color_offset;
 	vec4 mtx_mem[256];
-	vec3 linemap_data[1024*3];
+	uvec2 linemap_data[1024];
 };
 
 #ifdef VERTEX_SHADER
@@ -21,6 +21,7 @@ layout(std140, binding = 0) uniform video_data
 //=====================================
 layout(location = 0) uniform uvec2 lay_rect;
 layout(location = 1) uniform uvec4 map;
+layout(location = 2) uniform uvec2 user_data;
 
 
 layout(location = 0) out vec2 uv;
@@ -32,6 +33,7 @@ layout(location = 5) out flat uint pal_ofs;
 layout(location = 6) out flat uvec2 mos;
 layout(location = 7) out flat uvec2 scale;
 layout(location = 8) out flat uvec2 tmap_ofs;
+layout(location = 9) out flat uvec2 user_data_ofs;
 
 void main()
 {
@@ -48,6 +50,7 @@ void main()
 	tile_ofs = map.z & 0xFFFFu;
 	mos = (uvec2(map.x >> 8, map.x >> 12) & 0xFu) + 1u;
 	scale = uvec2(map.w, map.w >> 16) & 0xFFFFu;
+	user_data_ofs = user_data;
 	gl_Position = vec4(pos, 0.0, 1.0);
 }
 
@@ -66,6 +69,7 @@ layout(location = 5) in flat uint pal_ofs;
 layout(location = 6) in flat uvec2 mos;
 layout(location = 7) in flat uvec2 scale;
 layout(location = 8) in flat uvec2 tmap_ofs;
+layout(location = 9) in flat uvec2 user_data_ofs;
 
 layout(location = 0) out vec4 frag_color;
 
@@ -91,18 +95,18 @@ void main()
 	//uvec2 c = ((bg.yy >> uvec2(12u, 22u)) & 0x3ffu);
 	//vec2 scale_p = uv * (1.0/ (pix_h + 1.0));
 	//vec2 dp = (tmap_mat[layer_indx].xy * scale_p.xx) + (tmap_mat[layer_indx].zw * scale_p.yy);
-	//ivec2 ofs = ivec2(floor(tmap_offset[layer_indx] + dp)); //+ c;
-	uvec2 uv_delta = uvec2(0);
-	uvec2 scale_delta = uvec2(0);
-	/*
-	if () {
-		uv_delta = (linemap_data[uint(gl_FragCoord.y)].xx >> uvec2(0, 16)) & 0xFFFFu;
-		scale_delta.x = linemap_data[uint(gl_FragCoord.y)].y;
-	}*/
+	//ivec2 ofs = ivec2(floor(tmap_offset[layer_indx] + dp)); //+ c
 	//get tile
 	//Apply mosaic
 	uvec2 iuv = uvec2(uv) - (uvec2(uv) % mos);
-	uvec2 pix = ((((iuv + uv_delta) * (scale + scale_delta)) >> 4) + tmap_ofs) >> 6;
+	//Obtain user data
+	uvec2 uv_delta = uvec2(0);
+	uvec2 scale_delta = uvec2(0);
+	if (user_data_ofs.y > 0u) {
+		uv_delta = (linemap_data[iuv.y].xx >> uvec2(0, 16)) & 0xFFFFu;
+		scale_delta.x = linemap_data[iuv.y].y;
+	}
+	uvec2 pix = (((iuv * (scale + scale_delta)) >> 4) + (tmap_ofs + uv_delta)) >> 6;
 	//if (bool((p.x | p.y) & 0x400u)) {
 	//	discard;
 	//}

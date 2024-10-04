@@ -33,6 +33,9 @@ extern u8 norm_tm1[];
 #define TMAP_PALETTE_OFS 0
 #define SPR_PALETTE_OFS (4 * 16)
 
+
+KTLineMapEntry lmap_data[256] = {0};
+
 KTSpr sys_spr[8] = {0};
 
 int main() {
@@ -115,6 +118,12 @@ int main() {
 	u32 voice = 0, entrie = 0;
 	sseq_Open(10, 1.0);
 	sseq_SetSpeed(1.0);
+
+	for (u32 i = 0; i < 256; ++i) {
+		lmap_data[i].ofs_delta = ((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
+		lmap_data[i].scale_x_delta = 0;
+	}
+	kt_LayerSetUserData(KT_LAYER2, 256, lmap_data);
 
 	while (1) {
 		kt_Poll();

@@ -57,6 +57,7 @@ KTLineMapEntry linemap_data[KT_MAX_LINEMAP_LINES];
 static void __kt_BuildVertexData(void)
 {
 	u32 count = 0;
+	u32 linedata_ofs = sizeof(video_data) + sizeof(mtx_mem);
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
 		if (lr->type == KT_LAYER_SPRITE && lr->data_ptr) {
@@ -71,6 +72,8 @@ static void __kt_BuildVertexData(void)
 			}
 		} else if (lr->type == KT_LAYER_MAP_NORMAL && lr->data_ptr) {
 			//TODO: fill line data
+			glBufferSubData(GL_UNIFORM_BUFFER, linedata_ofs, 8 * lr->data_count, lr->data_ptr);
+			linedata_ofs += 8 * lr->data_count;
 		}
 		++lr;
 	}
@@ -170,7 +173,7 @@ void ogl_Init(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sprite_verts), NULL, GL_DYNAMIC_DRAW);
 	glGenBuffers(1, &video_data_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, video_data_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data) + sizeof(mtx_mem), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data) + sizeof(mtx_mem) + (sizeof(KTLineMapEntry) * 1024), NULL, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(KTSpr), (void*) 0);
@@ -283,12 +286,11 @@ void ogl_Draw(void)
 
 	//Update the buffers
 	glBindVertexArray(main_vao);
-	__kt_BuildVertexData();
 	glBindBuffer(GL_UNIFORM_BUFFER, video_data_ubo);
+	__kt_BuildVertexData();
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(sprite_verts), sprite_verts);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(video_data), &video_data);
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(video_data), sizeof(mtx_mem), &mtx_mem);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(video_data) + sizeof(mtx_mem), sizeof(linemap_data), &linemap_data);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, video_data_ubo);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -316,6 +318,7 @@ void ogl_Draw(void)
 
 	Layer *lr = layer_mem;
 	u32 spr_indx = 0;
+	u32 linemap_indx = 0;
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
 		//Set the blending mode for the layer
 		u8 blnd = lr->blnd;
@@ -327,6 +330,12 @@ void ogl_Draw(void)
 			glUseProgram(prog_bg);
 			glUniform2ui(0, lr->rect_pos, lr->rect_size);
 			glUniform4ui(1, lr->map_attr, lr->map_ofs, lr->chr_ofs, lr->map_scale);
+			if (lr->data_ptr) {
+				glUniform2ui(2, 256*linemap_indx, lr->data_count);
+				linemap_indx++;
+			} else {
+				glUniform2ui(2, 0, 0);
+			}
 			if (blnd_act ^ lr->map_attr >> 31) {
 				blnd_act = lr->map_attr >> 31;
 				if (blnd_act) {
