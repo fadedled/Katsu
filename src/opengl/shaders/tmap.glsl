@@ -12,7 +12,7 @@ layout(std140, binding = 0) uniform video_data
 	vec2 _padding;
 	vec4 color_offset;
 	vec4 mtx_mem[256];
-	uvec2 linemap_data[1024];
+	uvec4 linemap_data[512];
 };
 
 #ifdef VERTEX_SHADER
@@ -100,13 +100,16 @@ void main()
 	//Apply mosaic
 	uvec2 iuv = uvec2(uv) - (uvec2(uv) % mos);
 	//Obtain user data
-	uvec2 uv_delta = uvec2(0);
+	uvec2 ofs_delta = uvec2(0);
 	uvec2 scale_delta = uvec2(0);
 	if (user_data_ofs.y > 0u) {
-		uv_delta = (linemap_data[iuv.y].xx >> uvec2(0, 16)) & 0xFFFFu;
-		scale_delta.x = linemap_data[iuv.y].y;
+		uvec4 user_data = linemap_data[iuv.y >> 1u];
+		uvec2 mask = -((iuv.y & 1) ^ uvec2(0, 1));
+		user_data.xy = (user_data.xy & mask.xx) | (user_data.zw & mask.yy);
+		ofs_delta = (user_data.xx >> uvec2(0, 16)) & 0xFFFFu;
+		scale_delta.x = user_data.y;
 	}
-	uvec2 pix = (((iuv * ((scale + scale_delta) & 0xFFFFu)) >> 4) + (tmap_ofs + uv_delta)) >> 6;
+	uvec2 pix = (((iuv * ((scale + scale_delta) & 0xFFFFu)) >> 4) + (tmap_ofs + ofs_delta)) >> 6;
 	//if (bool((p.x | p.y) & 0x400u)) {
 	//	discard;
 	//}

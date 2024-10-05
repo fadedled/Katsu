@@ -72,8 +72,8 @@ static void __kt_BuildVertexData(void)
 			}
 		} else if (lr->type == KT_LAYER_MAP_NORMAL && lr->data_ptr) {
 			//TODO: fill line data
-			glBufferSubData(GL_UNIFORM_BUFFER, linedata_ofs, 8 * lr->data_count, lr->data_ptr);
-			linedata_ofs += 8 * lr->data_count;
+			glBufferSubData(GL_UNIFORM_BUFFER, linedata_ofs, sizeof(KTLineMapEntry) * lr->data_count, lr->data_ptr);
+			linedata_ofs += sizeof(KTLineMapEntry) * lr->data_count;
 		}
 		++lr;
 	}

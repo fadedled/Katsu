@@ -1,6 +1,7 @@
 res/dev_man
 build
 demo/demo
+demo/build_run.sh
 demo/*.o
 demo/res/*.o
 demo/res/tiles/*.o

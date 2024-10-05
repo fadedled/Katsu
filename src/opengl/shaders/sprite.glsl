@@ -12,7 +12,7 @@ layout(std140, binding = 0) uniform video_data
 	vec2 _padding;
 	vec4 color_offset;
 	vec4 mtx_mem[256];
-	uvec2 linemap_data[1024];
+	uvec4 linemap_data[512];
 };
 
 #ifdef VERTEX_SHADER
