@@ -26,8 +26,8 @@ extern const u32 affine_0_demo_4bpp_tilenum;
 extern const u32 affine_1_demo_4bpp_tilenum;
 extern const u32 system_4bpp_tilenum;
 
-extern u8 norm_tm0[];
-extern u8 norm_tm1[];
+extern u8 norm_tm_0_data[];
+extern u8 norm_tm_1_data[];
 
 
 #define TMAP_PALETTE_OFS 0
@@ -90,8 +90,8 @@ int main() {
 
 	kt_LayerInitSprite(KT_LAYER1, 4, spr);
 
-	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm0);
-	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm1);
+	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm_0_data);
+	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm_1_data);
 
 	kt_LayerInitMap(KT_LAYER0, KT_LAYER_MAP_NORMAL, 0, KT_MAP_SIZE_64x64);
 	kt_LayerInitMap(KT_LAYER2, KT_LAYER_MAP_NORMAL, 1, KT_MAP_SIZE_64x64);
@@ -103,7 +103,7 @@ int main() {
 	kt_LayerInitMap(KT_LAYER6, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
 	kt_LayerInitSprite(KT_LAYER7, 2, sys_spr);
 	system_WindowBegin(10, 4, 32);
-	system_WindowLabel("- Normal Map Demo");
+	system_WindowLabel("- Line Map Demo");
 	system_WindowLabel("- Sprite Demo");
 	system_WindowLabel("- ");
 	system_WindowLabel("");
@@ -123,6 +123,7 @@ int main() {
 		lmap_data[i].ofs_delta = (i*32); //+ ((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
 		lmap_data[i].scale_x_delta = (-i*2) & 0xFFFFu;
 	}
+	kt_LayerSetUserData(KT_LAYER0, 256, lmap_data);
 	kt_LayerSetUserData(KT_LAYER2, 256, lmap_data);
 
 	while (1) {
@@ -135,7 +136,7 @@ int main() {
 		u32 btns2 = kt_JoyButtonHeld(1);
 		x2 += ((btns2 >> JOY_BIT_RIGHT) & 0x1) - ((btns2 >> JOY_BIT_LEFT) & 0x1);
 		y2 += ((btns2 >> JOY_BIT_DOWN) & 0x1) - ((btns2 >> JOY_BIT_UP) & 0x1);
-		kt_OffsetColor(x - 50, x - 50, y - 50);
+		//kt_OffsetColor(x - 50, x - 50, y - 50);
 		kt_LayerSetMapOffset(KT_LAYER0, x, y);
 		kt_LayerSetMapOffset(KT_LAYER2, x, y);
 		//kt_LayerSetMapOffsetf(KT_LAYER2, x, y, 1);

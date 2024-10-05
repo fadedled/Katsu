@@ -29,11 +29,13 @@ var customMapFormat = {
                     var row = [];
                     for (x = 0; x < layer.width; ++x) {
                         var tile = layer.cellAt(x, y);
-                        var pal = layer.tileAt(x, y).properties()["Palette"];
-                        if (typeof pal == 'number') {
-                            pal = pal & 0x7F;
-                        } else {
-                            pal = 0; 
+                        if ( layer.tileAt(x, y) != null) {
+                            var pal = layer.tileAt(x, y).properties()["Palette"];
+                            if (typeof pal == 'number') {
+                                pal = pal & 0x7F;
+                            } else {
+                                pal = 0; 
+                            }                        
                         }
                     
                         var fthi = (tile.tileId & 0x3F00) >> 8;
