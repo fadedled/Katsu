@@ -28,6 +28,12 @@ extern const u32 system_4bpp_tilenum;
 
 extern u8 norm_tm_0_data[];
 extern u8 norm_tm_1_data[];
+extern u8 affine_tm_0_data[];
+extern u8 affine_tm_1_data[];
+
+extern u8 affine_bg_0_data[];
+extern u32 affine_bg_w;
+extern u32 affine_bg_h;
 
 
 #define TMAP_PALETTE_OFS 0
@@ -35,6 +41,47 @@ extern u8 norm_tm_1_data[];
 
 
 KTLineMapEntry lmap_data[256] = {0};
+
+void demo_AffineSetup(void)
+{
+	kt_LayerClear(KT_LAYER0);
+	kt_LayerClear(KT_LAYER1);
+	kt_LayerClear(KT_LAYER3);
+	//Load tilesets
+	kt_TilesetLoad(system_4bpp_tilenum, affine_0_demo_4bpp_tilenum, affine_0_demo_4bpp_data);
+	kt_TilesetLoad(affine_0_demo_4bpp_tilenum + system_4bpp_tilenum, affine_1_demo_4bpp_tilenum , affine_1_demo_4bpp_data);
+	kt_PaletteLoad(2, KT_PAL_SIZE_16, affine_0_demo_4bpp_pal);
+	kt_PaletteLoad(3, KT_PAL_SIZE_16, affine_1_demo_4bpp_pal);
+
+	//Setup tilemap
+	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, affine_bg_w, affine_bg_h, affine_bg_w, affine_bg_0_data);
+	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 32, 0, affine_bg_w, affine_bg_h, affine_bg_w, affine_bg_0_data);
+	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, affine_tm_0_data);
+	kt_TilemapLoad(2, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, affine_tm_1_data);
+
+	//Generate linemap data
+
+	for (s32 i = 0; i < 256; ++i) {
+		lmap_data[i].ofs_delta = 0;//(u32)(i*16*2.5); //+ ((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
+		lmap_data[i].scale_x_delta = (u32)(-i*4) & 0xFFFFu;
+	}
+
+	//Setup layers
+	kt_LayerInitMap(KT_LAYER0, KT_LAYER_MAP_NORMAL, 0, KT_MAP_SIZE_64x64);
+	kt_LayerInitMap(KT_LAYER1, KT_LAYER_MAP_NORMAL, 1, KT_MAP_SIZE_64x64);
+	kt_LayerInitMap(KT_LAYER3, KT_LAYER_MAP_NORMAL, 2, KT_MAP_SIZE_64x64);
+	kt_LayerSetBlendMode(KT_LAYER3, KT_BL_SRC_ALPHA, KT_BL_INV_SRC_ALPHA, KT_BL_FUNC_ADD);
+	kt_LayerSetMapBlend(KT_LAYER3, KT_TRUE, 0x80);
+	kt_LayerSetMapRect(KT_LAYER0, 0, 0, KT_VIDEO_STD_WIDTH, affine_bg_h * 8);
+	kt_LayerSetMapRect(KT_LAYER1, 0, affine_bg_h * 8, KT_VIDEO_STD_WIDTH, KT_VIDEO_STD_HEIGHT - (affine_bg_h * 8));
+	kt_LayerSetMapRect(KT_LAYER3, 0, (affine_bg_h * 8) - 2, KT_VIDEO_STD_WIDTH, KT_VIDEO_STD_HEIGHT - (affine_bg_h * 8));
+	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 2);
+	kt_LayerSetMapChrOffset(KT_LAYER1, system_4bpp_tilenum, 2);
+	kt_LayerSetMapChrOffset(KT_LAYER3, system_4bpp_tilenum, 2);
+	kt_LayerSetUserData(KT_LAYER1, 256, lmap_data);
+	kt_LayerSetUserData(KT_LAYER3, 256, lmap_data);
+}
+
 
 KTSpr sys_spr[8] = {0};
 
@@ -57,6 +104,7 @@ int main() {
 	system_Init(15);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
+	kt_VideoOutputSet(320, 240);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
@@ -67,11 +115,6 @@ int main() {
 	spr[1].chr = KT_SPR_CHR(12, 0, KT_SIZE_16, KT_SIZE_16, 1);
 	spr[1].sfx = KT_SPR_HUE(0x00FF, 0x60);
 	spr[1].mtx = KT_MTX_IDENTITY;
-
-	spr[2].pos = KT_SPR_POS(60, 120);
-	spr[2].chr = KT_SPR_CHR(0, 0, KT_SIZE_32, KT_SIZE_16, 0);
-	spr[2].sfx = KT_SPR_BLEND(0x80);
-	spr[2].mtx = 1;
 
 	spr[3].pos = KT_SPR_POS(40, 20);
 	spr[3].chr = KT_SPR_CHR(12, 0, KT_SIZE_24, KT_SIZE_32, 1);
@@ -88,22 +131,15 @@ int main() {
 	kt_MtxSet(1, 2.3, 0.0, 0.6, -2.3);
 
 
-	kt_LayerInitSprite(KT_LAYER1, 4, spr);
+	kt_LayerInitSprite(KT_LAYER2, 4, spr);
 
 	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm_0_data);
 	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm_1_data);
 
-	kt_LayerInitMap(KT_LAYER0, KT_LAYER_MAP_NORMAL, 0, KT_MAP_SIZE_64x64);
-	kt_LayerInitMap(KT_LAYER2, KT_LAYER_MAP_NORMAL, 1, KT_MAP_SIZE_64x64);
-	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 1);
-	kt_LayerSetMapChrOffset(KT_LAYER2, system_4bpp_tilenum, 1);
-
-	//kt_LayerSetMapScale(KT_LAYER2, 2.0, 1.5);
-
 	kt_LayerInitMap(KT_LAYER6, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
 	kt_LayerInitSprite(KT_LAYER7, 2, sys_spr);
 	system_WindowBegin(10, 4, 32);
-	system_WindowLabel("- Line Map Demo");
+	system_WindowLabel("- Normal Map Demo");
 	system_WindowLabel("- Sprite Demo");
 	system_WindowLabel("- ");
 	system_WindowLabel("");
@@ -116,15 +152,10 @@ int main() {
 	f32 rot = 0.0;
 
 	u32 voice = 0, entrie = 0;
-	sseq_Open(10, 1.0);
-	sseq_SetSpeed(1.0);
+	//sseq_Open(10, 1.0);
+	//sseq_SetSpeed(1.0);
 
-	for (u32 i = 0; i < 256; ++i) {
-		lmap_data[i].ofs_delta = (i*32); //+ ((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
-		lmap_data[i].scale_x_delta = (-i*2) & 0xFFFFu;
-	}
-	kt_LayerSetUserData(KT_LAYER0, 256, lmap_data);
-	kt_LayerSetUserData(KT_LAYER2, 256, lmap_data);
+	demo_AffineSetup();
 
 	while (1) {
 		kt_Poll();
@@ -137,8 +168,9 @@ int main() {
 		x2 += ((btns2 >> JOY_BIT_RIGHT) & 0x1) - ((btns2 >> JOY_BIT_LEFT) & 0x1);
 		y2 += ((btns2 >> JOY_BIT_DOWN) & 0x1) - ((btns2 >> JOY_BIT_UP) & 0x1);
 		//kt_OffsetColor(x - 50, x - 50, y - 50);
-		kt_LayerSetMapOffset(KT_LAYER0, x, y);
-		kt_LayerSetMapOffset(KT_LAYER2, x, y);
+		kt_LayerSetMapOffset(KT_LAYER0, x >> 3 , 0);
+		kt_LayerSetMapOffset(KT_LAYER1, x >> 1 , y >> 1);
+		kt_LayerSetMapOffset(KT_LAYER3, x, y);
 		//kt_LayerSetMapOffsetf(KT_LAYER2, x, y, 1);
 
 		spr[1].pos = KT_SPR_POS(-x + 307, -y + 234);

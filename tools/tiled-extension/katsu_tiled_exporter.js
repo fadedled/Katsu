@@ -46,7 +46,11 @@ var customMapFormat = {
                         if (tile.flippedVertically) {
                             fthi |= 0x80;
                         }
-                        
+                        if (tile.tileId == -1) {
+                            fthi = 0;
+                            tlo = 0;
+                            pal = 0;
+                        }    
                         file.write( toHex(pal) + ", 0x00, " + toHex(fthi) + ", " + toHex(tlo) + ", ");
                     }
                     file.write("\n\t");
