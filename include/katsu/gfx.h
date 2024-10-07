@@ -203,8 +203,8 @@ typedef struct KTSpr_t {
  * \brief Structure used to define line map user data entries.
  *
  * \code
- * ofs_delta = [ofs_y_delta : 16][ofs_x_delta : 16]
- * scale_x_delta = [- : 16][scale_x_delta : 16]
+ * ofs_delta = [- : 2][ofs_y_delta_int : 10][ofs_x_delta : 20]
+ * scale_x_delta = [- : 6][ofs_y_delta_frac : 10][scale_x_delta : 16]
  * \endcode
  */
 typedef struct KTLineMapEntry_t {
@@ -373,7 +373,7 @@ void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs);
  * \param[in] layer \ref layer_id.
  * \param[in] x_ofs Horizontal map offset.
  * \param[in] y_ofs Vertical map offset.
- * \param[in] frac number of fractional bits in the offsets (between 0 and 6).
+ * \param[in] frac number of fractional bits in the offset values (between 0 and 10).
  */
 void kt_LayerSetMapOffsetf(u32 layer, u32 x_ofs, u32 y_ofs, u32 frac);
 

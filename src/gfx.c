@@ -146,8 +146,9 @@ void kt_LayerSetMapOffset(u32 layer, u32 x_ofs, u32 y_ofs)
 void kt_LayerSetMapOffsetf(u32 layer, u32 x_ofs, u32 y_ofs, u32 frac)
 {
 	layer &= 0xF;
-	u32 shft = 6 - MIN(frac, 6);
-	layer_mem[layer].map_ofs = ((x_ofs << shft) & 0xFFFFu) | (y_ofs << (16 + shft));
+	u32 shft = 10 - MIN(frac, 10);
+	layer_mem[layer].map_ofsx = (x_ofs << shft) & 0xFFFFF;
+	layer_mem[layer].map_ofsy = (y_ofs << shft) & 0xFFFFF;
 }
 
 
@@ -231,7 +232,8 @@ void kt_LayerClear(u32 layer)
 	layer_mem[layer].type = KT_LAYER_NONE;
 	kt_LayerSetMapRect(layer, 0, 0, vstate.max_w, vstate.max_h);
 	layer_mem[layer].map_attr = 0;
-	layer_mem[layer].map_ofs = 0;
+	layer_mem[layer].map_ofsx = 0;
+	layer_mem[layer].map_ofsy = 0;
 	layer_mem[layer].map_scale = 0x04000400;
 	layer_mem[layer].blnd = 0x0;
 	layer_mem[layer].win_act = 0xF;

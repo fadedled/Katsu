@@ -20,8 +20,9 @@ layout(std140, binding = 0) uniform video_data
 // Vertex Shader
 //=====================================
 layout(location = 0) uniform uvec2 lay_rect;
-layout(location = 1) uniform uvec4 map;
-layout(location = 2) uniform uvec2 user_data;
+layout(location = 1) uniform uvec2 map_ofs;
+layout(location = 2) uniform uvec4 map_attr;
+layout(location = 3) uniform uvec2 user_data;
 
 
 layout(location = 0) out vec2 uv;
@@ -32,24 +33,22 @@ layout(location = 4) out flat uint tile_ofs;
 layout(location = 5) out flat uint pal_ofs;
 layout(location = 6) out flat uvec2 mos;
 layout(location = 7) out flat uvec2 scale;
-layout(location = 8) out flat uvec2 tmap_ofs;
-layout(location = 9) out flat uvec2 user_data_ofs;
+layout(location = 8) out flat uvec2 user_data_ofs;
 
 void main()
 {
 	const vec2 cl = vec2(1.0, 0.0);
 	vec2 tmap_pos = vec2(lay_rect.x  & 0xFFFFu, lay_rect.x >> 16);
 	vec2 tmap_size = vec2(lay_rect.y & 0xFFFFu, lay_rect.y >> 16);
-	blend = float(map.x & 0xFF) / 255.0;
+	blend = float(map_attr.x & 0xFF) / 255.0;
 	uv = vec2(gl_VertexID & 1, gl_VertexID >> 1) * tmap_size;
 	vec2 pos = ((uv + tmap_pos) / maxdims) + vec2(-1.0, 1.0);
-	tmap_ofs = uvec2(map.y, map.y >> 16) & 0xFFFFu;
-	map_size = (map.xx >> uvec2(11, 12)) & 0x200u;
-	tmap_num = (map.x >> 4) & 0xF000u;
-	pal_ofs = (map.z >> 16) & 0xFFFFu;
-	tile_ofs = map.z & 0xFFFFu;
-	mos = (uvec2(map.x >> 8, map.x >> 12) & 0xFu) + 1u;
-	scale = uvec2(map.w, map.w >> 16) & 0xFFFFu;
+	map_size = (map_attr.xx >> uvec2(11, 12)) & 0x200u;
+	tmap_num = (map_attr.x >> 4) & 0xF000u;
+	pal_ofs = (map_attr.z >> 16) & 0xFFFFu;
+	tile_ofs = map_attr.z & 0xFFFFu;
+	mos = (uvec2(map_attr.x >> 8, map_attr.x >> 12) & 0xFu) + 1u;
+	scale = uvec2(map_attr.w, map_attr.w >> 16) & 0xFFFFu;
 	user_data_ofs = user_data;
 	gl_Position = vec4(pos, 0.0, 1.0);
 }
@@ -68,9 +67,9 @@ layout(location = 4) in flat uint tile_ofs;
 layout(location = 5) in flat uint pal_ofs;
 layout(location = 6) in flat uvec2 mos;
 layout(location = 7) in flat uvec2 scale;
-layout(location = 8) in flat uvec2 tmap_ofs;
-layout(location = 9) in flat uvec2 user_data_ofs;
+layout(location = 8) in flat uvec2 user_data_ofs;
 
+layout(location = 1) uniform uvec2 map_ofs;
 layout(location = 0) out vec4 frag_color;
 
 layout(binding = 0) uniform usampler2D tile_mem;
@@ -106,11 +105,12 @@ void main()
 		uvec4 user_data = linemap_data[iuv.y >> 1u];
 		uvec2 mask = -((iuv.y & 1) ^ uvec2(0, 1));
 		user_data.xy = (user_data.xy & mask.xx) | (user_data.zw & mask.yy);
-		ofs_delta = (user_data.xx >> uvec2(0, 16)) & 0xFFFFu;
-		scale_delta.x = user_data.y;
+		ofs_delta = (user_data.xx >> uvec2(0, 10)) & uvec2(0xFFFFFu, 0xFFC00u);
+		//ofs_delta.y |= (user_data.y >> 16) & 0x3FFu;
+		scale_delta.x = user_data.y & 0xFFFFu;
 	}
-	uvec2 pix = (((iuv * ((scale + scale_delta) & 0xFFFFu)) >> 4) + (tmap_ofs + ofs_delta)) >> 6;
-	//if (bool((p.x | p.y) & 0x400u)) {
+	uvec2 pix = (((iuv * ((scale + scale_delta) & 0xFFFFu))) + (map_ofs + ofs_delta)) >> 10;
+	//if (bool((p.x | p.y) & 0x400 u)) {
 	//	discard;
 	//}
 	uint map_width = map_size.x >> 9;

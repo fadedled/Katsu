@@ -60,10 +60,22 @@ void demo_AffineSetup(void)
 	kt_TilemapLoad(2, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, affine_tm_1_data);
 
 	//Generate linemap data
+	f32 f = 1024;
+	f32 d = 32;
+	for (s32 i = 0; i < 256; i++) {
+		s32 y_d = (s32) (sinf(i * (3.14159f / 32.0f)) * 1024.0f*8);
+		lmap_data[i].ofs_delta = (y_d & 0xFFFFFu);
+		lmap_data[i].scale_x_delta = 0;
+		f -= d;
+		d -= 0.5;
+	}
 
-	for (s32 i = 0; i < 256; ++i) {
-		lmap_data[i].ofs_delta = 0;//(u32)(i*16*2.5); //+ ((s32) (sinf((f32)i * (3.14159f / 32.0f)) * 256.0f)) & 0xFFFFu;
-		lmap_data[i].scale_x_delta = (u32)(-i*4) & 0xFFFFu;
+	for (s32 i = 100; i < 256; i++) {
+		f32 y_d = (i*128*3);
+		lmap_data[i].ofs_delta = ((i*4) & 0xFFFFFu) | (((s32)(y_d) & 0xFFC00) << 10); //((s32) (sinf(i * (3.14159f / 32.0f)) * 1024.0f*4)) & 0xFFFFFu;
+		lmap_data[i].scale_x_delta = ((s32)(-i*3) & 0xFFFFu) | (((s32)(y_d) & 0x3FF) << 16);
+		f -= d;
+		d -= 0.5;
 	}
 
 	//Setup layers
@@ -104,7 +116,6 @@ int main() {
 	system_Init(15);
 	kt_VideoFillModeSet(KT_VIDEO_FILL_SCALE);
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
-	kt_VideoOutputSet(320, 240);
 
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
