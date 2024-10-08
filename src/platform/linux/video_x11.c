@@ -3,6 +3,7 @@
 #include "../../video_common.h"
 #include "../../joypad_common.h"
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <GL/glx.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +12,9 @@
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
+
+extern u32 __kt_KeyboardAddEvent(KeyEvent *kev);
+extern void __kt_KeyboardInit(void);
 
 struct KTVideoX11_t {
 	Display *dpy;
@@ -109,6 +113,7 @@ u32  __kt_VideoInit(void)
 	xkey_mapping[12] = XKeysymToKeycode(kt_x11.dpy, XK_Return);
 	xkey_mapping[13] = XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
 
+	__kt_KeyboardInit();
 	kt_Reset();
 	XFree(vinfo);
 	XMapWindow(kt_x11.dpy, kt_x11.win);
@@ -155,6 +160,8 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 
 void __kt_VideoPoll(void)
 {
+	KeySym sym;
+	u32 mod;
 	XEvent xev;
 
 	//Check that the user requested a window close
@@ -165,6 +172,7 @@ void __kt_VideoPoll(void)
 		}
 	}
 
+	KeyEvent kev;
 	//Check the rest of the events
 	while (XCheckWindowEvent(kt_x11.dpy, kt_x11.win,
 							 KeyPressMask| KeyReleaseMask | StructureNotifyMask, &xev)) {
@@ -176,7 +184,12 @@ void __kt_VideoPoll(void)
 						joy_state[0].btn |= (1 << k);
 					}
 				}
-
+				kev.type = KEYBOARD_EVTYPE_PRESSED;
+				kev.keycode = key_ev.keycode;
+				XkbLookupKeySym(kt_x11.dpy, key_ev.keycode, key_ev.state, &mod, &sym);
+				kev.mod = mod;
+				kev.sym = sym;
+				__kt_KeyboardAddEvent(&kev);
 			} break;
 			case KeyRelease:{
 				XKeyEvent key_ev = xev.xkey;
@@ -185,6 +198,12 @@ void __kt_VideoPoll(void)
 						joy_state[0].btn &= ~(1 << k);
 					}
 				}
+				kev.type = KEYBOARD_EVTYPE_RELEASED;
+				kev.keycode = key_ev.keycode;
+				XkbLookupKeySym(kt_x11.dpy, key_ev.keycode, key_ev.state, &mod, &sym);
+				kev.mod = mod;
+				kev.sym = sym;
+				__kt_KeyboardAddEvent(&kev);
 			} break;
 			case ConfigureNotify:{
 				XConfigureEvent conf_ev = xev.xconfigure;

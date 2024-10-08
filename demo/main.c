@@ -168,8 +168,23 @@ int main() {
 
 	demo_AffineSetup();
 
+	KeyEvent kev;
 	while (1) {
 		kt_Poll();
+
+		while (kt_KeyboardGetEvent(&kev)) {
+			if (kev.type == KEYBOARD_EVTYPE_PRESSED) {
+				//Print the UTF
+				if(kev.sym > 0x7FF) {
+					printf("%c%c%c", ((kev.sym >> 12) & 0xF) | 0xE0, (kev.sym >> 6 & 0x3F) | 0x80, (kev.sym & 0x3F) | 0x80);
+				} else if(kev.sym > 0x7F) {
+					printf("%c%c", ((kev.sym >> 6) & 0x1F) | 0xC0, (kev.sym & 0x3F) | 0x80);
+				} else {
+					printf("%c", kev.sym);
+				}
+				fflush(stdout);
+			}
+		}
 
 		u32 btns = kt_JoyButtonHeld(0);
 		x += ((btns >> JOY_BIT_RIGHT) & 0x1) - ((btns >> JOY_BIT_LEFT) & 0x1);

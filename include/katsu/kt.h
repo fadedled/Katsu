@@ -15,6 +15,7 @@
 #include <katsu/audio.h>
 #include <katsu/video.h>
 #include <katsu/gfx.h>
+#include <katsu/input.h>
 #include <katsu/joypad.h>
 
 
