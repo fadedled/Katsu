@@ -35,12 +35,22 @@ typedef struct KeyEvent_t{
 } KeyEvent;
 
 
+typedef struct MouseState_t{
+	s16 y;
+	s16 x;
+	s16 dy;
+	s16 dx;
+	u8 btn;
+} MouseState;
+
+
 
 /*Keyboard Functions*/
 u32 kt_KeyboardGetEvent(KeyEvent *kev);
 u32 kt_KeyboardFlushEvents(void);
 
 /*Mouse Functions*/
+u32 kt_MouseGetState(MouseState *mouse);
 
 #ifdef __cplusplus
 }

@@ -12,9 +12,10 @@
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
-
+//TODO: use a header
 extern u32 __kt_KeyboardAddEvent(KeyEvent *kev);
 extern void __kt_KeyboardInit(void);
+extern void __kt_MouseSetState(s32 x, s32 y, u32 btn);
 
 struct KTVideoX11_t {
 	Display *dpy;
@@ -66,7 +67,9 @@ u32  __kt_VideoInit(void)
 	win_attr.colormap = XDefaultColormap(kt_x11.dpy, vinfo->screen);
 	win_attr.background_pixel = None;
 	win_attr.border_pixel = 0;
-	win_attr.event_mask = KeyPressMask | KeyReleaseMask | StructureNotifyMask;
+	win_attr.event_mask = KeyPressMask | KeyReleaseMask |
+						ButtonPressMask | ButtonReleaseMask |
+						StructureNotifyMask;
 	//XXX: ResizeRedirectMask? ExposureMask?
 
 	kt_x11.win = XCreateWindow(kt_x11.dpy, RootWindow(kt_x11.dpy, vinfo->screen),
@@ -160,9 +163,14 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 
 void __kt_VideoPoll(void)
 {
+	MouseState mouse;
 	KeySym sym;
-	u32 mod;
 	XEvent xev;
+	Window root, child;
+	u32 mouse_mask, mod;
+	s32 mouse_x, mouse_y, tmp;
+
+	kt_MouseGetState(&mouse);
 
 	//Check that the user requested a window close
 	while (XCheckTypedWindowEvent(kt_x11.dpy, kt_x11.win, ClientMessage, &xev)) {
@@ -175,7 +183,8 @@ void __kt_VideoPoll(void)
 	KeyEvent kev;
 	//Check the rest of the events
 	while (XCheckWindowEvent(kt_x11.dpy, kt_x11.win,
-							 KeyPressMask| KeyReleaseMask | StructureNotifyMask, &xev)) {
+							 KeyPressMask | KeyReleaseMask |
+							 ButtonPressMask | ButtonReleaseMask | StructureNotifyMask, &xev)) {
 		switch(xev.type) {
 			case KeyPress: {
 				XKeyEvent key_ev = xev.xkey;
@@ -205,6 +214,14 @@ void __kt_VideoPoll(void)
 				kev.sym = sym;
 				__kt_KeyboardAddEvent(&kev);
 			} break;
+			case ButtonPress: {
+				XButtonEvent btn_ev = xev.xbutton;
+				mouse.btn = btn_ev.button;
+			} break;
+			case ButtonRelease: {
+				XButtonEvent btn_ev = xev.xbutton;
+				//mouse.btn = 0;//btn_ev.button;
+			} break;
 			case ConfigureNotify:{
 				XConfigureEvent conf_ev = xev.xconfigure;
 					vstate.frame_w = conf_ev.width;
@@ -213,6 +230,8 @@ void __kt_VideoPoll(void)
 			} break;
 		}
 	}
+	XQueryPointer(kt_x11.dpy, kt_x11.win, &root, &child, &tmp, &tmp, &mouse_x, &mouse_y, &mouse_mask);
+	__kt_MouseSetState(mouse_x, mouse_y, mouse.btn);
 }
 
 

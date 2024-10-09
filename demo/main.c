@@ -167,7 +167,7 @@ int main() {
 	//sseq_SetSpeed(1.0);
 
 	demo_AffineSetup();
-
+	MouseState mouse;
 	KeyEvent kev;
 	while (1) {
 		kt_Poll();
@@ -185,6 +185,8 @@ int main() {
 				fflush(stdout);
 			}
 		}
+		kt_MouseGetState(&mouse);
+		printf("%u\n", mouse.btn);
 
 		u32 btns = kt_JoyButtonHeld(0);
 		x += ((btns >> JOY_BIT_RIGHT) & 0x1) - ((btns >> JOY_BIT_LEFT) & 0x1);
@@ -199,7 +201,7 @@ int main() {
 		kt_LayerSetMapOffset(KT_LAYER3, x, y);
 		//kt_LayerSetMapOffsetf(KT_LAYER2, x, y, 1);
 
-		spr[1].pos = KT_SPR_POS(-x + 307, -y + 234);
+		spr[1].pos = KT_SPR_POS(mouse.x, mouse.y);
 		spr[3].pos = KT_SPR_POS(x, y);
 		spr[2].pos = KT_SPR_POS(x2, y2);
 
