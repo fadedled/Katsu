@@ -27,30 +27,32 @@
 extern "C" {
 #endif /* __cplusplus */
 
-typedef struct KeyEvent_t{
+typedef struct KTKeyEvent_t{
 	u8  type;
 	u8  keycode;
 	u16 mod;	//Modifiers
 	u16 sym;	//Leave?
-} KeyEvent;
+} KTKeyEvent;
 
 
-typedef struct MouseState_t{
+typedef struct KTMouse_t{
 	s16 y;
 	s16 x;
 	s16 dy;
 	s16 dx;
-	u8 btn;
-} MouseState;
+	u8 btn0;
+	u8 btn1;
+	s8 scroll;
+} KTMouse;
 
 
 
 /*Keyboard Functions*/
-u32 kt_KeyboardGetEvent(KeyEvent *kev);
+u32 kt_KeyboardGetEvent(KTKeyEvent *kev);
 u32 kt_KeyboardFlushEvents(void);
 
 /*Mouse Functions*/
-u32 kt_MouseGetState(MouseState *mouse);
+u32 kt_MouseGetState(KTMouse *mouse);
 
 #ifdef __cplusplus
 }

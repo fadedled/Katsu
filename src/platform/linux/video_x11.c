@@ -13,9 +13,9 @@
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 //TODO: use a header
-extern u32 __kt_KeyboardAddEvent(KeyEvent *kev);
+extern u32 __kt_KeyboardAddEvent(KTKeyEvent *kev);
 extern void __kt_KeyboardInit(void);
-extern void __kt_MouseSetState(s32 x, s32 y, u32 btn);
+extern void __kt_MouseSetState(KTMouse *m, s32 x, s32 y);
 
 struct KTVideoX11_t {
 	Display *dpy;
@@ -163,14 +163,12 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 
 void __kt_VideoPoll(void)
 {
-	MouseState mouse;
+	KTMouse mouse = {0};
 	KeySym sym;
 	XEvent xev;
 	Window root, child;
 	u32 mouse_mask, mod;
 	s32 mouse_x, mouse_y, tmp;
-
-	kt_MouseGetState(&mouse);
 
 	//Check that the user requested a window close
 	while (XCheckTypedWindowEvent(kt_x11.dpy, kt_x11.win, ClientMessage, &xev)) {
@@ -180,7 +178,7 @@ void __kt_VideoPoll(void)
 		}
 	}
 
-	KeyEvent kev;
+	KTKeyEvent kev;
 	//Check the rest of the events
 	while (XCheckWindowEvent(kt_x11.dpy, kt_x11.win,
 							 KeyPressMask | KeyReleaseMask |
@@ -216,11 +214,15 @@ void __kt_VideoPoll(void)
 			} break;
 			case ButtonPress: {
 				XButtonEvent btn_ev = xev.xbutton;
-				mouse.btn = btn_ev.button;
+				switch(btn_ev.button) {
+					case Button1: mouse.btn0++; break;
+					case Button3: mouse.btn1++; break;
+					case Button4: mouse.scroll--; break;
+					case Button5: mouse.scroll++; break;
+				}
 			} break;
 			case ButtonRelease: {
-				XButtonEvent btn_ev = xev.xbutton;
-				//mouse.btn = 0;//btn_ev.button;
+				//XButtonEvent btn_ev = xev.xbutton;
 			} break;
 			case ConfigureNotify:{
 				XConfigureEvent conf_ev = xev.xconfigure;
@@ -231,7 +233,10 @@ void __kt_VideoPoll(void)
 		}
 	}
 	XQueryPointer(kt_x11.dpy, kt_x11.win, &root, &child, &tmp, &tmp, &mouse_x, &mouse_y, &mouse_mask);
-	__kt_MouseSetState(mouse_x, mouse_y, mouse.btn);
+	__kt_MouseSetState(&mouse, mouse_x, mouse_y);
+	mouse.btn0 = 0;
+	mouse.btn1 = 0;
+	mouse.scroll = 0;
 }
 
 

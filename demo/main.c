@@ -167,8 +167,8 @@ int main() {
 	//sseq_SetSpeed(1.0);
 
 	demo_AffineSetup();
-	MouseState mouse;
-	KeyEvent kev;
+	KTMouse mouse;
+	KTKeyEvent kev;
 	while (1) {
 		kt_Poll();
 
@@ -186,10 +186,9 @@ int main() {
 			}
 		}
 		kt_MouseGetState(&mouse);
-		printf("%u\n", mouse.btn);
 
 		u32 btns = kt_JoyButtonHeld(0);
-		x += ((btns >> JOY_BIT_RIGHT) & 0x1) - ((btns >> JOY_BIT_LEFT) & 0x1);
+		x += ((btns >> JOY_BIT_RIGHT) & 0x1) - ((btns >> JOY_BIT_LEFT) & 0x1) + mouse.scroll;
 		y += ((btns >> JOY_BIT_DOWN) & 0x1) - ((btns >> JOY_BIT_UP) & 0x1);
 
 		u32 btns2 = kt_JoyButtonHeld(1);
