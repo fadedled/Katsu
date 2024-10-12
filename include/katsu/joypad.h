@@ -134,7 +134,6 @@ s8   kt_JoyStick(u32 joy_id, u32 stick_id);
 //XXX: Configure button mappings?
 //XXX: Join stick and dpad?
 
-//void kt_JoySetKeyboardAsJoypad(u32 active);
 
 #ifdef __cplusplus
 }

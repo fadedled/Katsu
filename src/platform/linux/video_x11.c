@@ -2,6 +2,7 @@
 #include <katsu/kt.h>
 #include "../../video_common.h"
 #include "../../joypad_common.h"
+#include "../../input_common.h"
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <GL/glx.h>
@@ -12,10 +13,6 @@
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
-//TODO: use a header
-extern u32 __kt_KeyboardAddEvent(KTKeyEvent *kev);
-extern void __kt_KeyboardInit(void);
-extern void __kt_MouseSetState(KTMouse *m, s32 x, s32 y);
 
 struct KTVideoX11_t {
 	Display *dpy;
@@ -116,7 +113,6 @@ u32  __kt_VideoInit(void)
 	xkey_mapping[12] = XKeysymToKeycode(kt_x11.dpy, XK_Return);
 	xkey_mapping[13] = XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
 
-	__kt_KeyboardInit();
 	kt_Reset();
 	XFree(vinfo);
 	XMapWindow(kt_x11.dpy, kt_x11.win);
@@ -163,12 +159,18 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 
 void __kt_VideoPoll(void)
 {
-	KTMouse mouse = {0};
 	KeySym sym;
 	XEvent xev;
 	Window root, child;
+	KTKeyEvent kev;
+	u32 polling_mask = KeyPressMask | KeyReleaseMask | StructureNotifyMask;
 	u32 mouse_mask, mod;
 	s32 mouse_x, mouse_y, tmp;
+
+	//TODO: should be done here or after using kt_MouseGetState()?
+	input_state.mouse.btn0 = 0;
+	input_state.mouse.btn1 = 0;
+	input_state.mouse.scroll = 0;
 
 	//Check that the user requested a window close
 	while (XCheckTypedWindowEvent(kt_x11.dpy, kt_x11.win, ClientMessage, &xev)) {
@@ -178,50 +180,63 @@ void __kt_VideoPoll(void)
 		}
 	}
 
-	KTKeyEvent kev;
+	//Only check button events when mouse polling is active
+	if (input_state.polling & KT_MOUSE_POLLING) {
+		polling_mask |= ButtonPressMask | ButtonReleaseMask;
+	}
+
 	//Check the rest of the events
-	while (XCheckWindowEvent(kt_x11.dpy, kt_x11.win,
-							 KeyPressMask | KeyReleaseMask |
-							 ButtonPressMask | ButtonReleaseMask | StructureNotifyMask, &xev)) {
+	while (XCheckWindowEvent(kt_x11.dpy, kt_x11.win, polling_mask, &xev)) {
 		switch(xev.type) {
 			case KeyPress: {
 				XKeyEvent key_ev = xev.xkey;
-				for (u32 k = 0; k < 14; ++k) {
-					if (xkey_mapping[k] == key_ev.keycode) {
-						joy_state[0].btn |= (1 << k);
+				if (input_state.polling & KT_KEYBOARD_POLLING) {
+					//If keyboard polling is active report key
+					kev.type = KEYBOARD_EVTYPE_PRESSED;
+					kev.keycode = key_ev.keycode;
+					XkbLookupKeySym(kt_x11.dpy, key_ev.keycode, key_ev.state, &mod, &sym);
+					kev.mod = mod;
+					kev.sym = sym;
+					__kt_KeyboardAddEvent(&kev);
+				} else {
+					//Inactive keyboard polling makes keyboard act as a joypad
+					for (u32 k = 0; k < 14; ++k) {
+						if (xkey_mapping[k] == key_ev.keycode) {
+							joy_state[0].btn |= (1 << k);
+						}
 					}
 				}
-				kev.type = KEYBOARD_EVTYPE_PRESSED;
-				kev.keycode = key_ev.keycode;
-				XkbLookupKeySym(kt_x11.dpy, key_ev.keycode, key_ev.state, &mod, &sym);
-				kev.mod = mod;
-				kev.sym = sym;
-				__kt_KeyboardAddEvent(&kev);
 			} break;
 			case KeyRelease:{
 				XKeyEvent key_ev = xev.xkey;
-				for (u32 k = 0; k < 14; ++k) {
-					if (xkey_mapping[k] == key_ev.keycode) {
-						joy_state[0].btn &= ~(1 << k);
+				if (input_state.polling & KT_KEYBOARD_POLLING) {
+					//If keyboard polling is active report key
+					kev.type = KEYBOARD_EVTYPE_RELEASED;
+					kev.keycode = key_ev.keycode;
+					XkbLookupKeySym(kt_x11.dpy, key_ev.keycode, key_ev.state, &mod, &sym);
+					kev.mod = mod;
+					kev.sym = sym;
+					__kt_KeyboardAddEvent(&kev);
+				} else {
+					//Inactive keyboard polling makes keyboard act as a joypad
+					for (u32 k = 0; k < 14; ++k) {
+						if (xkey_mapping[k] == key_ev.keycode) {
+							joy_state[0].btn &= ~(1 << k);
+						}
 					}
 				}
-				kev.type = KEYBOARD_EVTYPE_RELEASED;
-				kev.keycode = key_ev.keycode;
-				XkbLookupKeySym(kt_x11.dpy, key_ev.keycode, key_ev.state, &mod, &sym);
-				kev.mod = mod;
-				kev.sym = sym;
-				__kt_KeyboardAddEvent(&kev);
 			} break;
 			case ButtonPress: {
 				XButtonEvent btn_ev = xev.xbutton;
 				switch(btn_ev.button) {
-					case Button1: mouse.btn0++; break;
-					case Button3: mouse.btn1++; break;
-					case Button4: mouse.scroll--; break;
-					case Button5: mouse.scroll++; break;
+					case Button1: input_state.mouse.btn0++; break;
+					case Button3: input_state.mouse.btn1++; break;
+					case Button4: input_state.mouse.scroll--; break;
+					case Button5: input_state.mouse.scroll++; break;
 				}
 			} break;
 			case ButtonRelease: {
+				//TODO: see if this should do anything
 				//XButtonEvent btn_ev = xev.xbutton;
 			} break;
 			case ConfigureNotify:{
@@ -232,11 +247,11 @@ void __kt_VideoPoll(void)
 			} break;
 		}
 	}
-	XQueryPointer(kt_x11.dpy, kt_x11.win, &root, &child, &tmp, &tmp, &mouse_x, &mouse_y, &mouse_mask);
-	__kt_MouseSetState(&mouse, mouse_x, mouse_y);
-	mouse.btn0 = 0;
-	mouse.btn1 = 0;
-	mouse.scroll = 0;
+	//Update when mouse polling is active
+	if (input_state.polling & KT_MOUSE_POLLING) {
+		XQueryPointer(kt_x11.dpy, kt_x11.win, &root, &child, &tmp, &tmp, &mouse_x, &mouse_y, &mouse_mask);
+		__kt_MouseUpdateState(mouse_x, mouse_y);
+	}
 }
 
 

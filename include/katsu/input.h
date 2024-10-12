@@ -46,12 +46,13 @@ typedef struct KTMouse_t{
 } KTMouse;
 
 
-
 /*Keyboard Functions*/
+void kt_KeyboardEnablePolling(u32 enable);
 u32 kt_KeyboardGetEvent(KTKeyEvent *kev);
 u32 kt_KeyboardFlushEvents(void);
 
 /*Mouse Functions*/
+void kt_MouseEnablePolling(u32 enable);
 u32 kt_MouseGetState(KTMouse *mouse);
 
 #ifdef __cplusplus

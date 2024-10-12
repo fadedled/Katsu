@@ -169,6 +169,8 @@ int main() {
 	demo_AffineSetup();
 	KTMouse mouse;
 	KTKeyEvent kev;
+	//kt_KeyboardEnablePolling(1);
+	//kt_MouseEnablePolling(1);
 	while (1) {
 		kt_Poll();
 

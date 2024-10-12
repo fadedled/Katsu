@@ -7,6 +7,7 @@
 
 #include "opengl/gfx_ogl.h"
 #include "video_common.h"
+#include "input_common.h"
 #include "joypad_common.h"
 #include "audio_common.h"
 
@@ -35,6 +36,7 @@ u32 kt_Init(void)
 	if (err != KT_OK) {
 		return err;
 	}
+	__kt_InputInit();
 	err = __kt_JoypadInit();
 	if (err != KT_OK) {
 		goto err_joypad;
