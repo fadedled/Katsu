@@ -97,6 +97,8 @@ void demo_AffineSetup(void)
 
 KTSpr sys_spr[8] = {0};
 
+extern u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
+
 int main() {
 	if (kt_Init()) {
 		return 0;
@@ -120,7 +122,11 @@ int main() {
 	spr[0].pos = KT_SPR_POS(204, 112);
 	spr[0].chr = KT_SPR_CHR(32*2 + norm_demo_4bpp_tilenum, 0, KT_SIZE_16, KT_SIZE_16, 1);
 	spr[0].sfx = 0;
-	spr[0].mtx = KT_MTX_IDENTITY;
+	spr[0].mtx = KT_SPR_MTX(0x3FFF);
+
+	u32 *mtx_sht = (u32*)(tmap_mem + (0x3FFF*8));
+	mtx_sht[0] = 0x20000000u; //AB
+	mtx_sht[1] = 0x00002000u; //CD
 
 	spr[1].pos = KT_SPR_POS(40, 20);
 	spr[1].chr = KT_SPR_CHR(12, 0, KT_SIZE_16, KT_SIZE_16, 1);

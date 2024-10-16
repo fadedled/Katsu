@@ -20,7 +20,7 @@
 #define KT_MAX_TILEMAPS				16
 #define KT_MAX_COLORS				2048
 #define KT_MAX_PALETTES				(KT_MAX_COLORS >> 4)
-#define KT_MAX_MTX					256
+//#define KT_MAX_MTX					256
 #define KT_MAX_LINEMAP_LINES		1024*3
 
 
@@ -79,7 +79,7 @@
 #define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		((((pal & 0x7F)) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define KT_SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
 #define KT_SPR_BLEND(alpha)								((0x80000000u) | ((alpha) & 0xFFu))
-#define KT_SPR_MTX(mtx_idx)								((mtx_idx) & 0xFFu)
+#define KT_SPR_MTX(mtx_idx)								(((mtx_idx) & 0x7FFFu) | 0x8000u)
 
 
 /*! \addtogroup flip Tile flipping mode
@@ -188,14 +188,14 @@ typedef struct KTChr_t {
  * pos = [pos_y : 16][pos_x : 16]
  * chr = [- : 1][pal : 7][vsize : 4][hsize : 4][vf : 1][hf : 1][tid : 14]
  * sfx = [trs_act : 1][hue : 15][hue_alpha : 8][alpha : 8]
- * mtx = [-: 24][mtx_idx : 8]
+ * mtx = [-: 16][mtx_enable : 1][mtx_addr : 15]
  * \endcode
  */
 typedef struct KTSpr_t {
 	u32 pos;	/*!< Sprite position on screen. */
 	u32 chr;	/*!< Sprite tile, flip mode, size and palette. */
 	u32 sfx;	/*!< Special effects, Hue and final color blending. */
-	u32 mtx;	/*!< Index of affine matrix applied. */
+	u32 mtx;	/*!< Affine matrix applied. */
 } KTSpr;
 
 

@@ -57,7 +57,7 @@ KTLineMapEntry linemap_data[KT_MAX_LINEMAP_LINES];
 static void __kt_BuildVertexData(void)
 {
 	u32 count = 0;
-	u32 linedata_ofs = sizeof(video_data) + sizeof(mtx_mem);
+	u32 linedata_ofs = sizeof(video_data);
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
 		if (lr->type == KT_LAYER_SPRITE && lr->data_ptr) {
@@ -173,7 +173,7 @@ void ogl_Init(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sprite_verts), NULL, GL_DYNAMIC_DRAW);
 	glGenBuffers(1, &video_data_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, video_data_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data) + sizeof(mtx_mem) + (sizeof(KTLineMapEntry) * 1024), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data) + (sizeof(KTLineMapEntry) * 1024), NULL, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(KTSpr), (void*) 0);
@@ -290,7 +290,6 @@ void ogl_Draw(void)
 	__kt_BuildVertexData();
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(sprite_verts), sprite_verts);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(video_data), &video_data);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(video_data), sizeof(mtx_mem), &mtx_mem);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, video_data_ubo);
 
 	glActiveTexture(GL_TEXTURE0);

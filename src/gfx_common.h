@@ -56,7 +56,6 @@ typedef struct Layer_t {
 extern u8 tile_mem[KT_MAX_TILES * 32];
 extern u8 pal_mem[KT_MAX_COLORS * 4];
 extern u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
-extern KTMtx mtx_mem[KT_MAX_MTX];
 extern KTColor backcolor;
 extern u32 coloroffs;
 extern u32 colorline_cnt;

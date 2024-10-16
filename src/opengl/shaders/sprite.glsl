@@ -11,7 +11,6 @@ layout(std140, binding = 0) uniform video_data
 	vec2 outdims;
 	vec2 _padding;
 	vec4 color_offset;
-	vec4 mtx_mem[256];
 	uvec4 linemap_data[512];
 };
 
@@ -28,10 +27,23 @@ layout(location = 3) flat out uint width;
 layout(location = 4) flat out float blend;
 layout(location = 5) flat out vec4 hue;
 
+layout(binding = 1) uniform usampler2D tmap_mem;
+
 vec4 u16toRGBA(uint color, uint alpha) {
 	//XXX: Should add the lower bits to rest of the byte
-	uvec3 rgb = uvec3(color << 3, color >> 2, color >> 7) & 0xF8;
+	uvec3 rgb = uvec3(color << 3, color >> 2, color >> 7) & 0xF8u;
 	return vec4(rgb, alpha) / 255.0;
+}
+
+ivec4 toS16(uvec4 v) {
+	return ivec4(v | -(v & 0x8000u));
+}
+
+uvec4 convBytesTo4xU16(uvec4 ab, uvec4 cd) {
+	uvec4 tmp0 = ab.zwxy << uvec4(0, 8, 0, 8);
+	uvec4 tmp1 = cd.zwxy << uvec4(0, 8, 0, 8);
+	return uvec4(tmp0.x + tmp0.y, tmp0.z + tmp0.w,
+					tmp1.x + tmp1.y, tmp1.z + tmp1.w);
 }
 
 /* SPRITE STRUCTURE
@@ -48,7 +60,18 @@ void main()
 	uv = vec2(((hsize << 1) * vert));
 	/*Matrix transformation*/
 	vec4 flip = 1.0 - vec4((sprite.y >> 13) & 2u, 0, 0, (sprite.y >> 14) & 2u);
-	vec4 mtx = mtx_mem[sprite.w & 0xFFu] * flip;
+	vec4 mtx = vec4(1.0, 0.0, 0.0, 1.0);
+	if (sprite.w > 0x7FFFu) {
+		uint mtx_addr = sprite.w << 1;
+		ivec2 addr0 = ivec2(mtx_addr, mtx_addr >> 8u) & 0xFF;
+		ivec2 addr1 = addr0 + ivec2(1,0);
+		//uvec4 ab = uvec4(0, 0x00, 0x00, 0x20);
+		//uvec4 bc = uvec4(0, 0x20, 0x00, 0x00);
+		uvec4 ab = texelFetch(tmap_mem, addr0, 0);
+		uvec4 bc = texelFetch(tmap_mem, addr1, 0);
+		mtx = toS16(convBytesTo4xU16(ab, bc)) / 4096.0f;
+	}
+	mtx *= flip;
 	vec2 center_uv = uv - vec2(hsize);
 	center_uv = vec2(dot(center_uv, mtx.xy), dot(center_uv, mtx.zw));
 	uvec2 uofs = uvec2(sprite.x, sprite.x >> 16u) & 0xFFFFu;

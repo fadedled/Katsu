@@ -14,7 +14,6 @@
 u8 tile_mem[KT_MAX_TILES * 32];
 u8 pal_mem[KT_MAX_COLORS * 4];
 u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
-KTMtx mtx_mem[KT_MAX_MTX];
 KTColor backcolor;
 u32 coloroffs;
 u32 colorline_cnt;
@@ -260,10 +259,10 @@ void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
 	if (i == KT_MTX_IDENTITY) {
 		return;
 	}
-	mtx_mem[i].a = MIN(MAX(a, -8.0), 8.0);
-	mtx_mem[i].b = MIN(MAX(b, -8.0), 8.0);
-	mtx_mem[i].c = MIN(MAX(c, -8.0), 8.0);
-	mtx_mem[i].d = MIN(MAX(d, -8.0), 8.0);
+	//mtx_mem[i].a = MIN(MAX(a, -8.0), 8.0);
+	//mtx_mem[i].b = MIN(MAX(b, -8.0), 8.0);
+	//mtx_mem[i].c = MIN(MAX(c, -8.0), 8.0);
+	//mtx_mem[i].d = MIN(MAX(d, -8.0), 8.0);
 }
 
 void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
@@ -346,14 +345,7 @@ void kt_Reset(void)
 	kt_TilesetLoad(0, KT_MAX_TILES, NULL);
 	kt_PaletteLoad(0, KT_MAX_COLORS, NULL);
 
-	/*Init matrix memory*/
-	mtx_mem[0].a = 1.0f;
-	mtx_mem[0].b = 0.0f;
-	mtx_mem[0].c = 0.0f;
-	mtx_mem[0].d = 1.0f;
-	for (u32 i = 1; i < KT_MAX_MTX; ++i) {
-		kt_MtxSet(i, 0.0, 0.0, 0.0, 0.0);
-	}
+	/*TODO: init Tilemap memory*/
 }
 
 

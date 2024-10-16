@@ -11,7 +11,6 @@ layout(std140, binding = 0) uniform video_data
 	vec2 outdims;
 	vec2 _padding;
 	vec4 color_offset;
-	vec4 mtx_mem[256];
 	uvec4 linemap_data[512];
 };
 
