@@ -26,7 +26,7 @@ layout(location = 3) flat out uint width;
 layout(location = 4) flat out float blend;
 layout(location = 5) flat out vec4 hue;
 
-layout(binding = 1) uniform usampler2D tmap_mem;
+layout(binding = 1) uniform usampler2D kt_vram;
 
 vec4 u16toRGBA(uint color, uint alpha) {
 	//XXX: Should add the lower bits to rest of the byte
@@ -64,8 +64,8 @@ void main()
 		uint mtx_addr = sprite.w << 1;
 		ivec2 addr0 = ivec2(mtx_addr, mtx_addr >> 8u) & 0xFF;
 		ivec2 addr1 = addr0 + ivec2(1,0);
-		uvec4 ab = texelFetch(tmap_mem, addr0, 0);
-		uvec4 bc = texelFetch(tmap_mem, addr1, 0);
+		uvec4 ab = texelFetch(kt_vram, addr0, 0);
+		uvec4 bc = texelFetch(kt_vram, addr1, 0);
 		mtx = toS16(convBytesTo4xU16(ab, bc)) / 4096.0f;
 	}
 	mtx *= flip;

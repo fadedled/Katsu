@@ -15,9 +15,10 @@
 
 
 /*Graphics Constants*/
-#define KT_MAX_TILES				0x4000
+#define KT_VRAM_SIZE				0x40000
+#define KT_TMEM_SIZE				0x80000
+#define KT_MAX_TILES				(KT_TMEM_SIZE >> 5)
 #define KT_MAX_SPRITES				2048
-#define KT_LAYERMEM_SIZE			0x40000
 #define KT_MAX_TILEMAPS				16
 #define KT_MAX_COLORS				2048
 #define KT_MAX_PALETTES				(KT_MAX_COLORS >> 4)
@@ -49,12 +50,14 @@
 #define KT_LAYER8				8
 #define KT_LAYER9				9
 #define KT_LAYER10				10
-#define KT_LAYER12				11
-#define KT_LAYER13				12
-#define KT_LAYER14				13
-#define KT_LAYER15				14
+#define KT_LAYER11				11
+#define KT_LAYER12				12
+#define KT_LAYER13				13
+#define KT_LAYER14				14
+#define KT_LAYER15				15
 #define KT_MAX_LAYERS			16
 /*! @} */
+
 
 /*! \addtogroup layer_type Layer type
  * @{
@@ -65,6 +68,27 @@
 #define KT_LAYER_SPRITE			3			/*!< Draws a set of sprites. */
 /*! @} */
 
+
+/*! \addtogroup tmap_addr Address of a tilemap in vram (must be 16KiB aligned)
+ * @{
+ */
+#define KT_TMAP0				0x0000
+#define KT_TMAP1				0x4000
+#define KT_TMAP2				0x8000
+#define KT_TMAP3				0xC000
+#define KT_TMAP4				0x10000
+#define KT_TMAP5				0x14000
+#define KT_TMAP6				0x18000
+#define KT_TMAP7				0x1C000
+#define KT_TMAP8				0x20000
+#define KT_TMAP9				0x24000
+#define KT_TMAP10				0x28000
+#define KT_TMAP11				0x2C000
+#define KT_TMAP12				0x30000
+#define KT_TMAP13				0x34000
+#define KT_TMAP14				0x38000
+#define KT_TMAP15				0x3C000
+/*! @} */
 
 /*! \addtogroup tmap_size Map size
  * @{
@@ -158,10 +182,13 @@
 
 #define KT_MTX_IDENTITY						0
 
+#define KT_MEM_VRAM				(kt_vram)
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+extern u8 kt_vram[KT_VRAM_SIZE];
 
 /*== Structs ==*/
 
@@ -260,12 +287,11 @@ void kt_TilesetLoad(u32 tile_id, u32 tile_count, const void* data);
 
 /*!
  * \fn void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
- * \brief Used to load a block of characters to Tilemaps.
- * \details This function copies the characeters found in the application to a tilemap, so if the application modifies
- * those characters they must be reloaded for the changes to be shown. If a map layer uses more than one tilemap you
- * can use the same map size on this function to include the other tilemaps.
+ * \brief Used to load a block of characters to a tilemap.
+ * \details This function copies the characeters found in the application to a tilemap in vram. If a map layer
+ * uses more than one tilemap you can use the same map size on this function to include the other tilemaps.
  *
- * \param[in] tmap The first tilemap number (other tilemaps can be modified if you use a map_size other than KT_MAP_SIZE_64x64).
+ * \param[in] tmap \ref tmap_addr (other tilemaps are be modified if you use a map_size other than KT_MAP_SIZE_64x64).
  * \param[in] map_size \ref tmap_size.
  * \param[in] x The starting characters x position, where @f$ 0 <= x < Horizontal Map Size @f$.
  * \param[in] y The starting characters y position, where @f$ 0 <= y < Vertical Map Size @f$.
@@ -282,7 +308,7 @@ void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stri
  * \brief Used to set a single character in a tilemap.
  * \details Note that the (x, y) position of the tilemap (as well as the tilemap number) is wrapped.
  *
- * \param[in] tmap The tilemap number.
+ * \param[in] tmap \ref tmap_addr.
  * \param[in] x The characters x position, where @f$ 0 <= x < 64 @f$.
  * \param[in] y The characters y position, where @f$ 0 <= y < 64 @f$.
  * \param[in] tile_id The character's tile ID (Remember that the layer can offset this value).
@@ -332,7 +358,7 @@ void kt_PaletteSetColor(u32 color_num, KTColor color);
  *
  * \param[in] layer \ref layer_id.
  * \param[in] type \ref layer_type (only map layers are expected).
- * \param[in] tmap Number of the first tilemap.
+ * \param[in] tmap \ref tmap_addr.
  * \param[in] map_size \ref tmap_size.
  */
 void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
@@ -367,7 +393,7 @@ void kt_LayerSetType(u32 layer, u32 type);
  * \brief This function sets the tilemap and size of map layers.
  *
  * \param[in] layer \ref layer_id.
- * \param[in] tmap Number of the first tilemap.
+ * \param[in] tmap \ref tmap_addr.
  * \param[in] map_size \ref tmap_size.
  */
 void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size);

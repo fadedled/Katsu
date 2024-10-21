@@ -59,8 +59,8 @@ static void __kt_BuildVertexData(void)
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
 		if (lr->type == KT_LAYER_SPRITE && lr->data_addr) {
-			//TODO: wrap tmap memory
-			KTSpr *spr = (KTSpr *) (tmap_mem + lr->data_addr);
+			//TODO: wrap vram memory
+			KTSpr *spr = (KTSpr *) (kt_vram + lr->data_addr);
 			for (u32 i = 0; i < lr->data_count && count < (KT_MAX_SPRITES * 4); ++i) {
 				sprite_verts[count] = *spr;
 				sprite_verts[count+1] = *spr;
@@ -292,7 +292,7 @@ void ogl_Draw(void)
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x200, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, tile_mem);
 	glActiveTexture(GL_TEXTURE0+1);
 	glBindTexture(GL_TEXTURE_2D, tex_bg);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x100, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, tmap_mem);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x100, 0x100, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, kt_vram);
 	glActiveTexture(GL_TEXTURE0+2);
 	glBindTexture(GL_TEXTURE_2D, tex_pal);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0x10, 0x80, GL_RGBA, GL_UNSIGNED_BYTE, pal_mem);
@@ -312,7 +312,6 @@ void ogl_Draw(void)
 
 	Layer *lr = layer_mem;
 	u32 spr_indx = 0;
-	u32 linemap_indx = 0;
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
 		//Set the blending mode for the layer
 		u8 blnd = lr->blnd;
@@ -345,7 +344,7 @@ void ogl_Draw(void)
 		case KT_LAYER_SPRITE: {
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_spr);
-			KTSpr *spr = (KTSpr *) (tmap_mem + lr->data_addr);
+			KTSpr *spr = (KTSpr *) (kt_vram + lr->data_addr);
 			for (u32 j = 0; j < lr->data_count; ++j) {
 				if (blnd_act ^ spr[j].sfx >> 31) {
 					blnd_act = spr[j].sfx >> 31;

@@ -46,9 +46,9 @@ typedef struct Layer_t {
 
 #define S9TOS32(x)		((-((s32)(x) & 0x100) | ((s32)(x) & 0xFF)))
 
-extern u8 tile_mem[KT_MAX_TILES * 32];
+extern u8 tile_mem[KT_TMEM_SIZE];
+extern u8 kt_vram[KT_VRAM_SIZE];
 extern u8 pal_mem[KT_MAX_COLORS * 4];
-extern u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
 extern KTColor backcolor;
 extern u32 coloroffs;
 extern u32 colorline_cnt;

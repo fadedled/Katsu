@@ -71,7 +71,7 @@ layout(location = 1) uniform uvec2 map_ofs;
 layout(location = 0) out vec4 frag_color;
 
 layout(binding = 0) uniform usampler2D tile_mem;
-layout(binding = 1) uniform usampler2D tmap_mem;
+layout(binding = 1) uniform usampler2D kt_vram;
 layout(binding = 2) uniform sampler2D pal_mem;
 
 
@@ -107,14 +107,11 @@ void main()
 	//Obtain user data
 	uvec4 lineofs = uvec4(0);
 	if (user_data_ofs.y > 0u) {
-		uint lineofs_addr0 = user_data_ofs.x + (iuv.y << 1);
-		uint lineofs_addr1 = lineofs_addr0 + 1;
-		ivec2 addr0 = ivec2(lineofs_addr0, lineofs_addr0 >> 8u) & 0xFF;
-		ivec2 addr1 = ivec2(lineofs_addr1, lineofs_addr1 >> 8u) & 0xFF;
-		uvec4 ab = texelFetch(tmap_mem, addr0, 0);
-		uvec4 bc = texelFetch(tmap_mem, addr1, 0);
-
-		lineofs = convBytesToLineOffset(ab, bc);
+		ivec2 lineofs_addr = ivec2(user_data_ofs.xx + (iuv.yy << 1)) + ivec2(0, 1);
+		ivec4 addr = (lineofs_addr.xxyy >> ivec4(0,8,0,8)) & 0xFF;
+		uvec4 v0 = texelFetch(kt_vram, addr.xy, 0);
+		uvec4 v1 = texelFetch(kt_vram, addr.zw, 0);
+		lineofs = convBytesToLineOffset(v0, v1);
 	}
 	uvec2 pix = (((iuv * ((scale + lineofs.zw) & 0xFFFFu))) + (map_ofs + lineofs.xy)) >> 10;
 	//if (bool((p.x | p.y) & 0x400 u)) {
@@ -123,7 +120,7 @@ void main()
 	uint map_width = map_size.x >> 9;
 	uint tmap_ofs = (((pix.x & map_size.x) + ((pix.y & map_size.y) << map_width)) << 3) + tmap_num;
 	uint tl = ((pix.y & 0x1F8u) << 3u) + ((pix.x & 0x1F8u) >> 3u) + (tmap_ofs & 0xF000u);
-	uvec4 tile = texelFetch(tmap_mem, ivec2(tl & 0xffu, tl >> 8u), 0);
+	uvec4 tile = texelFetch(kt_vram, ivec2(tl & 0xffu, tl >> 8u), 0);
 
 	//get palette index
 	uint pal = (tile.x + pal_ofs) & 0x7Fu;

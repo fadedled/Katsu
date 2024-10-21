@@ -11,9 +11,9 @@
 
 #define COLOROFFS(r, g, b)	(u32) ((((r) & 0x1FFu)) | (((g) & 0x1FFu) << 9) | (((b) & 0x1FFu) << 18))
 
-u8 tile_mem[KT_MAX_TILES * 32];
+u8 tile_mem[KT_TMEM_SIZE];
+u8 kt_vram[KT_VRAM_SIZE];
 u8 pal_mem[KT_MAX_COLORS * 4];
-u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
 KTColor backcolor;
 u32 coloroffs;
 u32 colorline_cnt;
@@ -50,22 +50,22 @@ void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_num, u32 flip, u32 pal)
 {
 	x &= 0x3Fu;
 	y &= 0x3Fu;
-	u32 ofs = (((tmap & 0xf) * (64 * 64)) + (y << 6) + x) << 2;
-	tmap_mem[ofs] = pal & 0x7F;
-	tmap_mem[ofs+1] = 0;
-	tmap_mem[ofs+2] = ((flip & 0x3) << 6) | ((tile_num & 0x3F00) >> 8);
-	tmap_mem[ofs+3] = tile_num & 0xFF;
+	u32 ofs = (tmap & 0x3C000) + (((y << 6) + x) << 2);
+	kt_vram[ofs] = pal & 0x7F;
+	kt_vram[ofs+1] = 0;
+	kt_vram[ofs+2] = ((flip & 0x3) << 6) | ((tile_num & 0x3F00) >> 8);
+	kt_vram[ofs+3] = tile_num & 0xFF;
 }
 
 
 void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, const void* data)
 {
 	u32 *src = (u32*) data;
-	u32 *dst = (u32*) tmap_mem;
+	u32 *dst = (u32*) kt_vram;
 	for (u32 j = 0; j < h; ++j) {
 		//TODO: use the size parameter
 		for (u32 i = 0; i < w; ++i) {
-			u32 ofs = (((tmap & 0xf) * (64 * 64)) + ((j + y) << 6) + (i + x));
+			u32 ofs = (((tmap & 0x3C000) >> 2) + ((j + y) << 6) + (i + x));
 			dst[ofs & 0xFFFFu] = src[i];
 		}
 		src += stride;
@@ -104,8 +104,8 @@ void kt_PaletteSetColor(u32 color_num, KTColor color)
 
 u32 kt_LayerMemLoad(u32 addr, u32 size, void* data)
 {
-	u32 mask = (KT_LAYERMEM_SIZE - 1) >> 2;
-	u32 *dst = (u32*) tmap_mem;
+	u32 mask = (KT_TMEM_SIZE - 1) >> 2;
+	u32 *dst = (u32*) kt_vram;
 	u32 *src = (u32*) data;
 	u32 ret_addr = addr & ~0x3;
 	size >>= 2;
@@ -160,7 +160,7 @@ void kt_LayerSetMapSize(u32 layer, u32 tmap, u32 map_size)
 {
 	layer &= 0xF;
 	layer_mem[layer].map_attr &= ~0x003F0000u;
-	layer_mem[layer].map_attr = ((map_size & 0x3) << 20) | ((tmap & 0xF) << 16);
+	layer_mem[layer].map_attr = ((map_size & 0x3) << 20) | ((tmap & KT_TMAP15) << 2);
 }
 
 
