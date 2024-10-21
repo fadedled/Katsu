@@ -39,11 +39,12 @@ extern u32 affine_bg_h;
 #define TMAP_PALETTE_OFS 0
 #define SPR_PALETTE_OFS (4 * 16)
 
+extern u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
 
-KTLineMapEntry lmap_data[256] = {0};
 
 void demo_AffineSetup(void)
 {
+	KTLineOffset *lmap_data = (KTLineOffset*)(tmap_mem + 0x20400);
 	kt_LayerClear(KT_LAYER0);
 	kt_LayerClear(KT_LAYER1);
 	kt_LayerClear(KT_LAYER3);
@@ -90,14 +91,16 @@ void demo_AffineSetup(void)
 	kt_LayerSetMapChrOffset(KT_LAYER0, system_4bpp_tilenum, 2);
 	kt_LayerSetMapChrOffset(KT_LAYER1, system_4bpp_tilenum, 2);
 	kt_LayerSetMapChrOffset(KT_LAYER3, system_4bpp_tilenum, 2);
-	kt_LayerSetUserData(KT_LAYER1, 256, lmap_data);
-	kt_LayerSetUserData(KT_LAYER3, 256, lmap_data);
+
+	//u32 lmap_addr = kt_LineOffsetLoad(0x20400, 256, lmap_data);
+	kt_LayerSetUserData(KT_LAYER1, 256, 0x20400);
+	kt_LayerSetUserData(KT_LAYER3, 256, 0x20400);
+
 }
 
 
 KTSpr sys_spr[8] = {0};
 
-extern u8 tmap_mem[KT_MAX_TILEMAPS * 64 * 64 * sizeof(KTChr)];
 
 int main() {
 	if (kt_Init()) {
@@ -106,7 +109,8 @@ int main() {
 	u32 x = 40;
 	u32 y = 20;
 
-	KTSpr spr[4] = {0};
+	KTSpr *spr = (KTSpr*) (tmap_mem + 0x20000);
+	KTSpr *sys_spr = (KTSpr*) (tmap_mem + 0x20040);
 	//kt_TilesetLoad(0, 12, bg_pal_size);
 	kt_TilesetLoad(0, system_4bpp_tilenum , system_4bpp_data);
 	kt_TilesetLoad(system_4bpp_tilenum, norm_demo_4bpp_tilenum , norm_demo_4bpp_data);
@@ -148,13 +152,13 @@ int main() {
 	kt_MtxSet(1, 2.3, 0.0, 0.6, -2.3);
 
 
-	kt_LayerInitSprite(KT_LAYER2, 4, spr);
+	kt_LayerInitSprite(KT_LAYER2, 4, 0x20000);
 
 	kt_TilemapLoad(0, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm_0_data);
 	kt_TilemapLoad(1, KT_MAP_SIZE_64x64, 0, 0, 64, 64, 64, norm_tm_1_data);
 
 	kt_LayerInitMap(KT_LAYER6, KT_LAYER_MAP_NORMAL, 15, KT_MAP_SIZE_64x64);
-	kt_LayerInitSprite(KT_LAYER7, 2, sys_spr);
+	kt_LayerInitSprite(KT_LAYER7, 2, 0x20040);
 	system_WindowBegin(10, 4, 32);
 	system_WindowLabel("- Normal Map Demo");
 	system_WindowLabel("- Sprite Demo");

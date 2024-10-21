@@ -11,7 +11,6 @@ layout(std140, binding = 0) uniform video_data
 	vec2 outdims;
 	vec2 _padding;
 	vec4 color_offset;
-	uvec4 linemap_data[512];
 };
 
 #ifdef VERTEX_SHADER
@@ -65,8 +64,6 @@ void main()
 		uint mtx_addr = sprite.w << 1;
 		ivec2 addr0 = ivec2(mtx_addr, mtx_addr >> 8u) & 0xFF;
 		ivec2 addr1 = addr0 + ivec2(1,0);
-		//uvec4 ab = uvec4(0, 0x00, 0x00, 0x20);
-		//uvec4 bc = uvec4(0, 0x20, 0x00, 0x00);
 		uvec4 ab = texelFetch(tmap_mem, addr0, 0);
 		uvec4 bc = texelFetch(tmap_mem, addr1, 0);
 		mtx = toS16(convBytesTo4xU16(ab, bc)) / 4096.0f;

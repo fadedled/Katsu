@@ -17,6 +17,7 @@
 /*Graphics Constants*/
 #define KT_MAX_TILES				0x4000
 #define KT_MAX_SPRITES				2048
+#define KT_LAYERMEM_SIZE			0x40000
 #define KT_MAX_TILEMAPS				16
 #define KT_MAX_COLORS				2048
 #define KT_MAX_PALETTES				(KT_MAX_COLORS >> 4)
@@ -195,11 +196,26 @@ typedef struct KTSpr_t {
 	u32 pos;	/*!< Sprite position on screen. */
 	u32 chr;	/*!< Sprite tile, flip mode, size and palette. */
 	u32 sfx;	/*!< Special effects, Hue and final color blending. */
-	u32 mtx;	/*!< Affine matrix applied. */
+	u32 mtx;	/*!< Address of affine matrix applied. */
 } KTSpr;
 
 
-/*! \typedef struct KTLineMapEntry_t KTLineMapEntry
+/*! \typedef struct KTMtx_t KTMtx
+ * \brief Struct that contains information that defines a 2x2 matrix, every entry
+ * is a 16-bit value in signed 3.13 fixed point format.
+ *
+ * \code
+ * ab = [a : 16][b : 16]
+ * cd = [c : 16][d : 16]
+ * \endcode
+ */
+typedef struct KTMtx_t {
+	u32 ab;     /*!< First row of matrix. */
+	u32 cd;     /*!< Second row of matrix. */
+} KTMtx;
+
+
+/*! \typedef struct KTLineOffset_t KTLineOffset
  * \brief Structure used to define line map user data entries.
  *
  * \code
@@ -210,7 +226,7 @@ typedef struct KTSpr_t {
 typedef struct KTLineMapEntry_t {
 	u32 ofs_delta;		/*!< Change in value of the map offset (uses 10.6 fixed point). */
 	u32	scale_x_delta;	/*!< Change in value of the horizontal scale (uses 10.6 fixed point). */
-} KTLineMapEntry;
+} KTLineOffset;
 
 
 /*! \typedef struct KTColor_t KTColor
@@ -276,6 +292,10 @@ void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stri
 void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_id, u32 flip, u32 pal);
 
 
+
+u32 kt_SpriteLoad(u32 addr, u32 spr_count, KTSpr* data);
+u32 kt_LineOffsetLoad(u32 addr, u32 line_count, KTLineOffset* data);
+
 /*!
  * \fn void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data)
  * \brief Used to load a set of 16 color palettes to Color Memory.
@@ -329,7 +349,7 @@ void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
  * \param[in] spr_count Number of sprites in data.
  * \param[in] data A pointer to the sprite array.
  */
-void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data);
+void kt_LayerInitSprite(u32 layer, u32 spr_count, u32 spr_addr);
 
 /*!
  * \fn void kt_LayerSetType(u32 layer, u32 type)
@@ -454,7 +474,7 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
 
 
 /*!
- * \fn void kt_LayerSetUserData(u32 layer, u32 num_elems, void* data)
+ * \fn void kt_LayerSetUserData(u32 layer, u32 count, u32 addr)
  * \brief Sets a layer's user data.
  * \details The layer's user data is a pointer to memory allocated by the user
  * , the use of the data depends on the type of the layer.
@@ -464,9 +484,9 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
  *
  * \param[in] layer \ref layer_id.
  * \param[in] num_elems The number of elements that the data has.
- * \param[in] data Pointer to the data.
+ * \param[in] addr Address of .
  */
-void kt_LayerSetUserData(u32 layer, u32 num_elems, void* data);
+void kt_LayerSetUserData(u32 layer, u32 count, u32 addr);
 
 /*!
  * \fn void kt_LayerSetWindow(u32 layer, u32 act_windows)

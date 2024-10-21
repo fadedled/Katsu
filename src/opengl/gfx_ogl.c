@@ -51,17 +51,16 @@ u32 rb_depth;
 KTSpr sprite_verts[KT_MAX_SPRITES * 4];
 u32 vert_start[KT_MAX_SPRITES];
 u32 vert_count[KT_MAX_SPRITES];
-KTLineMapEntry linemap_data[KT_MAX_LINEMAP_LINES];
 
 //Repeats all Sprite data (the same sprite data per vertex)
 static void __kt_BuildVertexData(void)
 {
 	u32 count = 0;
-	u32 linedata_ofs = sizeof(video_data);
 	Layer *lr = layer_mem;
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
-		if (lr->type == KT_LAYER_SPRITE && lr->data_ptr) {
-			KTSpr *spr = (KTSpr *) lr->data_ptr;
+		if (lr->type == KT_LAYER_SPRITE && lr->data_addr) {
+			//TODO: wrap tmap memory
+			KTSpr *spr = (KTSpr *) (tmap_mem + lr->data_addr);
 			for (u32 i = 0; i < lr->data_count && count < (KT_MAX_SPRITES * 4); ++i) {
 				sprite_verts[count] = *spr;
 				sprite_verts[count+1] = *spr;
@@ -70,10 +69,6 @@ static void __kt_BuildVertexData(void)
 				count += 4;
 				++spr;
 			}
-		} else if (lr->type == KT_LAYER_MAP_NORMAL && lr->data_ptr) {
-			//TODO: fill line data
-			glBufferSubData(GL_UNIFORM_BUFFER, linedata_ofs, sizeof(KTLineMapEntry) * lr->data_count, lr->data_ptr);
-			linedata_ofs += sizeof(KTLineMapEntry) * lr->data_count;
 		}
 		++lr;
 	}
@@ -173,7 +168,7 @@ void ogl_Init(void)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(sprite_verts), NULL, GL_DYNAMIC_DRAW);
 	glGenBuffers(1, &video_data_ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, video_data_ubo);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data) + (sizeof(KTLineMapEntry) * 1024), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(video_data), NULL, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribIPointer(0, 4, GL_UNSIGNED_INT, sizeof(KTSpr), (void*) 0);
@@ -330,12 +325,13 @@ void ogl_Draw(void)
 			glUniform2ui(0, lr->rect_pos, lr->rect_size);
 			glUniform2ui(1, lr->map_ofsx, lr->map_ofsy);
 			glUniform4ui(2, lr->map_attr, 0, lr->chr_ofs, lr->map_scale);
-			if (lr->data_ptr) {
-				glUniform2ui(3, 256*linemap_indx, lr->data_count);
-				linemap_indx++;
+
+			if (lr->data_count) {
+				glUniform2ui(3, lr->data_addr >> 2, 1);
 			} else {
 				glUniform2ui(3, 0, 0);
 			}
+
 			if (blnd_act ^ lr->map_attr >> 31) {
 				blnd_act = lr->map_attr >> 31;
 				if (blnd_act) {
@@ -349,7 +345,7 @@ void ogl_Draw(void)
 		case KT_LAYER_SPRITE: {
 			//Since blending is activated per spirte we configure on the fly
 			glUseProgram(prog_spr);
-			KTSpr *spr = (KTSpr *) lr->data_ptr;
+			KTSpr *spr = (KTSpr *) (tmap_mem + lr->data_addr);
 			for (u32 j = 0; j < lr->data_count; ++j) {
 				if (blnd_act ^ spr[j].sfx >> 31) {
 					blnd_act = spr[j].sfx >> 31;

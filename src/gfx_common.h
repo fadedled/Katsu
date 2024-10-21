@@ -8,13 +8,6 @@
 
 #include <katsu/gfx.h>
 
-typedef struct KTMtx_t {
-	f32 a;
-	f32 b;
-	f32 c;
-	f32 d;
-} KTMtx;
-
 /* LAYER STRUCTURE
  * type: controls what is shown
  * rect_pos = [pos_y : 16][pos_x : 16]  - top-left corner shown
@@ -47,7 +40,7 @@ typedef struct Layer_t {
 	u8 blnd;
 	u8 win_act;
 	u32 data_count;
-	void *data_ptr;
+	u32 data_addr;
 } Layer;
 
 

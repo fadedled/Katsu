@@ -102,6 +102,33 @@ void kt_PaletteSetColor(u32 color_num, KTColor color)
 }
 
 
+u32 kt_LayerMemLoad(u32 addr, u32 size, void* data)
+{
+	u32 mask = (KT_LAYERMEM_SIZE - 1) >> 2;
+	u32 *dst = (u32*) tmap_mem;
+	u32 *src = (u32*) data;
+	u32 ret_addr = addr & ~0x3;
+	size >>= 2;
+	while (size--) {
+		dst[addr++] = *src;
+		addr &= mask;
+		++src;
+	}
+	return ret_addr;
+}
+
+
+u32 kt_SpriteLoad(u32 addr, u32 spr_count, KTSpr* data)
+{
+	return kt_LayerMemLoad(addr & ~0x3, spr_count * sizeof(*data), data);
+}
+
+
+u32 kt_LineOffsetLoad(u32 addr, u32 line_count, KTLineOffset* data)
+{
+	return kt_LayerMemLoad(addr & ~0x3, line_count * sizeof(*data), data);
+}
+
 
 /*Layers*/
 void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size)
@@ -112,13 +139,13 @@ void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size)
 }
 
 
-void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data)
+void kt_LayerInitSprite(u32 layer, u32 spr_count, u32 addr)
 {
-	u32 type = (spr_count && data ? KT_LAYER_SPRITE : KT_LAYER_NONE);
+	u32 type = (spr_count ? KT_LAYER_SPRITE : KT_LAYER_NONE);
 	u32 count = (type == KT_LAYER_SPRITE ? spr_count & (KT_MAX_SPRITES - 1) : 0);
 	kt_LayerClear(layer);
 	kt_LayerSetType(layer, type);
-	kt_LayerSetUserData(layer, count, data);
+	kt_LayerSetUserData(layer, count, addr);
 }
 
 
@@ -205,15 +232,15 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func)
 }
 
 
-void kt_LayerSetUserData(u32 layer, u32 num_elems, void* data)
+void kt_LayerSetUserData(u32 layer, u32 count, u32 addr)
 {
 	layer &= 0xF;
-	if (num_elems && data) {
-		layer_mem[layer].data_count = num_elems;
-		layer_mem[layer].data_ptr = data;
+	if (count) {
+		layer_mem[layer].data_count = count;
+		layer_mem[layer].data_addr = addr;
 	} else {
 		layer_mem[layer].data_count = 0;
-		layer_mem[layer].data_ptr = NULL;
+		layer_mem[layer].data_addr = 0;
 	}
 }
 
@@ -237,7 +264,7 @@ void kt_LayerClear(u32 layer)
 	layer_mem[layer].blnd = 0x0;
 	layer_mem[layer].win_act = 0xF;
 	layer_mem[layer].data_count = 0;
-	layer_mem[layer].data_ptr = NULL;
+	layer_mem[layer].data_addr = 0;
 }
 
 

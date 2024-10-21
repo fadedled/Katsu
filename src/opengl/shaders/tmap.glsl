@@ -11,7 +11,6 @@ layout(std140, binding = 0) uniform video_data
 	vec2 outdims;
 	vec2 _padding;
 	vec4 color_offset;
-	uvec4 linemap_data[512];
 };
 
 #ifdef VERTEX_SHADER
@@ -76,6 +75,14 @@ layout(binding = 1) uniform usampler2D tmap_mem;
 layout(binding = 2) uniform sampler2D pal_mem;
 
 
+uvec4 convBytesToLineOffset(uvec4 v0, uvec4 v1) {
+	uvec4 tmp0 = v0.xyzw << uvec4(0, 8, 16, 24);
+	uvec4 tmp1 = v1.xyzw << uvec4(0, 8, 16, 24);
+	uvec2 lo = uvec2(tmp0.x + tmp0.y + tmp0.z + tmp0.w,
+				     tmp1.x + tmp1.y + tmp1.z + tmp1.w);
+	uint yd = ((lo.x >> 10) & 0xFFC00u) | ((lo.y >> 16) & 0x003FFu);
+	return uvec4(lo.x & 0xFFFFFu, yd, lo.y & 0xFFFFu, 0);
+}
 
 void main()
 {
@@ -98,17 +105,18 @@ void main()
 	//Apply mosaic
 	uvec2 iuv = uvec2(uv) - (uvec2(uv) % mos);
 	//Obtain user data
-	uvec2 ofs_delta = uvec2(0);
-	uvec2 scale_delta = uvec2(0);
+	uvec4 lineofs = uvec4(0);
 	if (user_data_ofs.y > 0u) {
-		uvec4 user_data = linemap_data[iuv.y >> 1u];
-		uvec2 mask = -((iuv.y & 1) ^ uvec2(0, 1));
-		user_data.xy = (user_data.xy & mask.xx) | (user_data.zw & mask.yy);
-		ofs_delta = (user_data.xx >> uvec2(0, 10)) & uvec2(0xFFFFFu, 0xFFC00u);
-		//ofs_delta.y |= (user_data.y >> 16) & 0x3FFu;
-		scale_delta.x = user_data.y & 0xFFFFu;
+		uint lineofs_addr0 = user_data_ofs.x + (iuv.y << 1);
+		uint lineofs_addr1 = lineofs_addr0 + 1;
+		ivec2 addr0 = ivec2(lineofs_addr0, lineofs_addr0 >> 8u) & 0xFF;
+		ivec2 addr1 = ivec2(lineofs_addr1, lineofs_addr1 >> 8u) & 0xFF;
+		uvec4 ab = texelFetch(tmap_mem, addr0, 0);
+		uvec4 bc = texelFetch(tmap_mem, addr1, 0);
+
+		lineofs = convBytesToLineOffset(ab, bc);
 	}
-	uvec2 pix = (((iuv * ((scale + scale_delta) & 0xFFFFu))) + (map_ofs + ofs_delta)) >> 10;
+	uvec2 pix = (((iuv * ((scale + lineofs.zw) & 0xFFFFu))) + (map_ofs + lineofs.xy)) >> 10;
 	//if (bool((p.x | p.y) & 0x400 u)) {
 	//	discard;
 	//}
