@@ -280,19 +280,13 @@ void kt_LayerClearAll(void)
 
 
 /*Matrices*/
-void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
+void kt_MtxSet(KTMtx *mtx, f32 a, f32 b, f32 c, f32 d)
 {
-	u32 i = mtx_idx & 0xFF;
-	if (i == KT_MTX_IDENTITY) {
-		return;
-	}
-	//mtx_mem[i].a = MIN(MAX(a, -8.0), 8.0);
-	//mtx_mem[i].b = MIN(MAX(b, -8.0), 8.0);
-	//mtx_mem[i].c = MIN(MAX(c, -8.0), 8.0);
-	//mtx_mem[i].d = MIN(MAX(d, -8.0), 8.0);
+	mtx->ab = (((s32) (a * 4096.0f)) << 16) | (((s32) (b * 4096.0f)) & 0xFFFF);
+	mtx->cd = (((s32) (c * 4096.0f)) << 16) | (((s32) (d * 4096.0f)) & 0xFFFF);
 }
 
-void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
+void kt_MtxSetRotoscale(KTMtx *mtx, f32 x_scale, f32 y_scale, f32 angle)
 {
 	//Rotation matrix
 	f32 sn = sin(angle);
@@ -303,7 +297,7 @@ void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
 	f32 c = sn * x_scale;
 	f32 d = cs * x_scale;
 
-	kt_MtxSet(mtx_idx, a, b, c, d);
+	kt_MtxSet(mtx, a, b, c, d);
 }
 
 

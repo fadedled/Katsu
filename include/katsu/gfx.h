@@ -229,7 +229,7 @@ typedef struct KTSpr_t {
 
 /*! \typedef struct KTMtx_t KTMtx
  * \brief Struct that contains information that defines a 2x2 matrix, every entry
- * is a 16-bit value in signed 3.13 fixed point format.
+ * is a 16-bit value in s3.12 fixed point format.
  *
  * \code
  * ab = [a : 16][b : 16]
@@ -546,26 +546,26 @@ void kt_LayerClearAll(void);
  */
 /*!
  * \fn void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
- * \brief Sets the values of a given matrix in Matrix Memory.
+ * \brief Packs values into a 2x2 matrix.
  *
- * \param[in] mtx_idx Index of matrix to set (should be non-zero)
+ * \param[in] mtx Pointer of matrix.
  * \param[in] a
  * \param[in] b
  * \param[in] c
  * \param[in] d
  */
-void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d);
+void kt_MtxSet(KTMtx *mtx, f32 a, f32 b, f32 c, f32 d);
 
 /*!
  * \fn void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
- * \brief Sets a rotation and a scale on a given matrix in Matrix Memory.
+ * \brief Sets a rotation and a scale into a 2x2 matrix.
  *
- * \param[in] mtx_idx Index of matrix to set (should be non-zero)
+ * \param[in] mtx Pointer of matrix.
  * \param[in] x_scale Horizontal scaling factor.
  * \param[in] y_scale Vertical scaling factor.
  * \param[in] angle Angle of rotation in radians.
  */
-void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle);
+void kt_MtxSetRotoscale(KTMtx *mtx, f32 x_scale, f32 y_scale, f32 angle);
 
 
 /* ============================================================================

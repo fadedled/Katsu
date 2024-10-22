@@ -126,10 +126,8 @@ int main() {
 	spr[0].sfx = 0;
 	spr[0].mtx = KT_SPR_MTX(0x3FFF);
 
-	u32 *mtx_sht = (u32*)(kt_vram + (0x3FFF*8));
-	mtx_sht[0] = 0x20000000u; //AB
-	mtx_sht[1] = 0x00002000u; //CD
-
+	//kt_MtxSet((KTMtx*)(kt_vram + (0x3FFF*8)), 2.0, 0.0, 0.0, 2.0);
+	kt_MtxSetRotoscale((KTMtx*)(kt_vram + (0x3FFF*8)), 8, 8, 0.31);
 	spr[1].pos = KT_SPR_POS(40, 20);
 	spr[1].chr = KT_SPR_CHR(12, 0, KT_SIZE_16, KT_SIZE_16, 1);
 	spr[1].sfx = KT_SPR_HUE(0x00FF, 0x60);
@@ -146,8 +144,6 @@ int main() {
 	sys_spr[0].chr = KT_SPR_CHR(128, KT_FLIP_NONE, KT_SIZE_16, KT_SIZE_16, 0);
 	sys_spr[0].sfx = 0;
 	sys_spr[0].mtx = KT_MTX_IDENTITY;
-
-	kt_MtxSet(1, 2.3, 0.0, 0.6, -2.3);
 
 
 	kt_LayerInitSprite(KT_LAYER2, 4, 0x20000);
@@ -216,7 +212,6 @@ int main() {
 
 		f32 rot_inc = ((btns2 >> JOY_BIT_R) & 0x1) - ((btns2 >> JOY_BIT_L) & 0x1);
 		rot += rot_inc / 256.0;
-		kt_MtxSetRotoscale(1, 8, 8, 0.31);
 
 		if (kt_JoyButtonDown(0) & JOY_DOWN) {
 			pointer_indx = (pointer_indx + 1) & 3;
