@@ -6,27 +6,26 @@
 #include "system.h"
 #include "sequencer.h"
 #include "samples/keyboard_mouse.h"
+#include "samples/normal_map.h"
 
 
 
 /*Demo Palette*/
-extern const u8 norm_demo_4bpp_pal[];
 extern const u8 affine_0_demo_4bpp_pal[];
 extern const u8 affine_1_demo_4bpp_pal[];
 
 
 /*Demo Tiles*/
-extern const u8 norm_demo_4bpp_data[];
+
 extern const u8 affine_0_demo_4bpp_data[];
 extern const u8 affine_1_demo_4bpp_data[];
 
-extern const u32 norm_demo_4bpp_tilenum;
+
 extern const u32 affine_0_demo_4bpp_tilenum;
 extern const u32 affine_1_demo_4bpp_tilenum;
 
 
-extern u8 norm_tm_0_data[];
-extern u8 norm_tm_1_data[];
+
 extern u8 affine_tm_0_data[];
 extern u8 affine_tm_1_data[];
 
@@ -44,7 +43,7 @@ int main() {
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 	system_Init(KT_TMAP15);
 
-	samp_keymouse_init();
+	samp_normmap_init();
 	while (1) {
 		kt_Poll();
 #if 0
@@ -63,7 +62,7 @@ int main() {
 		}
 #endif
 
-		samp_keymouse_update();
+		samp_normmap_update();
 		kt_Draw();
 	}
 
