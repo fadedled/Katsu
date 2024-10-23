@@ -183,12 +183,17 @@
 /*! @} */
 
 
+#define kt_SpriteLoad(addr, spr_count, data)         kt_VRAMLoad((addr) & ~0xF, (spr_count)  * sizeof(KTSpr), data)
+#define kt_LineOffsetLoad(addr, line_count, data)    kt_VRAMLoad((addr) & ~0x7, (line_count) * sizeof(KTLineOffset), data)
+#define kt_MatrixLoad(addr, mtx_count, data)         kt_VRAMLoad((addr) & ~0x7, (mtx_count)  * sizeof(KTMtx), data)
+
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-extern u8 kt_vram[KT_VRAM_SIZE];
+extern u8 kt_vram[KT_VRAM_SIZE];	/*!< Direct access to VRAM memory */
 
 /*== Structs ==*/
 
@@ -250,7 +255,7 @@ typedef struct KTMtx_t {
  * scale_x_delta = [- : 6][ofs_y_delta_frac : 10][scale_x_delta : 16]
  * \endcode
  */
-typedef struct KTLineMapEntry_t {
+typedef struct KTLineOffset_t {
 	u32 ofs_delta;		/*!< Change in value of the map offset (uses 10.6 fixed point). */
 	u32	scale_x_delta;	/*!< Change in value of the horizontal scale (uses 10.6 fixed point). */
 } KTLineOffset;
@@ -318,9 +323,24 @@ void kt_TilemapLoad(u32 tmap, u32 map_size, u32 x, u32 y, u32 w, u32 h, u32 stri
 void kt_TilemapSetChr(u32 tmap, u32 x, u32 y, u32 tile_id, u32 flip, u32 pal);
 
 
+/*!
+ * \fn u32 kt_VRAMLoad(u32 addr, u32 size, void* data)
+ * \brief Used to load a block of data to VRAM.
+ * \details The data are loaded to 4 byte aligned addresses because of how they
+ * are accessed, keep in mind that non-aligned addresses are automatically adjusted.
+ * addresses greater than VRAM size are wrapped. There are helper macros that can be
+ * used to set specific types directly: kt_SpriteLoad, kt_LineOffsetLoad, kt_MatrixLoad
+ * (only note that addresses for sprites, line offsets and matrices must be 16, 8 and 8 byte
+ * aligned, respectively).
+ *
+ * \param[in] addr VRAM address (must be 4 byte aligned).
+ * \param[in] size Size in bytes of data array.
+ * \param[in] data Array of data to load.
+ *
+ * \return Beginning VRAM address of stored data.
+ */
+u32 kt_VRAMLoad(u32 addr, u32 size, void* data);
 
-u32 kt_SpriteLoad(u32 addr, u32 spr_count, KTSpr* data);
-u32 kt_LineOffsetLoad(u32 addr, u32 line_count, KTLineOffset* data);
 
 /*!
  * \fn void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data)
@@ -367,13 +387,13 @@ void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
  * \fn void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data)
  * \brief Initializes the specified layer as a sprite layer.
  * \details This function is an auxilary function and can be replicated with other layer
- * modifying functions. This funtion only copies the address of the array of sprites
- * to the layer, this means that the sprite memory must not be freed while it is still
- * attached to the layer.
+ * modifying functions. A 16-byte aligned address in VRAM must be passed to specify where
+ * the sprites are stored. To modify the sprite data you can call \ref kt_SpriteLoad or
+ * modify the VRAM data directly.
  *
  * \param[in] layer \ref layer_id.
  * \param[in] spr_count Number of sprites in data.
- * \param[in] data A pointer to the sprite array.
+ * \param[in] data Address in VRAM where sprites are stored.
  */
 void kt_LayerInitSprite(u32 layer, u32 spr_count, u32 spr_addr);
 
@@ -502,15 +522,13 @@ void kt_LayerSetBlendMode(u32 layer, u32 src_factor, u32 dst_factor, u32 func);
 /*!
  * \fn void kt_LayerSetUserData(u32 layer, u32 count, u32 addr)
  * \brief Sets a layer's user data.
- * \details The layer's user data is a pointer to memory allocated by the user
- * , the use of the data depends on the type of the layer.
- * This funtion only copies the address of the data array
- * to the layer, this means that the user must not free the memory while it is still
- * attached to the layer.
+ * \details The layer's user data is an address in VRAM, the use of the data
+ * depends on the type of the layer. This funtion only sets the address to the layer,
+ * this means that the user must load any data to VRAM before use.
  *
  * \param[in] layer \ref layer_id.
  * \param[in] num_elems The number of elements that the data has.
- * \param[in] addr Address of .
+ * \param[in] addr Address of data in VRAM.
  */
 void kt_LayerSetUserData(u32 layer, u32 count, u32 addr);
 
@@ -545,7 +563,7 @@ void kt_LayerClearAll(void);
  * ============================================================================
  */
 /*!
- * \fn void kt_MtxSet(u32 mtx_idx, f32 a, f32 b, f32 c, f32 d)
+ * \fn void kt_MtxSet(KTMtx *mtx, f32 a, f32 b, f32 c, f32 d)
  * \brief Packs values into a 2x2 matrix.
  *
  * \param[in] mtx Pointer of matrix.
@@ -557,7 +575,7 @@ void kt_LayerClearAll(void);
 void kt_MtxSet(KTMtx *mtx, f32 a, f32 b, f32 c, f32 d);
 
 /*!
- * \fn void kt_MtxSetRotoscale(u32 mtx_idx, f32 x_scale, f32 y_scale, f32 angle)
+ * \fn void kt_MtxSetRotoscale(KTMtx *mtx, f32 x_scale, f32 y_scale, f32 angle)
  * \brief Sets a rotation and a scale into a 2x2 matrix.
  *
  * \param[in] mtx Pointer of matrix.

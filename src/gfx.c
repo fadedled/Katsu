@@ -102,7 +102,7 @@ void kt_PaletteSetColor(u32 color_num, KTColor color)
 }
 
 
-u32 kt_LayerMemLoad(u32 addr, u32 size, void* data)
+u32 kt_VRAMLoad(u32 addr, u32 size, void* data)
 {
 	u32 mask = (KT_TMEM_SIZE - 1) >> 2;
 	u32 *dst = (u32*) kt_vram;
