@@ -102,7 +102,7 @@
 
 /* Macros for Sprite init */
 #define KT_SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
-#define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		((((pal & 0x7F)) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
+#define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		(((((pal) & 0x7F)) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define KT_SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
 #define KT_SPR_BLEND(alpha)									((0x80000000u) | ((alpha) & 0xFFu))
 #define KT_SPR_MTX(mtx_idx)									((((mtx_idx) >> 3) & 0x7FFFu) | 0x8000u)

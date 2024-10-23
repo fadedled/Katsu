@@ -118,18 +118,6 @@ u32 kt_VRAMLoad(u32 addr, u32 size, void* data)
 }
 
 
-u32 kt_SpriteLoad(u32 addr, u32 spr_count, KTSpr* data)
-{
-	return kt_LayerMemLoad(addr & ~0x3, spr_count * sizeof(*data), data);
-}
-
-
-u32 kt_LineOffsetLoad(u32 addr, u32 line_count, KTLineOffset* data)
-{
-	return kt_LayerMemLoad(addr & ~0x3, line_count * sizeof(*data), data);
-}
-
-
 /*Layers*/
 void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size)
 {

@@ -1,18 +1,29 @@
 
 #include <katsu/kt.h>
 
+extern const u8 system_4bpp_pal[];
+extern const u8 system_4bpp_data[];
+extern const u32 system_4bpp_tilenum;
 
 u32 sys_tmap;
 u32 win_x;
 u32 win_y;
 u32 win_width;
-
+u32 sys_pal_ofs;
+u32 sys_chr_ofs;
 
 void system_Init(u32 tmap)
 {
-	//u32 sys_tile_size =  ((u64)(&_binary_res_tiles_system_tiles_4bpp_end) - (u64)(&_binary_res_tiles_system_tiles_4bpp_start)) / 32;
-	//kt_TilesetLoad(0, sys_tile_size, &_binary_res_tiles_system_tiles_4bpp_start);
+	sys_chr_ofs = KT_MAX_TILES - system_4bpp_tilenum;
+	sys_pal_ofs = 127;
+	kt_TilesetLoad(sys_chr_ofs, system_4bpp_tilenum , system_4bpp_data);
+	kt_PaletteLoad(sys_pal_ofs, KT_PAL_SIZE_16, system_4bpp_pal);
 	sys_tmap = tmap;
+}
+
+void system_GetSystemChrOffs(u32 *chr_ofs, u32 *pal_ofs) {
+	*chr_ofs = sys_chr_ofs;
+	*pal_ofs = sys_pal_ofs;
 }
 
 void system_Clear()
@@ -22,6 +33,7 @@ void system_Clear()
 			kt_TilemapSetChr(sys_tmap, x, y, 0, KT_FLIP_NONE, 0);
 		}
 	}
+
 }
 
 u32 system_WindowBegin(u32 x, u32 y, u32 width)

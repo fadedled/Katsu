@@ -5,7 +5,7 @@ TARGET   :=	demo
 BUILD    :=	build
 INCLUDES :=	../include
 LIBDIRS :=	../lib
-SOURCES  :=	. res
+SOURCES  :=	. res samples
 CFLAGS	 :=	-O2 -g -Wall -I/usr/include/pipewire-0.3 -I/usr/include/spa-0.2 -D_REENTRANT
 
 LIBS     := -lGL -lpipewire-0.3 -lX11 -lm -ldl -lkatsu

@@ -26,7 +26,7 @@ void __kt_InputInit(void)
 	input_state.mouse.scroll = 0;
 }
 
-void kt_KeyboardEnablePolling(u32 enable)
+void kt_KeyboardSetPolling(u32 enable)
 {
 	input_state.polling = (input_state.polling & ~KT_KEYBOARD_POLLING) | (enable ? KT_KEYBOARD_POLLING : 0);
 }
@@ -67,7 +67,7 @@ u32 kt_KeyboardFlushEvents(void)
 }
 
 
-void kt_MouseEnablePolling(u32 enable)
+void kt_MouseSetPolling(u32 enable)
 {
 	input_state.polling = (input_state.polling & ~KT_MOUSE_POLLING) | (enable ? KT_MOUSE_POLLING : 0);
 }
