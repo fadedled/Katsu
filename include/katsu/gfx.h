@@ -64,8 +64,9 @@
  */
 #define KT_LAYER_NONE			0			/*!< Layer is not drawn. */
 #define KT_LAYER_MAP_NORMAL		1			/*!< Draws a normal map on screen. */
-#define KT_LAYER_MAP_ROTATION	2			/*!< Draws a map on screen with a 3D matrix applied. */
-#define KT_LAYER_SPRITE			3			/*!< Draws a set of sprites. */
+#define KT_LAYER_MAP_LINE		2
+#define KT_LAYER_MAP_ROTATION	3			/*!< Draws a map on screen with a 3D matrix applied. */
+#define KT_LAYER_SPRITE			4			/*!< Draws a set of sprites. */
 /*! @} */
 
 
@@ -103,9 +104,10 @@
 #define KT_SPR_POS(x, y)									(((y) << 16) | ((x) & 0xFFFFu))
 #define KT_SPR_CHR(tile_num, flip, hsize, vsize, pal)		((((pal & 0x7F)) << 24) | (((vsize) & 0xF) << 20) | (((hsize) & 0xF) << 16) | (((flip) & 0x3) << 14) | ((tile_num) & 0x3FFF))
 #define KT_SPR_HUE(hue, hue_alpha)							((((hue) & 0x7FFFu) << 16) | (((hue_alpha) & 0xFFu) << 8))
-#define KT_SPR_BLEND(alpha)								((0x80000000u) | ((alpha) & 0xFFu))
-#define KT_SPR_MTX(mtx_idx)								(((mtx_idx) & 0x7FFFu) | 0x8000u)
-
+#define KT_SPR_BLEND(alpha)									((0x80000000u) | ((alpha) & 0xFFu))
+#define KT_SPR_MTX(mtx_idx)									((((mtx_idx) >> 3) & 0x7FFFu) | 0x8000u)
+#define KT_SPR_MTX_IDENTITY									(0)
+#define KT_RGB8_TO_HUE(r, g, b)								((((r) & 0xF8) >> 3) | (((g) & 0xF8) << 2) | (((b) & 0xF8) << 7))
 
 /*! \addtogroup flip Tile flipping mode
  * @{
@@ -180,9 +182,7 @@
 #define KT_BL_INV_DST_ALPHA				0x5		/*!< Color is multiplied by 1 - destination alpha. */
 /*! @} */
 
-#define KT_MTX_IDENTITY						0
 
-#define KT_MEM_VRAM				(kt_vram)
 
 #ifdef __cplusplus
 extern "C" {
@@ -246,7 +246,7 @@ typedef struct KTMtx_t {
  * \brief Structure used to define line map user data entries.
  *
  * \code
- * ofs_delta = [- : 2][ofs_y_delta_int : 10][ofs_x_delta : 20]
+ * ofs_delta     = [- : 2][ofs_y_delta_int : 10][ofs_x_delta : 20]
  * scale_x_delta = [- : 6][ofs_y_delta_frac : 10][scale_x_delta : 16]
  * \endcode
  */

@@ -312,6 +312,7 @@ void ogl_Draw(void)
 
 	Layer *lr = layer_mem;
 	u32 spr_indx = 0;
+	//TODO: Optimize this, should be drawn front to back, then draw transparent layers
 	for (u32 i = 0; i < (KT_MAX_LAYERS >> vstate.res_mode); ++i) {
 		//Set the blending mode for the layer
 		u8 blnd = lr->blnd;
