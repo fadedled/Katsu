@@ -24,6 +24,7 @@ struct Caret {
 
 void samp_keymouse_init(void)
 {
+	kt_VideoSetResolution(KT_VIDEO_RES_HI);
 	KTColor col = {0x80, 0x80, 0x80, 0xFF};
 	kt_BackColor(col);
 	u8 *text_box = (u8*) malloc(2048);
@@ -35,7 +36,7 @@ void samp_keymouse_init(void)
 	kt_KeyboardSetPolling(KT_ENABLE);
 	kt_MouseSetPolling(KT_ENABLE);
 	kt_LayerInitMap(KT_LAYER1, KT_LAYER_MAP_NORMAL, KT_TMAP1, KT_MAP_SIZE_64x64);
-	kt_LayerSetMapRect(KT_LAYER1, 20, 10, 320, 220);
+	kt_LayerSetMapRect(KT_LAYER1, 20, 10, 640, 440);
 	kt_LayerSetMapChrOffset(KT_LAYER1, tofs, pofs);
 	kt_LayerInitSprite(KT_LAYER2, 2, KT_TMAP8);
 	car.spr->pos = KT_SPR_POS((car.col << 3) + 24, (car.row << 3) + 10);
@@ -43,7 +44,6 @@ void samp_keymouse_init(void)
 
 	mouse_spr->pos = KT_SPR_POS(640, 480);
 	mouse_spr->chr = KT_SPR_CHR(tofs+139, KT_FLIP_NONE, KT_SIZE_8, KT_SIZE_8, pofs);
-
 	for (int i = 0; i < 64; ++i) {
 	for (int j = 0; j < 64; ++j) {
 		kt_TilemapSetChr(KT_TMAP1, j, i, ' ', KT_FLIP_NONE, 0);
