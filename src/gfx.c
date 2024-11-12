@@ -4,6 +4,7 @@
 
 #include <katsu/kt.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include "video_common.h"
@@ -73,18 +74,35 @@ void kt_TilemapLoad(u32 tmap, u32 size, u32 x, u32 y, u32 w, u32 h, u32 stride, 
 }
 
 
-void kt_PaletteLoad(u32 pal_num, u32 pal_size, const void* data)
+void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data)
 {
-	u32 color_num = (pal_num & (KT_MAX_PALETTES - 1)) << 4;
-	u32 color_count = pal_size << 4;
+	u32 color_count = (16 << pal_size) & (KT_MAX_COLORS - 1);
+	u32 color_num = (pal & (KT_MAX_PALETTES - 1)) << 4;
+	//Set the first color, checks if data is NULL
+	if (data) {
+		((u32*) pal_mem)[color_num] = *((u32*) data);
+		kt_PaletteLoadOpaqueColors(pal, color_count - 1, ((u32*) data) + 1);
+	} else {
+		((u32*) pal_mem)[color_num] = 0;
+		kt_PaletteLoadOpaqueColors(pal, color_count - 1, NULL);
+	}
+}
+
+void kt_PaletteLoadOpaqueColors(u32 pal, u32 color_count, const void* data)
+{
+	u32 color_num = ((pal & (KT_MAX_PALETTES - 1)) << 4) + 1;
+	color_num &= (KT_MAX_COLORS - 1);
+	color_count &= (KT_MAX_COLORS - 1);
 	u32 *dst = (u32*) pal_mem;
 	if (data) {
+		//Copy data
 		u32 *src = (u32*) data;
 		for (u32 i = 0; i < color_count; ++i) {
 			dst[color_num++] = src[i];
 			color_num &= (KT_MAX_COLORS - 1);
 		}
 	} else {
+		//Clear data
 		for (u32 i = 0; i < color_count; ++i) {
 			dst[color_num++] = 0;
 			color_num &= (KT_MAX_COLORS - 1);
@@ -351,9 +369,10 @@ void kt_Reset(void)
 	kt_BackColor(black_color);
 	kt_OffsetColor(0, 0, 0);
 	kt_LayerClearAll();
-	kt_TilesetLoad(0, KT_MAX_TILES, NULL);
+	memset(tile_mem, 0, KT_TMEM_SIZE);
+	memset(kt_vram, 0, KT_VRAM_SIZE);
+	memset(pal_mem, 0, KT_MAX_COLORS * 4);
 	kt_PaletteLoad(0, KT_MAX_COLORS, NULL);
-
 	/*TODO: init Tilemap memory*/
 }
 

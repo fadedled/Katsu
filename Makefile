@@ -21,7 +21,7 @@ GLSLINCS := $(GLSLFILES:.glsl=.inc)
 OBJS     := $(CFILES:.c=.o)
 
 ifeq ($(KT_DEBUG), 1)
-	CFLAGS += -DKT_DEBUG
+	CFLAGS += -DKT_DEBUG -g
 endif
 
 .PHONY: clean static dynamic $(DIRS)

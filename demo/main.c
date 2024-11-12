@@ -43,7 +43,7 @@ int main() {
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 	system_Init(KT_TMAP15);
 
-	samp_keymouse_init();
+	samp_normmap_init();
 	while (1) {
 		kt_Poll();
 #if 0
@@ -62,7 +62,7 @@ int main() {
 		}
 #endif
 
-		samp_keymouse_update();
+		samp_normmap_update();
 		kt_Draw();
 	}
 

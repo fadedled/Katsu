@@ -29,11 +29,11 @@
 /*! \addtogroup pal_size Palette sizes
  * @{
  */
-#define KT_PAL_SIZE_16						0x1		/*!< Palette with 16 entries. */
-#define KT_PAL_SIZE_32						0x2		/*!< Palette with 32 entries. */
-#define KT_PAL_SIZE_64						0x4		/*!< Palette with 64 entries. */
-#define KT_PAL_SIZE_128						0x8		/*!< Palette with 128 entries. */
-#define KT_PAL_SIZE_256						0x10	/*!< Palette with 256 entries. */
+#define KT_PAL_SIZE_16						0		/*!< Palette with 16 entries. */
+#define KT_PAL_SIZE_32						1		/*!< Palette with 32 entries. */
+#define KT_PAL_SIZE_64						2		/*!< Palette with 64 entries. */
+#define KT_PAL_SIZE_128						3		/*!< Palette with 128 entries. */
+#define KT_PAL_SIZE_256						4		/*!< Palette with 256 entries. */
 /*! @} */
 
 /*! \addtogroup layer_id Number of layer
@@ -344,16 +344,28 @@ u32 kt_VRAMLoad(u32 addr, u32 size, void* data);
 
 /*!
  * \fn void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data)
- * \brief Used to load a set of 16 color palettes to Color Memory.
+ * \brief Used to load a set of 16-entry color palettes to Color Memory.
  * \details This function copies 16-entry palettes from the application to Color Memory. If the application modifies
  * loaded palettes, they must be reloaded for the changes to be shown.
  *
- * \param[in] pal Starting palette number, should be between 0 and KT_MAX_PALETTES-1.
+ * \param[in] pal Starting 16-entry palette number, should be between 0 and KT_MAX_PALETTES-1.
  * \param[in] pal_size \ref pal_size.
  * \param[in] data Pointer to the palette data to be loaded. If NULL is passed, the specified palettes are zeroed out.
  */
 void kt_PaletteLoad(u32 pal, u32 pal_size, const void* data);
 
+/*!
+ * \fn void kt_PaletteLoadOpaqueColors(u32 pal, u32 color_count, const void* data)
+ * \brief Used to load a arbitrary set of non-transparent color entries to Color Memory.
+ * \details This function copies an array of colors from the application to Color Memory. This function skips the first color in
+ * the starting palette so only non-transparent colors should be passed. This function is useful when you want to modify only the first
+ * n visible colors on a palette.
+ *
+ * \param[in] pal Starting 16-entry palette number, should be between 0 and KT_MAX_PALETTES-1.
+ * \param[in] color_count Number of colors in data array.
+ * \param[in] data Pointer to the color array to be loaded. If NULL is passed, the specified colors are zeroed out.
+ */
+void kt_PaletteLoadOpaqueColors(u32 pal, u32 color_count, const void* data);
 
 /*!
  * \fn void kt_PaletteSetColor(u32 color_num, KTColor color)
