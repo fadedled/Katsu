@@ -9,7 +9,7 @@
 #include <katsu/kt.h>
 
 void samp_keymouse_init(void);
-void samp_keymouse_update(void);
+u32 samp_keymouse_update(void);
 void samp_keymouse_deinit(void);
 
 #endif /*__SAMPLE_KEYMOUSE_H__*/

@@ -8,8 +8,8 @@
 
 #include <katsu/kt.h>
 
-void samp_sprites_init(void);
-u32 samp_sprites_update(void);
-void samp_sprites_deinit(void);
+//void samp_sprites_init(void);
+//void samp_sprites_update(void);
+//void samp_sprites_deinit(void);
 
 #endif /*__SAMPLE_SPRITES_H__*/

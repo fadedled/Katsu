@@ -35,7 +35,7 @@ void samp_normmap_init(void)
 }
 
 
-void samp_normmap_update(void)
+u32 samp_normmap_update(void)
 {
 	u32 btn = kt_JoyButtonHeld(0);
 	s32 dx = ((btn >> JOY_BIT_RIGHT)  & 1) - ((btn >> JOY_BIT_LEFT) & 1);
@@ -45,7 +45,7 @@ void samp_normmap_update(void)
 	ply.y += mult * dy;
 	kt_LayerSetMapOffsetf(KT_LAYER0, ply.x, ply.y, 1);
 	kt_LayerSetMapOffsetf(KT_LAYER2, ply.x, ply.y, 1);
-
+	return (~kt_JoyButtonDown(0) >> JOY_BIT_STR) & 0x1;
 }
 
 

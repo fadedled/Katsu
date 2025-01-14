@@ -7,9 +7,9 @@ void samp_linemap_init(void)
 }
 
 
-void samp_linemap_update(void)
+u32 samp_linemap_update(void)
 {
-
+	return 1;
 }
 
 

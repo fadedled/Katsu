@@ -35,7 +35,7 @@ void samp_keymouse_init(void)
 	system_GetSystemChrOffs(&tofs, &pofs);
 	kt_KeyboardSetPolling(KT_ENABLE);
 	kt_MouseSetPolling(KT_ENABLE);
-	kt_LayerInitMap(KT_LAYER1, KT_LAYER_MAP_NORMAL, KT_TMAP1, KT_MAP_SIZE_64x64);
+	kt_LayerInitMap(KT_LAYER1, KT_LAYER_MAP_NORMAL, KT_TMAP1, KT_MAP_SIZE_128x64);
 	kt_LayerSetMapRect(KT_LAYER1, 20, 10, 640, 440);
 	kt_LayerSetMapChrOffset(KT_LAYER1, tofs, pofs);
 	kt_LayerInitSprite(KT_LAYER2, 2, KT_TMAP8);
@@ -56,7 +56,7 @@ static void __update_textbox_tmap(void) {
 }
 
 
-void samp_keymouse_update(void)
+u32 samp_keymouse_update(void)
 {
 	KTKeyEvent kev;
 	while(kt_KeyboardGetEvent(&kev)) {
@@ -90,6 +90,8 @@ void samp_keymouse_update(void)
 				} else if (kev.sym == 65363) {
 					car.col++;
 					car.timer = 0;
+				} else if (kev.sym == 65307) {
+					return 0;
 				}
 				//printf("%d\n", kev.sym);
 			}
@@ -101,6 +103,7 @@ void samp_keymouse_update(void)
 	car.spr->chr = KT_SPR_CHR(tofs + carspr, KT_FLIP_NONE, KT_SIZE_8, KT_SIZE_8, 127);
 	kt_MouseGetState(&mouse);
 	mouse_spr->pos = KT_SPR_POS(mouse.x, mouse.y);
+	return 1;
 }
 
 
@@ -113,5 +116,6 @@ void samp_keymouse_deinit(void)
 	line_count = 0;
 	kt_KeyboardSetPolling(KT_DISABLE);
 	kt_MouseSetPolling(KT_DISABLE);
+	kt_VideoSetResolution(KT_VIDEO_RES_STD);
 	kt_LayerClearAll();
 }

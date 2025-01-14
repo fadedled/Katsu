@@ -9,7 +9,7 @@
 #include <katsu/kt.h>
 
 void samp_linemap_init(void);
-void samp_linemap_update(void);
+u32 samp_linemap_update(void);
 void samp_linemap_deinit(void);
 
 #endif /*__SAMPLE_LINEMAP_H__*/
