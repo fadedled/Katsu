@@ -126,6 +126,7 @@ u32 kt_VRAMLoad(u32 addr, u32 size, void* data)
 	u32 *dst = (u32*) kt_vram;
 	u32 *src = (u32*) data;
 	u32 ret_addr = addr & ~0x3;
+	addr >>= 2;
 	size >>= 2;
 	while (size--) {
 		dst[addr++] = *src;

@@ -16,7 +16,9 @@ typedef void (*SampleFunc)(void);
 typedef int (*SampleFuncUpd)(void);
 
 void samp_none_init(void);
+u32 samp_none_update(void);
 void samp_none_deinit(void);
+
 
 enum SampleId {
 	SAMPLE_NONE,
@@ -33,12 +35,12 @@ struct SampleCtx {
 	SampleFuncUpd update;
 	SampleFunc deinit;
 } samples[8] = {
-	{samp_none_init, NULL, samp_none_deinit},
+	{samp_none_init, samp_none_update, samp_none_deinit},
 	{samp_sprites_init, samp_sprites_update, samp_sprites_deinit},
 	{samp_normmap_init, samp_normmap_update, samp_normmap_deinit},
 	{samp_linemap_init, samp_linemap_update, samp_linemap_deinit},
-	{samp_keymouse_init, samp_keymouse_update, samp_keymouse_deinit},
 	{samp_joypad_init, samp_joypad_update, samp_joypad_deinit},
+	{samp_keymouse_init, samp_keymouse_update, samp_keymouse_deinit},
 	//{samp_audio_init, samp_audio_update, samp_audio_deinit},
 };
 
@@ -94,15 +96,23 @@ int sample_fade_step(void)
 	}
 }
 
+struct MenuCursor {
+	u32 sample;
+	KTSpr spr;
+} mcur;
 
 void samp_none_init(void)
 {
 	u32 chr_ofs, pal_ofs;
 	system_GetSystemChrOffs(&chr_ofs, &pal_ofs);
-
 	kt_LayerInitMap(KT_LAYER0, KT_LAYER_MAP_NORMAL, KT_TMAP15, KT_MAP_SIZE_64x64);
+	kt_LayerInitSprite(KT_LAYER1, 1, KT_TMAP8);
+	mcur.sample = SAMPLE_SPRITES;
+	mcur.spr.pos = KT_SPR_POS(12, 12);
+	mcur.spr.chr = KT_SPR_CHR(128 + chr_ofs, KT_FLIP_NONE, 1, 1, pal_ofs);
+	kt_SpriteLoad(KT_TMAP8, 1, &mcur.spr);
 	kt_LayerSetMapChrOffset(KT_LAYER0, chr_ofs, pal_ofs);
-	system_WindowBegin(4, 4, 23);
+	system_WindowBegin(4, 4, 30);
 	system_WindowLabel("SAMPLES:");
 	system_WindowLabel("  Sprite sample");
 	system_WindowLabel("  Normal Map sample");
@@ -110,6 +120,31 @@ void samp_none_init(void)
 	system_WindowLabel("  Joypad sample");
 	system_WindowLabel("  Keyboard-Mouse sample");
 	system_WindowEnd();
+}
+
+u32 samp_none_update(void)
+{
+	u32 chr_ofs, pal_ofs;
+	system_GetSystemChrOffs(&chr_ofs, &pal_ofs);
+	u32 btn = kt_JoyButtonDown(0);
+	if (btn & JOY_STR) {
+		sample_fade_black(mcur.sample, 32);
+		mcur.spr.chr = KT_SPR_CHR(132 + chr_ofs, KT_FLIP_NONE, 1, 1, pal_ofs);
+	} else if (btn & JOY_DOWN) {
+		mcur.sample++;
+
+		if (mcur.sample > SAMPLE_AUDIO) {
+			mcur.sample = SAMPLE_SPRITES;
+		}
+	} else if (btn & JOY_UP) {
+		mcur.sample--;
+		if (mcur.sample < SAMPLE_SPRITES) {
+			mcur.sample = SAMPLE_AUDIO;
+		}
+	}
+	mcur.spr.pos = KT_SPR_POS(20, 24 + (mcur.sample << 3));
+	kt_SpriteLoad(KT_TMAP8, 1, &mcur.spr);
+	return 1;
 }
 
 
@@ -129,25 +164,21 @@ int main()
 	kt_VideoFrameSet(KT_VIDEO_FRAME_2X);
 	system_Init(KT_TMAP15);
 
-	samp_normmap_init();
-	sample_curr = SAMPLE_NORMALMAP;
+	samp_none_init();
+	sample_curr = SAMPLE_NONE;
 	while (1) {
 		kt_Poll();
 
 		if (sample_fade) {
 			sample_fade_step();
-		}
-
-		if (sample_curr == SAMPLE_NONE) {
-			if (kt_JoyButtonDown(0) & JOY_STR) {
-				sample_fade_black(SAMPLE_KEYBOARDMOUSE, 32);
-			}
+			samples[sample_curr].update();
 		} else {
 			u32 cont = samples[sample_curr].update();
 			if (!cont) {
 				sample_fade_black(SAMPLE_NONE, 32);
 			}
 		}
+
 		kt_Draw();
 	}
 
