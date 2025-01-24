@@ -1,11 +1,10 @@
 
 
-
-#include <xinput.h>
 #include <stdio.h>
 #include <katsu/kt.h>
 #include "../../joypad_common.h"
-
+#include <windows.h>
+#include <xinput.h>
 
 #define MAX_WIN_JOYPADS			4		//Max joypads for Windows (up to 4)
 #define AXIS_CODE_MAX			8

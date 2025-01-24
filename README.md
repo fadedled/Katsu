@@ -70,10 +70,10 @@ int main() {
 
 ### Compiling on Windows
 
-You will need Visual Studios MSVC or MinGW installed, link with ```User32.lib```, ```Opengl32.lib```, ```Xinput1_4.lib``` and ```Katsu.lib```. If you are using the console/terminal you should set your environment to use MSVC. Then compile with:
+You will need MSVC installed, link with ```User32.lib```, ```Gdi32.lib```, ```Opengl32.lib```, ```Xinput9_1_0.lib``` (or ```Xinput1_4.lib```) and ```Katsu.lib```. If you are using the console/terminal you should set your environment to use MSVC. Then compile with:
 
 ```
-$> cl -Tc <your_source_code> -I".\include" -link User32.lib Opengl32.lib Xinput1_4.lib lib\Katsu.lib -OUT:mygame.exe
+$> cl -Tc <your_source_code> -I".\include" -link User32.lib Gdi32.lib Opengl32.lib Xinput9_1_0.lib lib\Katsu.lib -OUT:mygame.exe
 $> mygame.exe
 ```
 
