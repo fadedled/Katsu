@@ -45,7 +45,7 @@ void cstr_GenStrVariableName(char* in_fn, char* out_fn)
 	char *src_c = in_fn;
 	char *fn_start = in_fn;
 	while (*src_c) {
-		if (*src_c == '/') {
+		if (*src_c == '/' || *src_c == '\\') {
 			fn_start = src_c+1;
 		}
 		src_c++;
