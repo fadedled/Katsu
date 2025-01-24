@@ -1,15 +1,15 @@
 /*
- * sprites.h - sample sprite demo
+ * audio.h - sample audio demo
  */
 
 
-#ifndef __SAMPLE_SPRITES_H__
-#define __SAMPLE_SPRITES_H__
+#ifndef __SAMPLE_AUDIO_H__
+#define __SAMPLE_AUDIO_H__
 
 #include <katsu/kt.h>
 
-//void samp_sprites_init(void);
-//void samp_sprites_update(void);
-//void samp_sprites_deinit(void);
+void samp_audio_init(void);
+u32 samp_audio_update(void);
+void samp_audio_deinit(void);
 
-#endif /*__SAMPLE_SPRITES_H__*/
+#endif /*__SAMPLE_AUDIO_H__*/

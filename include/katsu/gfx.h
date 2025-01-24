@@ -396,7 +396,7 @@ void kt_PaletteSetColor(u32 color_num, KTColor color);
 void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
 
 /*!
- * \fn void kt_LayerInitSprite(u32 layer, u32 spr_count, KTSpr *data)
+ * \fn void kt_LayerInitSprite(u32 layer, u32 spr_count, u32 spr_addr)
  * \brief Initializes the specified layer as a sprite layer.
  * \details This function is an auxilary function and can be replicated with other layer
  * modifying functions. A 16-byte aligned address in VRAM must be passed to specify where
@@ -405,7 +405,7 @@ void kt_LayerInitMap(u32 layer, u32 type, u32 tmap, u32 map_size);
  *
  * \param[in] layer \ref layer_id.
  * \param[in] spr_count Number of sprites in data.
- * \param[in] data Address in VRAM where sprites are stored.
+ * \param[in] spr_addr Address in VRAM where sprites are stored.
  */
 void kt_LayerInitSprite(u32 layer, u32 spr_count, u32 spr_addr);
 

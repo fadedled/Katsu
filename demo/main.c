@@ -13,7 +13,7 @@
 #include "samples/audio.h"
 
 typedef void (*SampleFunc)(void);
-typedef int (*SampleFuncUpd)(void);
+typedef u32 (*SampleFuncUpd)(void);
 
 void samp_none_init(void);
 u32 samp_none_update(void);
@@ -41,7 +41,7 @@ struct SampleCtx {
 	{samp_linemap_init, samp_linemap_update, samp_linemap_deinit},
 	{samp_joypad_init, samp_joypad_update, samp_joypad_deinit},
 	{samp_keymouse_init, samp_keymouse_update, samp_keymouse_deinit},
-	//{samp_audio_init, samp_audio_update, samp_audio_deinit},
+	{samp_audio_init, samp_audio_update, samp_audio_deinit},
 };
 
 /*Demo Palette*/
@@ -96,30 +96,29 @@ int sample_fade_step(void)
 	}
 }
 
-struct MenuCursor {
-	u32 sample;
-	KTSpr spr;
-} mcur;
+const char *sample_name_list[] = {
+	"  Sprite sample",
+	"  Normal Map sample",
+	"  Line Map sample",
+	"  Joypad sample",
+	"  Keyboard-Mouse sample",
+	"  Audio sample",
+};
+
+KTSpr cursor_spr;
 
 void samp_none_init(void)
 {
 	u32 chr_ofs, pal_ofs;
 	system_GetSystemChrOffs(&chr_ofs, &pal_ofs);
+
 	kt_LayerInitMap(KT_LAYER0, KT_LAYER_MAP_NORMAL, KT_TMAP15, KT_MAP_SIZE_64x64);
 	kt_LayerInitSprite(KT_LAYER1, 1, KT_TMAP8);
-	mcur.sample = SAMPLE_SPRITES;
-	mcur.spr.pos = KT_SPR_POS(12, 12);
-	mcur.spr.chr = KT_SPR_CHR(128 + chr_ofs, KT_FLIP_NONE, 1, 1, pal_ofs);
-	kt_SpriteLoad(KT_TMAP8, 1, &mcur.spr);
+	kt_SpriteLoad(KT_TMAP8, 1, &cursor_spr);
 	kt_LayerSetMapChrOffset(KT_LAYER0, chr_ofs, pal_ofs);
-	system_WindowBegin(4, 4, 30);
-	system_WindowLabel("SAMPLES:");
-	system_WindowLabel("  Sprite sample");
-	system_WindowLabel("  Normal Map sample");
-	system_WindowLabel("  Line Map sample");
-	system_WindowLabel("  Joypad sample");
-	system_WindowLabel("  Keyboard-Mouse sample");
-	system_WindowEnd();
+
+	system_WindowMenuInit("SAMPLES:", 4, 4, 30, sample_name_list, 6, &cursor_spr);
+
 }
 
 u32 samp_none_update(void)
@@ -127,23 +126,12 @@ u32 samp_none_update(void)
 	u32 chr_ofs, pal_ofs;
 	system_GetSystemChrOffs(&chr_ofs, &pal_ofs);
 	u32 btn = kt_JoyButtonDown(0);
+	u32 sel = system_WindowMenuUpdate( sample_fade && sample_fade > sample_fade_half, &cursor_spr);
 	if (btn & JOY_STR) {
-		sample_fade_black(mcur.sample, 32);
-		mcur.spr.chr = KT_SPR_CHR(132 + chr_ofs, KT_FLIP_NONE, 1, 1, pal_ofs);
-	} else if (btn & JOY_DOWN) {
-		mcur.sample++;
-
-		if (mcur.sample > SAMPLE_AUDIO) {
-			mcur.sample = SAMPLE_SPRITES;
-		}
-	} else if (btn & JOY_UP) {
-		mcur.sample--;
-		if (mcur.sample < SAMPLE_SPRITES) {
-			mcur.sample = SAMPLE_AUDIO;
-		}
+		sample_fade_black(sel + SAMPLE_SPRITES, 32);
 	}
-	mcur.spr.pos = KT_SPR_POS(20, 24 + (mcur.sample << 3));
-	kt_SpriteLoad(KT_TMAP8, 1, &mcur.spr);
+
+	kt_SpriteLoad(KT_TMAP8, 1, &cursor_spr);
 	return 1;
 }
 

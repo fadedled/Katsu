@@ -3,7 +3,7 @@
 
 void samp_linemap_init(void)
 {
-
+	printf("linemap\n");
 }
 
 

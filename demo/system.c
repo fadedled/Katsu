@@ -1,5 +1,6 @@
 
 #include <katsu/kt.h>
+#include "system.h"
 
 extern const u8 system_4bpp_pal[];
 extern const u8 system_4bpp_data[];
@@ -11,6 +12,51 @@ u32 win_y;
 u32 win_width;
 u32 sys_pal_ofs;
 u32 sys_chr_ofs;
+
+
+struct Menu {
+	u32 size;
+	s32 cursor_pos;
+	u32 x, y;
+} menu;
+
+void system_WindowMenuInit(const char *title, u32 x, u32 y, u32 width, const char **elems, u32 num_elems, KTSpr *cursor)
+{
+	cursor->pos = KT_SPR_POS(x*8, (x*8) + 2);
+	cursor->chr = KT_SPR_CHR(128 + sys_chr_ofs, KT_FLIP_NONE, 1, 1, sys_pal_ofs);
+	menu.cursor_pos = 0;
+	menu.size = num_elems;
+	menu.x = x;
+	menu.y = y;
+	//Draw
+	system_WindowBegin(x+1, y, width / 2);
+	system_WindowLabel(title);
+	system_WindowEnd();
+	system_WindowBegin(x, y+2, width);
+	for (u32 i = 0; i < num_elems; ++i) {
+		system_WindowLabel(elems[i]);
+		system_WindowLabel("");
+	}
+	system_WindowEnd();
+}
+
+u32 system_WindowMenuUpdate(u32 was_selected, KTSpr *cursor)
+{
+	u32 tile_id = 128 + ((was_selected ? 1 : 0) * 4);
+	if (!was_selected) {
+		u32 btn = kt_JoyButtonDown(0);
+		if (btn & JOY_DOWN) {
+			menu.cursor_pos = (menu.cursor_pos >= menu.size - 1 ? 0 : menu.cursor_pos + 1);
+		} else if (btn & JOY_UP) {
+			menu.cursor_pos = (menu.cursor_pos <= 0 ? menu.size - 1 : menu.cursor_pos - 1);
+		}
+	}
+	cursor->chr = KT_SPR_CHR(tile_id + sys_chr_ofs, KT_FLIP_NONE, 1, 1, sys_pal_ofs);
+	cursor->pos = KT_SPR_POS(menu.x*8 + 7, (menu.y*8) + 20 + (menu.cursor_pos * 16));
+	return menu.cursor_pos;
+}
+
+
 
 void system_Init(u32 tmap)
 {
@@ -55,7 +101,7 @@ u32 system_WindowBegin(u32 x, u32 y, u32 width)
 
 
 
-u32 system_WindowLabel(char *str)
+u32 system_WindowLabel(const char *str)
 {
 	if (!win_width)
 		return 0;
