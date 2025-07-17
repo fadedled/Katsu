@@ -44,6 +44,7 @@ static void __kt_JoyClose(u32 joy_id)
 
 void __kt_JoypadSearchAndOpen(void)
 {
+	XINPUT_STATE state = {0};
 	for (u32 i = 0; i < MAX_WIN_JOYPADS; ++i) {
 		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
 			joy_state[i].active = 1;
@@ -100,7 +101,7 @@ const u32 xinput_gpad_btn_converter[16] = {
 
 void __kt_JoypadPoll(void)
 {
-	XINPUT_STATE state = {};
+	XINPUT_STATE state = {0};
 
 	//Update the prev values per active joypad
 	for (u32 i = 0; i < MAX_WIN_JOYPADS; ++i) {
@@ -114,7 +115,7 @@ void __kt_JoypadPoll(void)
 
 				XINPUT_GAMEPAD xgamepad = state.Gamepad;
 				u32 btn = 0;
-				for (k = 0; k < 16; ++k) {
+				for (u32 k = 0; k < 16; ++k) {
 					btn |= xinput_gpad_btn_converter[k] * (xgamepad.wButtons >> k) & 1;
 				}
 				btn |= (xgamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) * JOY_TL;

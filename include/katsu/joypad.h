@@ -68,7 +68,7 @@ extern "C" {
 /*! \addtogroup joypad_id Joypad ID
  * @{
  */
-enum WinId {
+enum JoyId {
 	JOY0,
 	JOY1,
 	JOY2,

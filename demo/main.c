@@ -78,6 +78,7 @@ int sample_fade_black(u32 sample, u32 num_frames)
 	sample_next = sample;
 	sample_fade = num_frames & ~1;
 	sample_fade_half = num_frames >> 1;
+	return 0;
 }
 
 
@@ -94,6 +95,7 @@ int sample_fade_step(void)
 		sample_curr = sample_next;
 	} else {
 	}
+	return 0;
 }
 
 const char *sample_name_list[] = {
@@ -125,10 +127,17 @@ u32 samp_none_update(void)
 {
 	u32 chr_ofs, pal_ofs;
 	system_GetSystemChrOffs(&chr_ofs, &pal_ofs);
+
 	u32 btn = kt_JoyButtonDown(0);
 	u32 sel = system_WindowMenuUpdate( sample_fade && sample_fade > sample_fade_half, &cursor_spr);
 	if (btn & JOY_STR) {
 		sample_fade_black(sel + SAMPLE_SPRITES, 32);
+	}
+
+	if (btn & JOY_A) {
+		kt_MappingMode(KT_MAPMODE_1D);
+	} else if (btn & JOY_B) {
+		kt_MappingMode(KT_MAPMODE_2D);
 	}
 
 	kt_SpriteLoad(KT_TMAP8, 1, &cursor_spr);
@@ -144,7 +153,10 @@ void samp_none_deinit(void)
 
 int main()
 {
-	if (kt_Init()) {
+	printf("What is this\n");
+	u32 err;
+	if ((err = kt_Init())) {
+		printf("What is this %d\n", err);
 		return 0;
 	}
 	kt_VideoTitleSet("Katsu Demo");

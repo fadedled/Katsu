@@ -15,13 +15,14 @@
 u8 tile_mem[KT_TMEM_SIZE];
 u8 kt_vram[KT_VRAM_SIZE];
 u8 pal_mem[KT_MAX_COLORS * 4];
+u32 gfx_cnt0;
+u32 gfx_cnt1;
 KTColor backcolor;
 u32 coloroffs;
 u32 colorline_cnt;
 u32 colorline[0x100];
 u32 window_cnt;
 u32 window[2][0x100];
-u32 blend_mode;
 Layer layer_mem[16];
 
 
@@ -363,7 +364,13 @@ void kt_ColorLineLoad(u32 line_count, const void* data)
 
 
 
-/*Utils*/
+/* General */
+void kt_MappingMode(u32 mode)
+{
+	gfx_cnt0 = (gfx_cnt0 & ~0x20) | (mode ? 0x20 : 0x00);
+}
+
+
 void kt_Reset(void)
 {
 	const KTColor black_color = {0};

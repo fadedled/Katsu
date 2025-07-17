@@ -182,6 +182,13 @@
 #define KT_BL_INV_DST_ALPHA				0x5		/*!< Color is multiplied by 1 - destination alpha. */
 /*! @} */
 
+/*! \addtogroup map_modes Sprite mapping modes
+ * @{
+ */
+#define KT_MAPMODE_1D						0x0		/*!< One dimensional sprite mapping mode (sprites width is used as its stride). */
+#define KT_MAPMODE_2D						0x1		/*!< Two dimensional sprite mapping mode (sprites stride fixed to 256 pixels). */
+/*! @} */
+
 
 #define kt_SpriteLoad(addr, spr_count, data)         kt_VRAMLoad((addr) & ~0xF, (spr_count)  * sizeof(KTSpr), data)
 #define kt_LineOffsetLoad(addr, line_count, data)    kt_VRAMLoad((addr) & ~0x7, (line_count) * sizeof(KTLineOffset), data)
@@ -645,6 +652,24 @@ void kt_OffsetColor(s32 r, s32 g, s32 b);
  * \brief Resets all Katsu graphics memory to match settings on startup.
  */
 void kt_Reset(void);
+
+/*!
+ * \fn void kt_MappingMode(u32 mode)
+ * \brief Sets the mapping mode for all sprites in a frame.
+ *
+ * \details The mapping mode refers to the way tiles are mapped onto a sprite.
+ * For 1D mapping, the stride of a tile depends on the sprite's width (this is the default behaviour).
+ * For 2D mapping, the stride of a tile is fixed to 32 tiles.
+ *
+ * \note The one you choose depends on your specific use case. 1D mapping is preffered when seeking
+ * efficient use of VRAM memory and for streaming animations to VRAM.
+ * 2D mapping is better for loading single sprite sheets and for meta/composite sprite animations.
+ * You can do the same things only with a bit of work.
+ *
+ * \param[in] \ref map_modes
+ */
+void kt_MappingMode(u32 mode);
+
 // u32  kt_LerpColor(KTColor c0, KTColor c1, u8 blend);
 
 #ifdef __cplusplus

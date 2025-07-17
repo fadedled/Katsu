@@ -1,6 +1,6 @@
 
 #include <katsu/kt.h>
-
+#include <stdio.h>
 
 void draw_joypad(u32 joy_num, u32 x, u32 y) {
 

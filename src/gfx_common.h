@@ -49,13 +49,14 @@ typedef struct Layer_t {
 extern u8 tile_mem[KT_TMEM_SIZE];
 extern u8 kt_vram[KT_VRAM_SIZE];
 extern u8 pal_mem[KT_MAX_COLORS * 4];
+extern u32 gfx_cnt0;
+extern u32 gfx_cnt1;
 extern KTColor backcolor;
 extern u32 coloroffs;
 extern u32 colorline_cnt;
 extern u32 colorline[0x100];
 extern u32 window_cnt;
 extern u32 window[2][0x100];
-extern u32 blend_mode;
 extern Layer layer_mem[16];
 
 

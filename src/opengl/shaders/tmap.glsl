@@ -6,11 +6,11 @@
 
 layout(std140, binding = 0) uniform video_data
 {
-	vec2 maxdims;
-	vec2 frame;
-	vec2 outdims;
-	vec2 _padding;
-	vec4 color_offset;
+	vec2  maxdims;
+	vec2  frame;
+	vec2  outdims;
+	uvec2 gfx_cnt;
+	vec4  color_offset;
 };
 
 #ifdef VERTEX_SHADER

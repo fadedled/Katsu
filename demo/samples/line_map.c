@@ -1,5 +1,6 @@
 
 #include <katsu/kt.h>
+#include <stdio.h>
 
 void samp_linemap_init(void)
 {

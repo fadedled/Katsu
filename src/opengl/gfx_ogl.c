@@ -20,8 +20,8 @@ struct VideoData_t {
 	f32 frame_h;
 	f32 outdims_w;
 	f32 outdims_h;
-	f32 _padding0;
-	f32 _padding1;
+	u32 gfx_cnt0;
+	u32 gfx_cnt1;
 	f32 color_offset_r;
 	f32 color_offset_g;
 	f32 color_offset_b;
@@ -270,10 +270,13 @@ void ogl_Draw(void)
 	video_data.frame_h = (f32) vstate.frame_h;
 	video_data.outdims_w = (f32) vstate.output_w;
 	video_data.outdims_h = (f32) vstate.output_h;
+	video_data.gfx_cnt0 = gfx_cnt0;
+	video_data.gfx_cnt1 = gfx_cnt1;
 	video_data.color_offset_r = ((f32) S9TOS32(coloroffs) / 255.0);
 	video_data.color_offset_g = ((f32) S9TOS32(coloroffs >> 9) / 255.0);
 	video_data.color_offset_b = ((f32) S9TOS32(coloroffs >> 18) / 255.0);
 	video_data.color_offset_a = 1.0;
+
 
 	f32 backcol_r = (backcolor.r & 0xFF) / 255.0;
 	f32 backcol_g = (backcolor.g & 0xFF) / 255.0;

@@ -6,11 +6,11 @@
 
 layout(std140, binding = 0) uniform video_data
 {
-	vec2 maxdims;
-	vec2 frame;
-	vec2 outdims;
-	vec2 _padding;
-	vec4 color_offset;
+	vec2  maxdims;
+	vec2  frame;
+	vec2  outdims;
+	uvec2 gfx_cnt;
+	vec4  color_offset;
 };
 
 #ifdef VERTEX_SHADER
@@ -19,12 +19,15 @@ layout(std140, binding = 0) uniform video_data
 //=====================================
 layout(location = 0) in uvec4 sprite;
 
+
 layout(location = 0) flat out uint tile;
 layout(location = 1) flat out uint pal;
 layout(location = 2) out vec2 uv;
 layout(location = 3) flat out uint width;
 layout(location = 4) flat out float blend;
 layout(location = 5) flat out vec4 hue;
+
+layout(location = 0) uniform uint map_mode;
 
 layout(binding = 1) uniform usampler2D kt_vram;
 
@@ -79,7 +82,7 @@ void main()
 
 	tile = (sprite.y & 0x3FFFu) << 3;
 	pal = (sprite.y >> 24) & 0x7Fu;
-	width = uint(hsize.x >> 2);
+	width = max(uint(hsize.x >> 2), gfx_cnt[0] & 32u); // Mapping mode
 	hue = u16toRGBA((sprite.z >> 16u) & 0x7FFFu, (sprite.z >> 8u) & 0xFFu);
 	if ((sprite.z >> 31) == 1) {
 		blend = float(sprite.z & 0xffu) / 255.0;

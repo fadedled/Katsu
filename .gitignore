@@ -2,10 +2,10 @@ res/dev_man
 build
 demo/demo
 demo/build_run.sh
-demo/*.o
-demo/res/*.o
-demo/res/tiles/*.o
-demo/samples/*.o
+demo/*.o*
+demo/res/*.o*
+demo/res/tiles/*.o*
+demo/samples/*.o*
 lib
 src/opengl/shaders/*.inc
 tools/kt-bin2inc
