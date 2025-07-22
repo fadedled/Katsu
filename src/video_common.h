@@ -25,6 +25,7 @@ typedef struct VideoState_t {
 	u32 frame_output_y;
 	u32 frame_output_w;
 	u32 frame_output_h;
+	u64 target_us;
 } VideoState;
 
 extern VideoState vstate;

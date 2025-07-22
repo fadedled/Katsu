@@ -306,7 +306,10 @@ void ogl_Draw(void)
 
 	//Draw all layers
 	glBindFramebuffer(GL_FRAMEBUFFER, fb_main);
-	glViewport(0, 0, vstate.max_w, vstate.max_h);
+
+	//Viewport depends on resolution
+	u32 vp_y = (vstate.res_mode == KT_VIDEO_RES_STD ? vstate.max_h : 0);
+	glViewport(0, vp_y, vstate.max_w, vstate.max_h);
 	glClearColor(backcol_r, backcol_g, backcol_b, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//XXX: Test

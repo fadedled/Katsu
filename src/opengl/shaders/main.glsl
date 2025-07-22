@@ -26,8 +26,8 @@ void main()
 	const vec2 cl = vec2(1.0, 0.0);
 	vec2 p = vec2(uint(gl_VertexID) & 1u, uint(gl_VertexID) >> 1u);
 	gl_Position = vec4(((p * 2.0) - 1.0), 0.0, 1.0);
-	uv = p.xy * outdims;
-	scale = max(floor(frame / vec2(848, 480)), cl.xx);
+	uv = (p.xy * outdims) + vec2(0, 512 - outdims.y) ;
+	scale = max(floor(frame / outdims), cl.xx);
 	range = 0.5 - (0.5 / scale);
 }
 
@@ -48,7 +48,7 @@ vec2 sharp_uv()
 {
 	vec2 center = fract(uv) - 0.5;
 	vec2 f = ((center - clamp(center, -range, range)) * scale) + 0.5;
-	return ((floor(uv) + f) / vec2(848, 480));
+	return ((floor(uv) + f) / vec2(848, 512));
 }
 
 void main()

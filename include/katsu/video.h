@@ -14,15 +14,13 @@
 #include <katsu/types.h>
 
 
-#define KT_VIDEO_MIN_WIDTH     32					/*!< Minimum width of output. */
-#define KT_VIDEO_MIN_HEIGHT    KT_VIDEO_MIN_WIDTH	/*!< Minimum height of output. */
+#define KT_VIDEO_MIN_WIDTH     32						/*!< Minimum width of output. */
+#define KT_VIDEO_MIN_HEIGHT    KT_VIDEO_MIN_WIDTH		/*!< Minimum height of output. */
 
-#define KT_VIDEO_STD_WIDTH     424					/*!< Width of Standard definition. */
-#define KT_VIDEO_STD_HEIGHT    240					/*!< Height of Standard definition. */
-#define KT_VIDEO_MDN_WIDTH     636					/*!< Width of Modern definition. */
-#define KT_VIDEO_MDN_HEIGHT    360					/*!< Height of Modern definition. */
-#define KT_VIDEO_HI_WIDTH      848					/*!< Width of High definition. */
-#define KT_VIDEO_HI_HEIGHT     480					/*!< Height of High definition. */
+#define KT_VIDEO_STD_WIDTH     424							/*!< Width of Standard definition. */
+#define KT_VIDEO_STD_HEIGHT    256							/*!< Height of Standard definition. */
+#define KT_VIDEO_HI_WIDTH      (KT_VIDEO_STD_WIDTH << 1)	/*!< Width of High definition. */
+#define KT_VIDEO_HI_HEIGHT     (KT_VIDEO_STD_HEIGHT << 1)	/*!< Height of High definition. */
 
 
 
@@ -61,7 +59,6 @@ enum ViFrames {
  */
 enum ViResolution {
 	KT_VIDEO_RES_STD,	/*!< Sets standard definition. */
-	KT_VIDEO_RES_MDN,	/*!< Sets modern definition. */
 	KT_VIDEO_RES_HI,	/*!< Sets high definition. */
 	KT_VIDEO_MAX_RES
 };
@@ -112,13 +109,12 @@ void kt_VideoOutputGet(u32 *w, u32 *h);
 /*!
  * \fn void kt_VideoSetResolution(u32 res)
  * \brief Sets the resolution of the KFB.
- * \details There are three resolutions: Standard (240p), Modern (mostly
- * for applications that want more detailed images), High (480p). This function
+ * \details There are two resolutions: Standard (424x256 pixels) and High (848x512 pixels). This function
  * should be used before \ref kt_VideoFrameSet and \ref kt_VideoOutputSet.
- * \warning All resolutions have different rendering capabilities: Standard definition
- * allows for 16 layers with 4 of them being rotation layer maps. Modern definition only allows 8 layers and
- * 2 rotation layer maps. High definition only allows 4 layers and no rotation layer maps.
- * It is best to clear all layers with \ref kt_LayerClearAll after using this function.
+ * \warning Both resolutions have different rendering capabilities: Standard resolution
+ * allows for 16 layers with 4 of them being rotation layer maps. High resolution only allows 8 layers and
+ * 1 rotation layer map. It is best to clear all layers with \ref kt_LayerClearAll after using this function.
+ *
  * \param[in] res \ref res_mode.
  */
 void kt_VideoSetResolution(u32 res);
@@ -134,10 +130,10 @@ void kt_VideoFilterSet(u32 filter);
 
 /*!
  * \fn void kt_VideoFrameSet(u32 frame)
- * \brief Sets the dimensions of the frame to predefined values.
+ * \brief Sets the dimensions of the frame to the output values.
  * \details The frame is resized to these new dimensions, the current
- * resolution is used for calculating the new size so this function should
- * be called after using \ref kt_VideoSetResolution.
+ * output dimensions is used for calculating the new size so this function should
+ * be called after using \ref kt_VideoSetResolution and \ref kt_VideoOutputSet.
  * \param[in] frame \ref frame_size.
  */
 void kt_VideoFrameSet(u32 frame);
@@ -150,7 +146,14 @@ void kt_VideoFrameSet(u32 frame);
  */
 void kt_VideoTitleSet(const char* title);
 
-//XXX: High definition mode
+/*!
+ * \fn void kt_VideoHintFPS(u32 fps)
+ * \brief Tries to set the FPS to a static framerate, note that
+ * the systems refresh rate is a cap on the possible ranges.
+ *
+ * \param[in] fps The new number of frames per second.
+ */
+void kt_VideoHintFPS(u32 fps);
 
 #ifdef __cplusplus
 }

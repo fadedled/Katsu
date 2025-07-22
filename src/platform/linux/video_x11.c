@@ -1,4 +1,5 @@
 
+
 #include <katsu/kt.h>
 #include "../../video_common.h"
 #include "../../joypad_common.h"
@@ -8,6 +9,8 @@
 #include <GL/glx.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string.h>
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB       0x2092
@@ -18,6 +21,8 @@ struct KTVideoX11_t {
 	Display *dpy;
 	Window win;
 	GLXContext glc;
+	struct timespec time_begin;
+
 	//Atoms
 	Atom wmdelwin;
 } kt_x11;
@@ -95,6 +100,15 @@ u32  __kt_VideoInit(void)
 	free(fbc_arr);
 	glXMakeCurrent(kt_x11.dpy, kt_x11.win, kt_x11.glc);
 
+	/* Get GLX extensions */
+	const char *glxExts = glXQueryExtensionsString(kt_x11.dpy, DefaultScreen(kt_x11.dpy));
+
+	/* Set Vsync, it won't cry if we can't get it */
+	int (*glXSwapInterval)(unsigned int interval) = NULL;
+	glXSwapInterval = (int (*)(unsigned int)) glXGetProcAddress((const GLubyte *) "glXSwapIntervalMESA");
+	if (strstr(glxExts, "GLX_MESA_swap_control") && glXSwapInterval) {
+		glXSwapInterval(1);
+	}
 
 	//Generate the keyboard mappings
 	joy_state[0].active = 1;
@@ -114,6 +128,8 @@ u32  __kt_VideoInit(void)
 	xkey_mapping[13] = XKeysymToKeycode(kt_x11.dpy, XK_Shift_R);
 
 	kt_Reset();
+	kt_VideoHintFPS(60);
+	clock_gettime(CLOCK_MONOTONIC, &kt_x11.time_begin);
 	XFree(vinfo);
 	XMapWindow(kt_x11.dpy, kt_x11.win);
 	XFlush(kt_x11.dpy);
@@ -143,8 +159,8 @@ void __kt_VideoAttrSet(u32 attr, void *val)
 		} break;
 		case KT_VIDEO_ATTR_FRAME: {
 			u32 frame = *((u32*)val);
-			u32 w = vstate.max_w * (frame + 1);
-			u32 h = vstate.max_h * (frame + 1);
+			u32 w = vstate.output_w * (frame + 1);
+			u32 h = vstate.output_h * (frame + 1);
 			if (frame == KT_VIDEO_FRAME_FULLSCREEN) {
 
 			}
@@ -254,8 +270,23 @@ void __kt_VideoPoll(void)
 	}
 }
 
-
 void __kt_VideoSwapBuffers(void)
 {
 	glXSwapBuffers(kt_x11.dpy, kt_x11.win);
+	//if using fps
+	/* Calculate next wakeup time */
+	struct timespec	next = kt_x11.time_begin;
+	next.tv_sec += (vstate.target_us / 1000000000L);
+	next.tv_nsec += (vstate.target_us % 1000000000L);
+	if (next.tv_nsec >= 1000000000L) {
+		next.tv_sec++;
+		next.tv_nsec -= 1000000000L;
+	} else if (next.tv_nsec < 0) {
+		next.tv_sec--;
+		next.tv_nsec += 1000000000L;
+	}
+
+	/* Sleep some time until next frame */
+	while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next, NULL));
+	clock_gettime(CLOCK_MONOTONIC, &kt_x11.time_begin);
 }

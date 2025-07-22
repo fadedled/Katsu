@@ -7,14 +7,20 @@ VideoState vstate;
 
 void kt_VideoOutputSet(u32 w, u32 h)
 {
-	if (vstate.res_mode == KT_VIDEO_RES_STD) {
-		w = MIN(w, KT_VIDEO_STD_WIDTH);
-		h = MIN(h, KT_VIDEO_STD_HEIGHT);
-		w = MAX(w, KT_VIDEO_MIN_WIDTH);
-		h = MAX(h, KT_VIDEO_MIN_HEIGHT);
-		vstate.output_w = w;
-		vstate.output_h = h;
+	switch (vstate.res_mode) {
+		case KT_VIDEO_RES_STD: {
+			w = MIN(w, KT_VIDEO_STD_WIDTH);
+			h = MIN(h, KT_VIDEO_STD_HEIGHT);
+		} break;
+		case KT_VIDEO_RES_HI: {
+			w = MIN(w, KT_VIDEO_HI_WIDTH);
+			h = MIN(h, KT_VIDEO_HI_HEIGHT);
+		} break;
+		default: return; //do nothing
 	}
+
+	vstate.output_w = MAX(w, KT_VIDEO_MIN_WIDTH);
+	vstate.output_h = MAX(h, KT_VIDEO_MIN_HEIGHT);
 }
 
 
@@ -27,8 +33,17 @@ void kt_VideoOutputGet(u32 *w, u32 *h)
 
 void kt_VideoSetResolution(u32 res)
 {
-	vstate.max_w = (KT_VIDEO_STD_WIDTH >> 1) * (res + 2);
-	vstate.max_h = (KT_VIDEO_STD_HEIGHT >> 1) * (res + 2);
+	switch (res) {
+		case KT_VIDEO_RES_STD: {
+			vstate.max_w = KT_VIDEO_STD_WIDTH;
+			vstate.max_h = KT_VIDEO_STD_HEIGHT;
+		} break;
+		case KT_VIDEO_RES_HI: {
+			vstate.max_w = KT_VIDEO_HI_WIDTH;
+			vstate.max_h = KT_VIDEO_HI_HEIGHT;
+		} break;
+		default: return;
+	}
 	vstate.res_mode = res;
 	vstate.output_w = vstate.max_w;
 	vstate.output_h = vstate.max_h;
@@ -120,4 +135,11 @@ void __kt_UpdateOutputDims(void)
 	vstate.frame_output_y = (vstate.frame_h - out_h) / 2;
 	vstate.frame_output_w = out_w;
 	vstate.frame_output_h = out_h;
+}
+
+void kt_VideoHintFPS(u32 fps)
+{
+	if (fps > 0) {
+		vstate.target_us = 1000000000L / ((u64) fps);
+	}
 }
